@@ -8,6 +8,7 @@
 <script>
 import { Editor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
+import Gap from '../marks/Gap.ts'
 import MenuBar from './MenuBar.vue'
 
 export default {
@@ -46,6 +47,7 @@ export default {
       content: this.modelValue,
       extensions: [
         StarterKit,
+        Gap,
       ],
       onUpdate: () => {
         this.$emit('update:modelValue', this.editor.getHTML())
@@ -169,6 +171,11 @@ export default {
         margin-right: 0.5rem;
       }
     }
+  }
+
+  span[data-type="gap"] {
+    color: #FFFFFF;
+    background-color: #3D3D3D;
   }
 }
 </style>

@@ -144,6 +144,15 @@ export default {
           title: 'Redo',
           action: () => this.editor.chain().focus().redo().run(),
         },
+        {
+          type: 'divider',
+        },
+        {
+          icon: 'space',
+          title: 'Gap',
+          action: () => this.editor.chain().focus().toggleGap().run(),
+          isActive: () => this.editor.isActive('gap'),
+        },
       ],
     }
   },
