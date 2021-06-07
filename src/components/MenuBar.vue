@@ -153,6 +153,11 @@ export default {
           action: () => this.editor.chain().focus().toggleGap().run(),
           isActive: () => this.editor.isActive('gap'),
         },
+        {
+          icon: 'volume-up-line',
+          title: 'Audioelement hinzufügen',
+          action: () => this.editor.chain().focus().addAudio().run(),
+        },
       ],
     }
   },
