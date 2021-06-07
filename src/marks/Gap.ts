@@ -42,6 +42,8 @@ export default Mark.create<GapOptions>({
     HTMLAttributes: {},
   },
 
+  excludes: '_',
+
   parseHTML() {
     return [
       {
