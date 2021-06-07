@@ -57,6 +57,11 @@ export default defineComponent({
 });
 </script>
 
-<style>
-
+<style lang="scss">
+  input.correct-gap {
+    background-color: rgba(#00ff00, 0.5);
+  }
+  input.incorrect-gap {
+    background-color: rgba(#ff0000, 0.5);
+  }
 </style>
