@@ -1,9 +1,14 @@
 <template>
   <div id="app">
-    <tiptap v-model="editorContent"></tiptap>
     <input type="file" id="file-input" accept=".mp3, .ogg, .m4a">
-    <p>Sicht der Lernenden</p>
-    <div v-html="sheet"></div>
+    <div id="editor">
+      <h1>Editor</h1>
+      <tiptap v-model="editorContent"></tiptap>
+    </div>
+    <div id="preview">
+      <h1>Sicht der Lernenden</h1>
+      <div v-html="sheet"></div>
+    </div>
   </div>
 </template>
 
@@ -39,11 +44,29 @@ export default defineComponent({
     }
   }
 });
+
 </script>
 
-
-<style lang="scss">
+<style lang="scss" scoped>
   input[type="file"]#file-input {
     display: none;
+  }
+  
+  div#app {
+    display: flex;
+  }
+
+  div#editor {
+    padding: 10px;
+    width: 50%;
+  }
+
+  div#preview {
+    padding: 10px;
+    width: 50%;
+  }
+
+  div#preview > div {
+    padding-top: 46px;
   }
 </style>
