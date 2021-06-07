@@ -7,7 +7,7 @@
     </div>
     <div id="preview">
       <h1>Sicht der Lernenden</h1>
-      <div v-html="sheet"></div>
+      <sheet :editorHTML="editorContent"></sheet>
     </div>
   </div>
 </template>
@@ -15,11 +15,13 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Tiptap from './components/Tiptap.vue';
+import Sheet from './components/Sheet.vue';
 
 export default defineComponent({
   name: 'App',
   components: {
     Tiptap,
+    Sheet,
   },
 
   data() {
