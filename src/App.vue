@@ -31,6 +31,7 @@ export default defineComponent({
         if (s.getAttribute("data-type") == "gap") {
           const i = sheet.createElement("input");
           i.setAttribute("type", "text");
+          i.setAttribute("data-solution", s.innerText);
           s.replaceWith(i);
         }
       }
