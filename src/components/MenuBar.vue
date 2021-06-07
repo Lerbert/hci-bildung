@@ -27,19 +27,19 @@ export default {
       items: [
         {
           icon: 'bold',
-          title: 'Bold',
+          title: 'Text fett drucken',
           action: () => this.editor.chain().focus().toggleBold().run(),
           isActive: () => this.editor.isActive('bold'),
         },
         {
           icon: 'italic',
-          title: 'Italic',
+          title: 'Text kursiv drucken',
           action: () => this.editor.chain().focus().toggleItalic().run(),
           isActive: () => this.editor.isActive('italic'),
         },
         {
           icon: 'strikethrough',
-          title: 'Strike',
+          title: 'Text durchstreichen',
           action: () => this.editor.chain().focus().toggleStrike().run(),
           isActive: () => this.editor.isActive('strike'),
         },
@@ -48,37 +48,37 @@ export default {
         },
         {
           icon: 'h-1',
-          title: 'Heading 1',
+          title: 'Große Überschrift einfügen',
           action: () => this.editor.chain().focus().toggleHeading({ level: 1 }).run(),
           isActive: () => this.editor.isActive('heading', { level: 1 }),
         },
         {
           icon: 'h-2',
-          title: 'Heading 2',
+          title: 'Kleine Überschrift einfügen',
           action: () => this.editor.chain().focus().toggleHeading({ level: 2 }).run(),
           isActive: () => this.editor.isActive('heading', { level: 2 }),
         },
         {
           icon: 'paragraph',
-          title: 'Paragraph',
+          title: 'Absatz einfügen',
           action: () => this.editor.chain().focus().setParagraph().run(),
           isActive: () => this.editor.isActive('paragraph'),
         },
         {
           icon: 'list-unordered',
-          title: 'Bullet List',
+          title: 'Auflistung einfügen',
           action: () => this.editor.chain().focus().toggleBulletList().run(),
           isActive: () => this.editor.isActive('bulletList'),
         },
         {
           icon: 'list-ordered',
-          title: 'Ordered List',
+          title: 'Aufzählung einfügen',
           action: () => this.editor.chain().focus().toggleOrderedList().run(),
           isActive: () => this.editor.isActive('orderedList'),
         },
         {
           icon: 'code-box-line',
-          title: 'Code Block',
+          title: 'Codeblock einfügen',
           action: () => this.editor.chain().focus().toggleCodeBlock().run(),
           isActive: () => this.editor.isActive('codeBlock'),
         },
@@ -87,12 +87,12 @@ export default {
         },
         {
           icon: 'text-wrap',
-          title: 'Hard Break',
+          title: 'Zeilenumbruch erzwingen',
           action: () => this.editor.chain().focus().setHardBreak().run(),
         },
         {
           icon: 'format-clear',
-          title: 'Clear Format',
+          title: 'Formatierung entfernen',
           action: () => this.editor.chain()
             .focus()
             .clearNodes()
@@ -104,12 +104,12 @@ export default {
         },
         {
           icon: 'arrow-go-back-line',
-          title: 'Undo',
+          title: 'Änderung zurücknehmen',
           action: () => this.editor.chain().focus().undo().run(),
         },
         {
           icon: 'arrow-go-forward-line',
-          title: 'Redo',
+          title: 'Änderung wiederholen',
           action: () => this.editor.chain().focus().redo().run(),
         },
         {
@@ -117,7 +117,7 @@ export default {
         },
         {
           icon: 'space',
-          title: 'Gap',
+          title: 'Auswahl in Lücke umwandeln',
           action: () => this.editor.chain().focus().toggleGap().run(),
           isActive: () => this.editor.isActive('gap'),
         },
