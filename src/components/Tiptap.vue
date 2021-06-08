@@ -19,7 +19,7 @@ export default {
   },
 
   props: {
-    modelValue: {
+    initialContent: {
       type: Object,
       default: () => ({type:'doc'}),
     },
@@ -28,31 +28,20 @@ export default {
   data() {
     return {
       editor: null,
+      content: this.initialContent,
     }
-  },
-
-  watch: {
-    modelValue(value) {
-      const isSame = this.editor.getJSON() === value
-
-      if (isSame) {
-        return
-      }
-
-      this.editor.commands.setContent(this.modelValue, false)
-    },
   },
 
   mounted() {
     this.editor = new Editor({
-      content: this.modelValue,
+      content: this.content,
       extensions: [
         StarterKit,
         Gap,
         Audio,
       ],
       onUpdate: () => {
-        this.$emit('update:modelValue', this.editor.getJSON())
+        this.$emit('update:content', this.editor.getJSON())
       },
     })
   },

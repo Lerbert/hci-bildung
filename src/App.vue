@@ -3,7 +3,7 @@
     <input type="file" id="file-input" accept=".mp3, .ogg, .m4a">
     <div id="editor">
       <h1>Editor</h1>
-      <tiptap v-model="editorContent"></tiptap>
+      <tiptap :initialContent="editorContent" @update:content="editorContent=$event"></tiptap>
     </div>
     <div id="preview">
       <h1>Sicht der Lernenden</h1>
