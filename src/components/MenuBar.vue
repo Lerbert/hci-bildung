@@ -9,6 +9,7 @@
 
 <script>
 import MenuItem from './MenuItem.vue'
+import { upload } from '../storage'
 
 export default {
   components: {
@@ -120,6 +121,11 @@ export default {
           title: 'Gap',
           action: () => this.editor.chain().focus().toggleGap().run(),
           isActive: () => this.editor.isActive('gap'),
+        },
+        {
+          icon: 'volume-up-line',
+          title: 'Audioelement hinzufügen',
+          action: () => upload((url, type) => this.editor.chain().focus().setAudio(url, type).run()),
         },
       ],
     }
