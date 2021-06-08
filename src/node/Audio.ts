@@ -3,12 +3,12 @@ import {
   Node,
   mergeAttributes,
 } from '@tiptap/core'
+import { upload } from '../storage'
 
 declare module '@tiptap/core' {
   interface Commands {
     audio: {
       setAudio: (source: string, mimetype: string) => Command,
-      setAudioUpload: () => Command,
     }
   }
 }
@@ -67,7 +67,7 @@ export default Node.create({
 
   addKeyboardShortcuts() {
     return {
-      'Mod-m': () => this.editor.commands.setAudio('https://esclear.de/public/.abifeier/abi_intro_v2.ogg', 'audio/ogg'),
+      'Mod-m': () => { upload(this.editor.commands.setAudio); return true; },
     }
   },
 })

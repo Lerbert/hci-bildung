@@ -9,6 +9,7 @@
 
 <script>
 import MenuItem from './MenuItem.vue'
+import { upload } from '../storage'
 
 export default {
   components: {
@@ -156,7 +157,7 @@ export default {
         {
           icon: 'volume-up-line',
           title: 'Audioelement hinzufügen',
-          action: () => this.editor.chain().focus().setAudio().run(),
+          action: () => upload((url, type) => this.editor.chain().focus().setAudio(url, type).run()),
         },
       ],
     }
