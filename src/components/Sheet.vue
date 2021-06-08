@@ -1,6 +1,6 @@
 <template>
   <!-- <div v-html="studentView"></div> -->
-  <node :tiptapNode="editorJSON"></node>
+  <node :tiptapNode="editorJSON" :checkTrigger="checkTrigger"></node>
   <button v-on:click="checkAll">Alle überprüfen</button>
   <div>{{ editorJSON }}</div>
 </template>
@@ -22,31 +22,20 @@ export default defineComponent({
     },
   },
 
+  data() {
+    return {
+      checkTrigger: false,
+    }
+  },
+
   methods: {
     checkAll() {
-      for (const i of Array.from(document.getElementsByTagName("input"))) {
-        if (i.getAttribute("data-type") == "gap") {
-          const solution = i.getAttribute("data-solution");
-          const value = i.value;
-          if (solution === value) {
-            i.classList.remove("incorrect-gap");
-            i.classList.add("correct-gap");
-          } else {
-            i.classList.remove("correct-gap");
-            i.classList.add("incorrect-gap");
-          }
-        }
-      }
+      this.checkTrigger = !this.checkTrigger;
     }
   },
 });
 </script>
 
-<style lang="scss">
-  input.correct-gap {
-    background-color: rgba(#00ff00, 0.5);
-  }
-  input.incorrect-gap {
-    background-color: rgba(#ff0000, 0.5);
-  }
+<style>
+
 </style>
