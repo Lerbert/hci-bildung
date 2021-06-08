@@ -4,49 +4,62 @@ import {
   mergeAttributes,
 } from '@tiptap/core'
 
-export interface AudioOptions {
-  source: string,
-  mimetype: string,
-}
-
 declare module '@tiptap/core' {
   interface Commands {
     audio: {
-      addAudio: () => Command,
-      removeAudio: () => Command,
+      setAudio: (source: string, mimetype: string) => Command,
+      setAudioUpload: () => Command,
     }
   }
 }
 
-export default Node.create<AudioOptions>({
+export default Node.create({
   name: 'audio',
 
-  defaultOptions: {
-    source: 'https://esclear.de/public/.abifeier/abi_intro_v2.ogg',
-    mimetype: 'audio/ogg',
-  },
-
   content: '',
+  group: 'block',
   marks: '_',
   atom: true,
+
+  addAttributes() {
+    return {
+      source: {
+        default: 'https://4m6.de/rick.ogg',
+        renderHTML: _ => {},
+      },
+      mimetype: {
+        default: 'audio/ogg',
+        renderHTML: _ => {},
+      },
+    }
+  },
 
   parseHTML() {
     return [
       {
         tag: 'audio',
+        getAttrs: node => {
+          const audio = node as HTMLAudioElement;
+          const source = audio.children[0] as HTMLSourceElement;
+          return {
+            source: source.src,
+            mimetype: source.type,
+          };
+        },
       },
     ]
   },
 
-  renderHTML({ HTMLAttributes }) {
-    return ['audio', mergeAttributes(HTMLAttributes, {'controls': true}), ['source', {'type': this.options.mimetype, 'src': this.options.source}, 0]]
+  renderHTML({ node }) {
+    return ['audio', mergeAttributes({ 'controls': true }), ['source', { src: node.attrs.source, type: node.attrs.mimetype }]]
   },
 
   addCommands() {
     return {
-      addAudio: () => ({ commands }) => {
+      setAudio: (source, mimetype) => ({ commands }) => {
         return commands.insertContent({
           type: this.name,
+          attrs: { source, mimetype, },
         })
       },
     }
@@ -54,7 +67,7 @@ export default Node.create<AudioOptions>({
 
   addKeyboardShortcuts() {
     return {
-      'Mod-m': () => this.editor.commands.addAudio(),
+      'Mod-m': () => this.editor.commands.setAudio('https://esclear.de/public/.abifeier/abi_intro_v2.ogg', 'audio/ogg'),
     }
   },
 })
