@@ -1,7 +1,7 @@
 <template>
   <slot v-if="empty"/>
-  <component v-else :is="markType">
-    <marking :marks="marks.slice(1)"><slot/></marking>
+  <component v-else :is="markType" :tiptapNode="tiptapNode" :checkTrigger="checkTrigger">
+    <marking :tiptapNode="{...tiptapNode, marks: marks.slice(1)}" :checkTrigger="checkTrigger"><slot/></marking>
   </component>
 </template>
 
@@ -9,6 +9,7 @@
 import { defineComponent } from 'vue';
 
 import BoldMark from './BoldMark.vue';
+import GapMark from './GapMark.vue';
 import ItalicMark from './ItalicMark.vue';
 import StrikeMark from './StrikeMark.vue';
 
@@ -18,20 +19,28 @@ export default defineComponent({
 
   components: {
     BoldMark,
+    GapMark,
     ItalicMark,
     StrikeMark,
   },
 
   props: {
-    marks: {
-      type: Array as () => Array<any>,
+    tiptapNode: {
+      type: Object,
       required: true,
-    }
+    },
+    checkTrigger: {
+      type: Boolean,
+      required: true
+    },
   },
 
   computed: {
+    marks(): any[] {
+      return this.tiptapNode.marks;
+    },
     empty(): boolean {
-      return this.marks.length === 0
+      return this.marks.length == 0
     },
     markType(): string {
       if (this.empty) {
