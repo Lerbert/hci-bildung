@@ -21,7 +21,7 @@ export default {
   props: {
     initialContent: {
       type: Object,
-      default: () => ({type:'doc'}),
+      default: () => ({type: 'doc', content: [{type: 'paragraph'}]}),
     },
   },
 

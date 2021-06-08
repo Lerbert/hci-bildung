@@ -1,6 +1,7 @@
 <template>
   <node :tiptapNode="editorJSON" :checkTrigger="checkTrigger"></node>
   <button v-on:click="checkAll">Alle überprüfen</button>
+  <div>{{ editorJSON }}</div>
 </template>
 
 <script lang="ts">
