@@ -1,11 +1,18 @@
 <template>
-  <component :is="nodeType" :tiptapNode="tiptapNode">
+  <marking v-if="tiptapNode.marks" :marks="tiptapNode.marks">
+    <component :is="nodeType" :tiptapNode="tiptapNode">
+      <node v-for="(c, index) in tiptapNode.content" :key="index" :tiptapNode="c"></node>
+    </component>
+  </marking>
+  <component v-else :is="nodeType" :tiptapNode="tiptapNode">
       <node v-for="(c, index) in tiptapNode.content" :key="index" :tiptapNode="c"></node>
   </component>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+
+import Marking from '../marks/Marking.vue';
 
 import BulletlistNode from './BulletlistNode.vue';
 import CodeblockNode from './CodeblockNode.vue';
@@ -22,6 +29,7 @@ export default defineComponent({
   name: 'node',
 
   components: {
+    Marking,
     BulletlistNode,
     CodeblockNode,
     DocNode,
