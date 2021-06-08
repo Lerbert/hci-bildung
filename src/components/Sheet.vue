@@ -1,23 +1,25 @@
 <template>
-  <div v-html="studentView"></div>
+  <!-- <div v-html="studentView"></div> -->
+  <node :tiptapNode="editorJSON"></node>
   <button v-on:click="checkAll">Alle überprüfen</button>
+  <div>{{ editorJSON }}</div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import Node from './nodes/Node.vue';
+
 
 export default defineComponent({
-  props: {
-    editorHTML: {
-      type: String,
-      required: true,
-    },
+  components: {
+    Node,
   },
 
-  data() {
-    return {
-      studentView: '',
-    }
+  props: {
+    editorJSON: {
+      type: Object,
+      required: true,
+    },
   },
 
   methods: {
@@ -37,23 +39,6 @@ export default defineComponent({
       }
     }
   },
-
-  watch: {
-    editorHTML(val) {
-      const parser = new DOMParser();
-      let sheet = parser.parseFromString(val, "text/html");
-      for (const s of Array.from(sheet.getElementsByTagName("span"))) {
-        if (s.getAttribute("data-type") == "gap") {
-          const i = sheet.createElement("input");
-          i.setAttribute("type", "text");
-          i.setAttribute("data-type", "gap");
-          i.setAttribute("data-solution", s.innerText);
-          s.replaceWith(i);
-        }
-      }
-      this.studentView = sheet.documentElement.innerHTML;
-    }
-  }
 });
 </script>
 

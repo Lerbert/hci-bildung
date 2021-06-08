@@ -20,8 +20,8 @@ export default {
 
   props: {
     modelValue: {
-      type: String,
-      default: '',
+      type: Object,
+      default: () => ({type:'doc'}),
     },
   },
 
@@ -33,7 +33,7 @@ export default {
 
   watch: {
     modelValue(value) {
-      const isSame = this.editor.getHTML() === value
+      const isSame = this.editor.getJSON() === value
 
       if (isSame) {
         return
@@ -52,7 +52,7 @@ export default {
         Audio,
       ],
       onUpdate: () => {
-        this.$emit('update:modelValue', this.editor.getHTML())
+        this.$emit('update:modelValue', this.editor.getJSON())
       },
     })
   },

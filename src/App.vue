@@ -7,7 +7,7 @@
     </div>
     <div id="preview">
       <h1>Sicht der Lernenden</h1>
-      <sheet :editorHTML="editorContent"></sheet>
+      <sheet :editorJSON="editorContent"></sheet>
     </div>
   </div>
 </template>
@@ -26,7 +26,7 @@ export default defineComponent({
 
   data() {
     return {
-      editorContent: '',
+      editorContent: {type:'doc'},
     }
   },
 });
