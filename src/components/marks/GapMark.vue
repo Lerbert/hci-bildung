@@ -1,6 +1,5 @@
 <template>
   <input v-model="value" v-bind:class="!checked ? '' : correct ? 'correct' : 'incorrect'">
-  {{ solution }}
 </template>
 
 <script lang="ts">
