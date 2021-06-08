@@ -4,6 +4,8 @@ import {
   mergeAttributes,
 } from '@tiptap/core'
 
+import AudioPopup from './AudioPopup.vue'
+
 export interface AudioOptions {
   source: string,
   mimetype: string,
@@ -45,6 +47,9 @@ export default Node.create<AudioOptions>({
   addCommands() {
     return {
       addAudio: () => ({ commands }) => {
+        console.log("Hello");
+        AudioPopup.watch?.showModal(commands);
+        console.log(AudioPopup.methods?.getShow());
         return commands.insertContent({
           type: this.name,
         })

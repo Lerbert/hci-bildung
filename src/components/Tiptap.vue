@@ -1,5 +1,6 @@
 <template>
   <div class="editor" v-if="editor">
+    <audio-popup ref="ytmodal" @onConfirm="addCommand" />
     <menu-bar class="editor__header" :editor="editor" />
     <editor-content class="editor__content" :editor="editor" />
   </div>
@@ -10,12 +11,14 @@ import { Editor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Gap from '../marks/Gap.ts'
 import Audio from '../node/Audio.ts'
+import AudioPopup from '../node/AudioPopup.vue'
 import MenuBar from './MenuBar.vue'
 
 export default {
   components: {
     EditorContent,
     MenuBar,
+    AudioPopup,
   },
 
   props: {
@@ -40,6 +43,14 @@ export default {
       }
 
       this.editor.commands.setContent(this.modelValue, false)
+    },
+  },
+
+  methods: {
+    addCommand(data) {
+      if (data.command !== null) {
+        data.command(data.data);
+      }
     },
   },
 
