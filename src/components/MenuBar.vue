@@ -156,7 +156,7 @@ export default {
         {
           icon: 'volume-up-line',
           title: 'Audioelement hinzufügen',
-          action: () => this.editor.chain().focus().addAudio().run(),
+          action: () => this.editor.chain().focus().setAudio().run(),
         },
       ],
     }
