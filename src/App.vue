@@ -2,7 +2,7 @@
   <div id="app">
     <tiptap v-model="editorContent"></tiptap>
     <p>Sicht der Lernenden</p>
-    <sheet :editorHTML="editorContent"></sheet>
+    <sheet :editorJSON="editorContent"></sheet>
   </div>
 </template>
 
@@ -20,7 +20,7 @@ export default defineComponent({
 
   data() {
     return {
-      editorContent: '',
+      editorContent: {type:'doc'},
     }
   },
 });
