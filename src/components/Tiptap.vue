@@ -6,8 +6,10 @@
 </template>
 
 <script>
+import debounce from 'lodash/debounce'
 import { Editor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
+
 import Gap from '../marks/Gap.ts'
 import Audio from '../nodes/Audio.ts'
 import MenuBar from './MenuBar.vue'
@@ -21,7 +23,7 @@ export default {
   props: {
     initialContent: {
       type: Object,
-      default: () => ({type:'doc'}),
+      default: () => ({type: 'doc', content: [{type: 'paragraph'}]}),
     },
   },
 
@@ -40,9 +42,9 @@ export default {
         Gap,
         Audio,
       ],
-      onUpdate: () => {
+      onUpdate: debounce(() => {
         this.$emit('update:content', this.editor.getJSON())
-      },
+      }, 100),
     })
   },
 
