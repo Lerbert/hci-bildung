@@ -74,7 +74,7 @@ export default {
   }
 
   &__content {
-    padding: 0.25rem;
+    padding: 0.5rem;
     flex: 1 1 auto;
     overflow-x: hidden;
     overflow-y: auto;
@@ -129,43 +129,9 @@ export default {
     }
   }
 
-  mark {
-    background-color: #FAF594;
-  }
-
   img {
     max-width: 100%;
     height: auto;
-  }
-
-  hr {
-    margin: 1rem 0;
-  }
-
-  blockquote {
-    padding-left: 1rem;
-    border-left: 2px solid rgba(#0D0D0D, 0.1);
-  }
-
-  hr {
-    border: none;
-    border-top: 2px solid rgba(#0D0D0D, 0.1);
-    margin: 2rem 0;
-  }
-
-  ul[data-type="taskList"] {
-    list-style: none;
-    padding: 0;
-
-    li {
-      display: flex;
-      align-items: center;
-
-      > label {
-        flex: 0 0 auto;
-        margin-right: 0.5rem;
-      }
-    }
   }
 
   span[data-type="gap"] {
