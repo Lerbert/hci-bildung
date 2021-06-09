@@ -3,6 +3,7 @@ import {
   Node,
   mergeAttributes,
 } from '@tiptap/core'
+import { TextSelection } from 'prosemirror-state'
 import { upload } from '../storage'
 
 declare module '@tiptap/core' {
@@ -56,11 +57,34 @@ export default Node.create({
 
   addCommands() {
     return {
-      setAudio: (source, mimetype) => ({ commands }) => {
-        return commands.insertContent({
-          type: this.name,
-          attrs: { source, mimetype, },
-        })
+      setAudio: (source, mimetype) => ({ chain }) => {
+        return chain()
+          .insertContent({
+            type: this.name,
+            attrs: { source, mimetype, },
+          })
+          .command(({ tr, dispatch }) => {
+            if (dispatch) {
+              const { parent, pos } = tr.selection.$from
+              const posAfter = pos + 1
+              const nodeAfter = tr.doc.nodeAt(posAfter)
+
+              // end of document
+              if (!nodeAfter) {
+                const node = parent.type.contentMatch.defaultType?.create()
+
+                if (node) {
+                  tr.insert(posAfter, node)
+                  tr.setSelection(TextSelection.create(tr.doc, posAfter))
+                }
+              }
+
+              tr.scrollIntoView()
+            }
+
+            return true
+          })
+          .run()
       },
     }
   },
