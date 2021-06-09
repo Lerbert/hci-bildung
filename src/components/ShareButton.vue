@@ -12,6 +12,10 @@
       <span class="close" v-on:click="closeShare">&times;</span>
       <p>Benutzen Sie den folgenden QR-Code, um Ihr Lernmaterial mit den SuS zu teilen: </p>
       <img src="../assets/qr.png" alt="QR-Code" class="center">
+      <p>
+        Alternativ können Sie folgenden Link verwenden:
+        <a href="https://4m6.de/r">https://4m6.de/r</a>
+      </p>
     </div>
   </div>
 </template>
