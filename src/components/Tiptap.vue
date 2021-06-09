@@ -60,7 +60,6 @@ export default {
   flex-direction: column;
   max-height: 400px;
   color: #0D0D0D;
-  background-color: #FFFFFF;
   border: 3px solid #0D0D0D;
   border-radius: 0.75rem;
 
@@ -71,6 +70,7 @@ export default {
     flex-wrap: wrap;
     padding: 0.25rem;
     border-bottom: 3px solid #0D0D0D;
+    background-color: #FFFFFF;
   }
 
   &__content {
@@ -79,6 +79,8 @@ export default {
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    background-color: hsla(0, 0, 90, 0.9);
+    border-radius: 0 0 0.55rem 0.55rem;
   }
 }
 </style>

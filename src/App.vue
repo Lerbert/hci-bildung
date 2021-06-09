@@ -45,8 +45,4 @@ export default defineComponent({
   input[type="file"]#file-input {
     display: none;
   }
-
-  div#preview > div {
-    padding-top: 46px;
-  }
 </style>
