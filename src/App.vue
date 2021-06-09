@@ -1,13 +1,16 @@
 <template>
-  <div id="app">
-    <input type="file" id="file-input" accept=".mp3, .ogg, .m4a">
-    <div id="editor">
-      <h1>Editor</h1>
-      <tiptap :initialContent="editorContent" @update:content="editorContent=$event"></tiptap>
-    </div>
-    <div id="preview">
-      <h1>Sicht der Lernenden</h1>
-      <sheet :editorJSON="editorContent"></sheet>
+  <div class="container is-fluid content" id="app">
+    <div class="py-3"><input class="input is-large has-text-weight-bold" type="text" value="Neues Dokument"></div>
+    <div class="columns pt-5">
+      <div class="column is-half" id="editor">
+        <h1 class="title">Editor</h1>
+        <tiptap :initialContent="editorContent" @update:content="editorContent=$event"></tiptap>
+        <input type="file" id="file-input" accept=".mp3, .ogg, .m4a">
+      </div>
+      <div class="column is-half" id="preview">
+        <h1 class="title">Vorschau</h1>
+        <sheet :editorJSON="editorContent"></sheet>
+      </div>
     </div>
   </div>
 </template>
@@ -36,20 +39,6 @@ export default defineComponent({
 <style lang="scss" scoped>
   input[type="file"]#file-input {
     display: none;
-  }
-  
-  div#app {
-    display: flex;
-  }
-
-  div#editor {
-    padding: 10px;
-    width: 50%;
-  }
-
-  div#preview {
-    padding: 10px;
-    width: 50%;
   }
 
   div#preview > div {
