@@ -8,7 +8,10 @@
         <input type="file" id="file-input" accept=".mp3, .ogg, .m4a">
       </div>
       <div class="column is-half" id="preview">
-        <h1 class="title">Vorschau</h1>
+        <div class="is-flex is-justify-content-space-between">
+          <h1 class="title">Vorschau</h1>
+          <share-button class=""></share-button>
+        </div>
         <sheet :editorJSON="editorContent"></sheet>
       </div>
     </div>
@@ -19,12 +22,14 @@
 import { defineComponent } from 'vue';
 import Tiptap from './components/Tiptap.vue';
 import Sheet from './components/Sheet.vue';
+import ShareButton from './components/ShareButton.vue';
 
 export default defineComponent({
   name: 'App',
   components: {
-    Tiptap,
+    ShareButton,
     Sheet,
+    Tiptap,
   },
 
   data() {
