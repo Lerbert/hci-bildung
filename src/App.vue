@@ -26,7 +26,7 @@ export default defineComponent({
 
   data() {
     return {
-      editorContent: {type:'doc'},
+      editorContent: {type: 'doc', content: [{type: 'paragraph'}]},
     }
   },
 });

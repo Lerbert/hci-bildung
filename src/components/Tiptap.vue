@@ -9,7 +9,7 @@
 import { Editor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Gap from '../marks/Gap.ts'
-import Audio from '../node/Audio.ts'
+import Audio from '../nodes/Audio.ts'
 import MenuBar from './MenuBar.vue'
 
 export default {

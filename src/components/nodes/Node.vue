@@ -14,6 +14,7 @@ import { defineComponent } from 'vue';
 
 import Marking from '../marks/Marking.vue';
 
+import AudioNode from './AudioNode.vue';
 import BulletlistNode from './BulletlistNode.vue';
 import CodeblockNode from './CodeblockNode.vue';
 import DocNode from './DocNode.vue';
@@ -30,6 +31,7 @@ export default defineComponent({
 
   components: {
     Marking,
+    AudioNode,
     BulletlistNode,
     CodeblockNode,
     DocNode,
