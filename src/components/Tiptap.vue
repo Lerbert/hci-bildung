@@ -79,6 +79,8 @@ export default {
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    background-color: hsla(0, 0, 90, 0.9);
+    border-radius: 0 0 0.55rem 0.55rem;
   }
 }
 </style>
