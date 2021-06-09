@@ -9,7 +9,7 @@
 import { Editor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Gap from '../marks/Gap.ts'
-import Audio from '../node/Audio.ts'
+import Audio from '../nodes/Audio.ts'
 import MenuBar from './MenuBar.vue'
 
 export default {
@@ -19,40 +19,29 @@ export default {
   },
 
   props: {
-    modelValue: {
-      type: String,
-      default: '',
+    initialContent: {
+      type: Object,
+      default: () => ({type:'doc'}),
     },
   },
 
   data() {
     return {
       editor: null,
+      content: this.initialContent,
     }
-  },
-
-  watch: {
-    modelValue(value) {
-      const isSame = this.editor.getHTML() === value
-
-      if (isSame) {
-        return
-      }
-
-      this.editor.commands.setContent(this.modelValue, false)
-    },
   },
 
   mounted() {
     this.editor = new Editor({
-      content: this.modelValue,
+      content: this.content,
       extensions: [
         StarterKit,
         Gap,
         Audio,
       ],
       onUpdate: () => {
-        this.$emit('update:modelValue', this.editor.getHTML())
+        this.$emit('update:content', this.editor.getJSON())
       },
     })
   },
