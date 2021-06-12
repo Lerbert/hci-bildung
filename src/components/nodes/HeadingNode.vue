@@ -10,7 +10,11 @@ export default defineComponent({
   },
 
   render() {
-    return h('h' + this.tiptapNode.attrs.level, {}, this.$slots.default());
+    if (this.tiptapNode.content) {
+      return h('h' + this.tiptapNode.attrs.level, {}, this.$slots.default());
+    } else {
+      return h('h' + this.tiptapNode.attrs.level, {}, [this.$slots.default(), h('br')]);
+    }
   }
 });
 </script>

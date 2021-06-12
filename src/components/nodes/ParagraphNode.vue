@@ -1,5 +1,8 @@
 <template>
-  <p><slot/></p>
+  <p>
+    <slot/>
+    <br v-if="!tiptapNode.content">
+  </p>
 </template>
 
 <script lang="ts">

@@ -70,11 +70,62 @@ export default defineComponent({
     }
 
     &__content {
-      padding: 0.25rem;
+      padding: 0.5rem;
       flex: 1 1 auto;
       overflow-x: hidden;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+    }
+  }
+
+  .sheet__content {
+    > * + * {
+      margin-top: 0.75em;
+    }
+
+    ul,
+    ol {
+      padding: 0 1rem;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      line-height: 1.1;
+    }
+
+    code {
+      background-color: rgba(#616161, 0.1);
+      color: #616161;
+    }
+
+    pre {
+      background: #0D0D0D;
+      color: #FFF;
+      font-family: 'JetBrainsMono', monospace;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      white-space: pre-wrap;
+
+      code {
+        color: inherit;
+        padding: 0;
+        background: none;
+        font-size: 0.8rem;
+      }
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    span[data-type="gap"] {
+      color: #FFFFFF;
+      background-color: #3D3D3D;
     }
   }
 </style>
