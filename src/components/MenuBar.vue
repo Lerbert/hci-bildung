@@ -77,12 +77,12 @@ export default {
           action: () => this.editor.chain().focus().toggleOrderedList().run(),
           isActive: () => this.editor.isActive('orderedList'),
         },
-        {
-          icon: 'code-box-line',
-          title: 'Codeblock einfügen',
-          action: () => this.editor.chain().focus().toggleCodeBlock().run(),
-          isActive: () => this.editor.isActive('codeBlock'),
-        },
+        // {
+        //   icon: 'code-box-line',
+        //   title: 'Codeblock einfügen',
+        //   action: () => this.editor.chain().focus().toggleCodeBlock().run(),
+        //   isActive: () => this.editor.isActive('codeBlock'),
+        // },
         {
           type: 'divider',
         },
