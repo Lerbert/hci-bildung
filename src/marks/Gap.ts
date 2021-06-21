@@ -48,7 +48,15 @@ export default Mark.create<GapOptions>({
     return [
       {
         tag: 'span',
-        'data-type': name,
+        getAttrs: element => {
+          const dataType = (element as HTMLElement).getAttribute('data-type');
+
+          if (!dataType || dataType != name) {
+            return false
+          }
+
+          return {}
+        }
       },
     ]
   },
