@@ -28,19 +28,19 @@ export default {
       items: [
         {
           icon: 'bold',
-          title: 'Text fett drucken',
+          title: 'Fett (Strg + B)',
           action: () => this.editor.chain().focus().toggleBold().run(),
           isActive: () => this.editor.isActive('bold'),
         },
         {
           icon: 'italic',
-          title: 'Text kursiv drucken',
+          title: 'Kursiv (Strg + I)',
           action: () => this.editor.chain().focus().toggleItalic().run(),
           isActive: () => this.editor.isActive('italic'),
         },
         {
           icon: 'strikethrough',
-          title: 'Text durchstreichen',
+          title: 'Durchstreichen (Strg + Shift + X)',
           action: () => this.editor.chain().focus().toggleStrike().run(),
           isActive: () => this.editor.isActive('strike'),
         },
@@ -49,46 +49,40 @@ export default {
         },
         {
           icon: 'h-1',
-          title: 'Große Überschrift einfügen',
+          title: 'Große Überschrift (Strg + Alt + 1)',
           action: () => this.editor.chain().focus().toggleHeading({ level: 1 }).run(),
           isActive: () => this.editor.isActive('heading', { level: 1 }),
         },
         {
           icon: 'h-2',
-          title: 'Kleine Überschrift einfügen',
+          title: 'Kleine Überschrift (Strg + Alt + 2)',
           action: () => this.editor.chain().focus().toggleHeading({ level: 2 }).run(),
           isActive: () => this.editor.isActive('heading', { level: 2 }),
         },
         {
-          icon: 'paragraph',
-          title: 'Absatz einfügen',
+          icon: 'text',
+          title: 'Absatz (Strg + Alt + 0)',
           action: () => this.editor.chain().focus().setParagraph().run(),
           isActive: () => this.editor.isActive('paragraph'),
         },
         {
           icon: 'list-unordered',
-          title: 'Auflistung einfügen',
+          title: 'Auflistung einfügen (Strg + Shift + 8)',
           action: () => this.editor.chain().focus().toggleBulletList().run(),
           isActive: () => this.editor.isActive('bulletList'),
         },
         {
           icon: 'list-ordered',
-          title: 'Aufzählung einfügen',
+          title: 'Aufzählung einfügen (Strg + Shift + 7)',
           action: () => this.editor.chain().focus().toggleOrderedList().run(),
           isActive: () => this.editor.isActive('orderedList'),
         },
-        // {
-        //   icon: 'code-box-line',
-        //   title: 'Codeblock einfügen',
-        //   action: () => this.editor.chain().focus().toggleCodeBlock().run(),
-        //   isActive: () => this.editor.isActive('codeBlock'),
-        // },
         {
           type: 'divider',
         },
         {
           icon: 'text-wrap',
-          title: 'Zeilenumbruch erzwingen',
+          title: 'Zeilenumbruch erzwingen (Shift + Enter)',
           action: () => this.editor.chain().focus().setHardBreak().run(),
         },
         {
@@ -105,12 +99,12 @@ export default {
         },
         {
           icon: 'arrow-go-back-line',
-          title: 'Änderung zurücknehmen',
+          title: 'Änderung zurücknehmen (Strg + Z)',
           action: () => this.editor.chain().focus().undo().run(),
         },
         {
           icon: 'arrow-go-forward-line',
-          title: 'Änderung wiederholen',
+          title: 'Änderung wiederholen (Strg + Shift + Z)',
           action: () => this.editor.chain().focus().redo().run(),
         },
         {
@@ -118,13 +112,13 @@ export default {
         },
         {
           icon: 'space',
-          title: 'Auswahl in Lücke umwandeln',
+          title: 'Auswahl in Lücke umwandeln (Strg + G)',
           action: () => this.editor.chain().focus().toggleGap().run(),
           isActive: () => this.editor.isActive('gap'),
         },
         {
           icon: 'volume-up-line',
-          title: 'Audioelement hinzufügen',
+          title: 'Audioelement hinzufügen (Strg + M)',
           action: () => upload((url, type) => this.editor.chain().focus().setAudio(url, type).run()),
         },
       ],
