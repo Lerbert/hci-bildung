@@ -1,7 +1,7 @@
 <template>
   <div class="spinner_container">
-    <div v-if="!saved" class="spinner"></div>
-    <svg v-if="saved" color="#48c774" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" height=18px stroke="currentColor">
+    <div v-if="saveStatus === SaveStatus.SAVING" class="spinner"></div>
+    <svg v-if="saveStatus === SaveStatus.SAVED" color="#48c774" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" height=18px stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
     </svg>
     {{ text }}
@@ -11,17 +11,30 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
+import { SaveStatus } from '../enums';
+
 
 export default defineComponent({
+  props: {
+    saveStatus: {
+      required: true,
+    }
+  },
+
   data() {
     return {
-      saved: false,
+      SaveStatus,
     }
   },
 
   computed: {
     text(): string {
-      return this.saved ? "Gespeichert" : "Wird gespeichert";
+      switch (this.saveStatus) {
+        case SaveStatus.WAITING: return "Dokument wird bearbeitet";
+        case SaveStatus.SAVING: return "Dokument wird gespeichert";
+        case SaveStatus.SAVED: return "Dokument gespeichert";
+        default: return "";
+      }
     }
   },
 });

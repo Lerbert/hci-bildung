@@ -3,13 +3,12 @@
     <menu-bar class="editor__header" :editor="editor" />
     <editor-content class="editor__content" :editor="editor" />
     <div class="editor__footer">
-      <save-status></save-status>
+      <save-status :saveStatus="saveStatus"></save-status>
     </div>
   </div>
 </template>
 
 <script>
-import debounce from 'lodash/debounce'
 import { Editor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 
@@ -30,6 +29,9 @@ export default {
       type: Object,
       default: () => ({type: 'doc', content: [{type: 'paragraph'}]}),
     },
+    saveStatus: {
+      required: true,
+    }
   },
 
   data() {
@@ -47,9 +49,9 @@ export default {
         Gap,
         Audio,
       ],
-      onUpdate: debounce(() => {
+      onUpdate: () => {
         this.$emit('update:content', this.editor.getJSON())
-      }, 100),
+      },
     })
   },
 
