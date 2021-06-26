@@ -22,7 +22,7 @@
 import { defineComponent } from 'vue';
 import debounce from 'lodash/debounce';
 
-import { SaveStatus } from './enums.ts';
+import { SaveStatus } from './enums';
 import Tiptap from './components/Tiptap.vue';
 import Sheet from './components/Sheet.vue';
 import ShareButton from './components/ShareButton.vue';
@@ -39,15 +39,24 @@ export default defineComponent({
     return {
       editorContent: {type: 'doc', content: [{type: 'paragraph'}]},
       saveStatus: SaveStatus.SAVED,
+      pendingSave: Promise.resolve(),
       updatePreview: debounce((event) => {
         this.editorContent = event;
       }, 100),
-      save: debounce(async () => {
-        this.saveStatus = SaveStatus.SAVING;
-        await new Promise(r => setTimeout(r, 1000));
-        if (this.saveStatus === SaveStatus.SAVING) {
-          this.saveStatus = SaveStatus.SAVED;
+      save: debounce(() => {
+        // From https://stackoverflow.com/questions/53540348/js-async-await-tasks-queue
+        const run = async () => {
+          try {
+            await this.pendingSave;
+          } finally { 
+            this.saveStatus = SaveStatus.SAVING;
+            console.log("saving");
+            await new Promise(r => setTimeout(r, 5000));
+            this.saveStatus = SaveStatus.SAVED;
+            console.log("saved");
+          }
         }
+        return this.pendingSave = run()
       }, 500),
     }
   },
