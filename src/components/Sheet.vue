@@ -10,6 +10,7 @@
       </button>
     </div>
     <node class="sheet__content" :tiptapNode="editorJSON" :checkTrigger="checkTrigger"></node>
+    <div class="sheet__footer"></div>
   </div>
 </template>
 
@@ -75,6 +76,22 @@ export default defineComponent({
       overflow-x: hidden;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+    }
+
+    &__footer {
+      height: 28px; // Fixed height should be removed once there is stuff in the footer
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      white-space: nowrap;
+      border-top: 3px solid #0D0D0D;
+      font-size: 12px;
+      font-weight: 600;
+      color: #0D0D0D;
+      white-space: nowrap;
+      padding: 0.25rem 0.75rem;
     }
   }
 

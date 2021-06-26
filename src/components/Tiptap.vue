@@ -2,6 +2,9 @@
   <div class="editor" v-if="editor">
     <menu-bar class="editor__header" :editor="editor" />
     <editor-content class="editor__content" :editor="editor" />
+    <div class="editor__footer">
+      <save-status></save-status>
+    </div>
   </div>
 </template>
 
@@ -13,11 +16,13 @@ import StarterKit from '@tiptap/starter-kit'
 import Gap from '../marks/Gap.ts'
 import Audio from '../nodes/Audio.ts'
 import MenuBar from './MenuBar.vue'
+import SaveStatus from './SaveStatus.vue'
 
 export default {
   components: {
     EditorContent,
     MenuBar,
+    SaveStatus,
   },
 
   props: {
@@ -80,7 +85,21 @@ export default {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     background-color: hsla(0, 0%, 90%, 90%);
-    border-radius: 0 0 0.55rem 0.55rem;
+  }
+
+  &__footer {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    white-space: nowrap;
+    border-top: 3px solid #0D0D0D;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0D0D0D;
+    white-space: nowrap;
+    padding: 0.25rem 0.75rem;
   }
 }
 </style>
