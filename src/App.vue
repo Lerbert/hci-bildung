@@ -1,6 +1,6 @@
 <template>
   <div class="container is-fluid content" id="app">
-    <div class="py-3"><input class="input is-large has-text-weight-bold" type="text" value="Neues Dokument"></div>
+    <div class="py-3"><input class="input is-large has-text-weight-bold" type="text" placeholder="Titel eingeben"></div>
     <div class="columns pt-5">
       <div class="column is-half" id="editor">
         <h1 class="title">Editor</h1>
