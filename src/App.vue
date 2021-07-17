@@ -15,6 +15,7 @@
         <sheet :editorJSON="editorContent"></sheet>
       </div>
     </div>
+    <!-- <span>{{editorContent}}</span> -->
   </div>
 </template>
 
@@ -37,7 +38,8 @@ export default defineComponent({
 
   data() {
     return {
-      editorContent: {type: 'doc', content: [{type: 'paragraph'}]},
+      // editorContent: {type: 'doc', content: [{type: 'paragraph'}]},
+      editorContent: { "type": "doc", "content": [ { "type": "heading", "attrs": { "level": 1 }, "content": [ { "type": "text", "marks": [ { "type": "bold" } ], "text": "Listening Comprehension" } ] }, { "type": "paragraph", "content": [ { "type": "text", "text": "You will " }, { "type": "text", "marks": [ { "type": "bold" } ], "text": "hear a podcast" }, { "type": "text", "text": " about Instagram, the photo-sharing social networking site, and some of its unexpected consequences." } ] }, { "type": "paragraph", "content": [ { "type": "text", "text": "1. " }, { "type": "text", "marks": [ { "type": "italic" } ], "text": "Complete the information." }, { "type": "text", "text": " Brent Knepper…" } ] }, { "type": "bulletList", "content": [ { "type": "listItem", "content": [ { "type": "paragraph", "content": [ { "type": "text", "text": "wrote an article called “Instagram is _______________________________”" } ] } ] }, { "type": "listItem", "content": [ { "type": "paragraph", "content": [ { "type": "text", "text": "works as a t____________ _____________" } ] } ] }, { "type": "listItem", "content": [ { "type": "paragraph", "content": [ { "type": "text", "text": "calls in from ________________________________" } ] } ] } ] }, { "type": "paragraph", "content": [ { "type": "text", "text": "2. Horseshoe Bend. " }, { "type": "text", "marks": [ { "type": "italic" } ], "text": "Complete the sentences." } ] }, { "type": "paragraph", "content": [ { "type": "text", "text": "One of Knepper’s examples is Horseshoe Bend in __________________________________. In two ways, it is a very special place because firstly the river makes a __________________________________________ and secondly the canyon is ___________________________." } ] }, { "type": "paragraph" }, { "type": "paragraph", "content": [ { "type": "text", "text": "Source: https://www.isb.bayern.de/download/22676/jahrgangsstufentest_englisch_2019___jgst_10_aufgaben.pdf" } ] } ] },
       saveStatus: SaveStatus.SAVED,
       updatePreview: debounce((event) => {
         this.editorContent = event;
