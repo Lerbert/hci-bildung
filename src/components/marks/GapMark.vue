@@ -1,5 +1,5 @@
 <template>
-  <input v-model="value" v-bind:class="!checked ? '' : correct ? 'correct' : 'incorrect'">
+  <input v-model="value" v-bind:class="!checked ? '' : correct ? 'correct' : 'incorrect'" v-bind:size="solution.length">
 </template>
 
 <script lang="ts">
