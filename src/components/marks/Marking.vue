@@ -1,7 +1,7 @@
 <template>
   <slot v-if="empty"/>
-  <component v-else :is="markType" :tiptapNode="tiptapNode" :checkTrigger="checkTrigger">
-    <marking :tiptapNode="{...tiptapNode, marks: marks.slice(1)}" :checkTrigger="checkTrigger"><slot/></marking>
+  <component v-else :is="markType" :tiptapNode="tiptapNode" :checkTrigger="checkTrigger" @grantPoints="(event) => $emit('grantPoints', event)">
+    <marking :tiptapNode="{...tiptapNode, marks: marks.slice(1)}" :checkTrigger="checkTrigger" @grantPoints="(event) => $emit('grantPoints', event)"><slot/></marking>
   </component>
 </template>
 
@@ -32,6 +32,12 @@ export default defineComponent({
     checkTrigger: {
       type: Boolean,
       required: true
+    },
+  },
+  
+  emits: {
+    grantPoints(payload: { achievedPoints: number; totalPoints: number }) {
+      return payload.achievedPoints <= payload.totalPoints;
     },
   },
 

@@ -1,11 +1,11 @@
 <template>
-  <marking v-if="tiptapNode.marks" :tiptapNode="tiptapNode" :checkTrigger="checkTrigger">
-    <component :is="nodeType" :tiptapNode="tiptapNode">
-      <node v-for="(c, index) in tiptapNode.content" :key="index" :tiptapNode="c" :checkTrigger="checkTrigger"></node>
+  <marking v-if="tiptapNode.marks" :tiptapNode="tiptapNode" :checkTrigger="checkTrigger" @grantPoints="(event) => $emit('grantPoints', event)">
+    <component :is="nodeType" :tiptapNode="tiptapNode" @grantPoints="(event) => $emit('grantPoints', event)">
+      <node v-for="(c, index) in tiptapNode.content" :key="index" :tiptapNode="c" :checkTrigger="checkTrigger" @grantPoints="(event) => $emit('grantPoints', event)"></node>
     </component>
   </marking>
-  <component v-else :is="nodeType" :tiptapNode="tiptapNode">
-      <node v-for="(c, index) in tiptapNode.content" :key="index" :tiptapNode="c" :checkTrigger="checkTrigger"></node>
+  <component v-else :is="nodeType" :tiptapNode="tiptapNode" @grantPoints="(event) => $emit('grantPoints', event)">
+      <node v-for="(c, index) in tiptapNode.content" :key="index" :tiptapNode="c" :checkTrigger="checkTrigger" @grantPoints="(event) => $emit('grantPoints', event)"></node>
   </component>
 </template>
 
@@ -51,6 +51,12 @@ export default defineComponent({
     checkTrigger: {
       type: Boolean,
       required: true
+    },
+  },
+
+  emits: {
+    grantPoints(payload: { achievedPoints: number; totalPoints: number }) {
+      return payload.achievedPoints <= payload.totalPoints;
     },
   },
 
