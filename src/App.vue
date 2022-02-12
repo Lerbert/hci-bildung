@@ -1,7 +1,7 @@
 <template>
   <div class="container is-fluid content" id="app">
-    <edit-view v-if="edit" :docJSON="docJSON"></edit-view>
-    <student-view v-else :docJSON="docJSON" :title="title"></student-view>
+    <edit-view v-if="edit" :docJSON="docJSON" :docTitle="docTitle"></edit-view>
+    <student-view v-else :docJSON="docJSON" :docTitle="docTitle"></student-view>
   </div>
 </template>
 
@@ -21,7 +21,7 @@ export default defineComponent({
   data() {
     return {
       docJSON: {type: 'doc', content: [{type: 'paragraph'}]},
-      title: "Amazing Title",
+      docTitle: "Amazing Title",
       edit: false,
     }
   },

@@ -1,5 +1,5 @@
 <template>
-  <div class="py-3"><input class="input is-large has-text-weight-bold" type="text" placeholder="Titel eingeben"></div>
+  <div class="py-3"><input v-model="title" class="input is-large has-text-weight-bold" type="text" placeholder="Titel eingeben"></div>
   <div class="columns pt-5">
     <div class="column is-half" id="editor">
       <h1 class="title">Editor</h1>
@@ -38,11 +38,16 @@ export default defineComponent({
       type: Object,
       default: () => ({type: 'doc', content: [{type: 'paragraph'}]}),
     },
+    docTitle: {
+      type: String,
+      default: '',
+    }
   },
 
   data() {
     return {
       editorContent: this.docJSON,
+      title: this.docTitle,
       saveStatus: SaveStatus.SAVED,
       updatePreview: debounce((event) => {
         this.editorContent = event;

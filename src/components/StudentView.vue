@@ -1,5 +1,5 @@
 <template>
-  <h1>{{ title }}</h1>
+  <h1>{{ docTitle }}</h1>
   <sheet :editorJSON="docJSON"></sheet>
 </template>
 
@@ -19,7 +19,7 @@ export default defineComponent({
       type: Object,
       required: true,
     },
-    title: {
+    docTitle: {
       type: String,
       required: true,
     }
