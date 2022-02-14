@@ -25,7 +25,7 @@
               Startseite
             </a>
       
-            <a class="navbar-item" href="/documents">
+            <a class="navbar-item" href='{{ url_for(name="documents") }}'>
               Dokumente
             </a>
       

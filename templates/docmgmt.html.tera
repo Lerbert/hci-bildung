@@ -28,7 +28,7 @@
               Startseite
             </a>
       
-            <a class="navbar-item" href="/documents">
+            <a class="navbar-item" href='{{ url_for(name="documents") }}'>
               Dokumente
             </a>
       
@@ -81,7 +81,7 @@
         <div class="column is-one-fifth">
           <aside class="box menu">
             <div>
-              <a class="button" href="../">Neues Dokument erstellen</a>
+              <a class="button" href='{{ url_for(name="index") }}'>Neues Dokument erstellen</a>
             </div>
             <p class="menu-label">
               Dokumente
