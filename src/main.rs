@@ -8,18 +8,18 @@ use rocket_dyn_templates::Template;
 use tera::{self, from_value, to_value, Function};
 
 #[derive(Serialize)]
-struct VueContext {
+struct SheetContext {
     edit: bool,
 }
 
 #[get("/")]
 fn index() -> Template {
-    Template::render("vue", &VueContext { edit: false })
+    Template::render("sheet", &SheetContext { edit: false })
 }
 
 #[get("/?edit")]
 fn edit() -> Template {
-    Template::render("vue", &VueContext { edit: true })
+    Template::render("sheet", &SheetContext { edit: true })
 }
 
 #[get("/documents")]

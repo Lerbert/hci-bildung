@@ -1,0 +1,8 @@
+{% extends "generic/base" %}
+{% block title %}
+  Editor - {{ super() }}
+{% endblock title %}
+{% block content %}
+  <div id="app" data-edit="{{ edit }}"></div>
+  {% include "vue_index" %}
+{% endblock content %}
