@@ -1,0 +1,2 @@
+[global.databases.hci_bildung]
+url = "postgresql://postgres:postgres@localhost/hci-bildung"

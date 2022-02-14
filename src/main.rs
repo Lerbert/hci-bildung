@@ -5,9 +5,13 @@ extern crate rocket;
 use rocket::fs::{relative, FileServer};
 use rocket::route::RouteUri;
 use rocket_dyn_templates::Template;
+use rocket_sync_db_pools::{database, postgres};
 use tera::{self, from_value, to_value, Function};
 
 mod sheets;
+
+#[database("hci_bildung")]
+pub struct Db(postgres::Client);
 
 fn make_url_for(urls: HashMap<String, RouteUri<'static>>) -> impl Function {
     move |args: &HashMap<String, tera::Value>| -> tera::Result<tera::Value> {
@@ -99,4 +103,5 @@ fn rocket() -> _ {
             .tera
             .register_function("url_for", make_url_for(map.clone()));
     }))
+    .attach(Db::fairing())
 }
