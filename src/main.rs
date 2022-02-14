@@ -3,36 +3,17 @@ use std::collections::HashMap;
 #[macro_use]
 extern crate rocket;
 use rocket::fs::{relative, FileServer};
-use rocket::serde::Serialize;
+use rocket::route::RouteUri;
 use rocket_dyn_templates::Template;
 use tera::{self, from_value, to_value, Function};
 
-#[derive(Serialize)]
-struct SheetContext {
-    edit: bool,
-}
+mod sheets;
 
-#[get("/")]
-fn index() -> Template {
-    Template::render("sheet", &SheetContext { edit: false })
-}
-
-#[get("/?edit")]
-fn edit() -> Template {
-    Template::render("sheet", &SheetContext { edit: true })
-}
-
-#[get("/documents")]
-fn documents() -> Template {
-    let context: HashMap<String, String> = HashMap::new();
-    Template::render("docmgmt", &context)
-}
-
-fn make_url_for(urls: HashMap<String, String>) -> impl Function {
+fn make_url_for(urls: HashMap<String, RouteUri<'static>>) -> impl Function {
     move |args: &HashMap<String, tera::Value>| -> tera::Result<tera::Value> {
-        match args.get("name") {
+        match args.get("endpoint") {
             Some(val) => match from_value::<String>(val.clone()) {
-                Ok(v) => Ok(to_value(urls.get(&v).unwrap()).unwrap()),
+                Ok(v) => instantiate_uri(urls.get(&v).unwrap(), &args),
                 Err(_) => Err("oops".into()),
             },
             None => Err("oops".into()),
@@ -40,20 +21,74 @@ fn make_url_for(urls: HashMap<String, String>) -> impl Function {
     }
 }
 
+fn instantiate_uri(
+    uri: &RouteUri,
+    args: &HashMap<String, tera::Value>,
+) -> tera::Result<tera::Value> {
+    let path = uri
+        .origin
+        .path()
+        .segments()
+        .map(|s| {
+            if s.starts_with('<') && s.ends_with('>') {
+                let mut name = &s[1..(s.len() - 1)];
+
+                if name.ends_with("..") {
+                    name = &name[..(name.len() - 2)];
+                }
+
+                args.get(name)
+                    .and_then(|val| from_value::<String>(val.clone()).ok())
+                    .unwrap_or(s.into())
+            } else {
+                s.into()
+            }
+        })
+        .collect::<Vec<String>>()
+        .join("/");
+
+    let query = uri.origin.query().map(|q| {
+        {
+            q.segments().map(|(k, v)| {
+                if k.starts_with('<') && k.ends_with('>') {
+                    let mut name = &k[1..(k.len() - 1)];
+
+                    if name.ends_with("..") {
+                        name = &name[..(name.len() - 2)];
+                    }
+
+                    let v = args
+                        .get(name)
+                        .and_then(|val| from_value::<String>(val.clone()).ok())
+                        .unwrap_or(v.into());
+                    format!("{}={}", name, v)
+                } else {
+                    format!("{}={}", k, v)
+                }
+            })
+        }
+        .collect::<Vec<String>>()
+        .join("&")
+    });
+    if let Some(query) = query {
+        Ok(to_value(format!("/{}?{}", path, query)).unwrap())
+    } else {
+        Ok(to_value(format!("/{}", path)).unwrap())
+    }
+}
+
 #[launch]
 fn rocket() -> _ {
     let r = rocket::build()
-        .mount("/", routes![index, documents, edit])
+        .mount(
+            "/sheets",
+            routes![sheets::sheets, sheets::view_sheet, sheets::edit_sheet],
+        )
         .mount("/vue", FileServer::from(relative!("vue_dist/vue")))
         .mount("/assets", FileServer::from(relative!("assets")));
-    let map: HashMap<String, String> = r
+    let map: HashMap<String, RouteUri> = r
         .routes()
-        .map(|route| {
-            (
-                route.name.clone().unwrap().into(),
-                route.uri.as_str().into(),
-            )
-        })
+        .map(|route| (route.name.clone().unwrap().into(), route.uri.clone()))
         .collect();
     r.attach(Template::custom(move |engines| {
         engines
