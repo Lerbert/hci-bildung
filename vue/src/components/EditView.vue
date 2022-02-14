@@ -14,6 +14,7 @@
       <sheet :editorJSON="editorContent"></sheet>
     </div>
   </div>
+  <p>{{ editorContent }}</p>
 </template>
 
 <script>

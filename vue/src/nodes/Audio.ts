@@ -7,9 +7,9 @@ import { TextSelection } from 'prosemirror-state'
 import { upload } from '../storage'
 
 declare module '@tiptap/core' {
-  interface Commands {
+  interface Commands<ReturnType> {
     audio: {
-      setAudio: (source: string, mimetype: string) => Command,
+      setAudio: (source: string, mimetype: string) => ReturnType,
     }
   }
 }

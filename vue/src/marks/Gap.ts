@@ -12,20 +12,20 @@ export interface GapOptions {
 }
 
 declare module '@tiptap/core' {
-  interface Commands {
+  interface Commands<ReturnType> {
     gap: {
       /**
        * Set a gap mark
        */
-      setGap: () => Command,
+      setGap: () => ReturnType,
       /**
        * Toggle a gap mark
        */
-      toggleGap: () => Command,
+      toggleGap: () => ReturnType,
       /**
        * Unset a gap mark
        */
-      unsetGap: () => Command,
+      unsetGap: () => ReturnType,
     }
   }
 }
@@ -38,8 +38,10 @@ const name = 'gap'
 export default Mark.create<GapOptions>({
   name: name,
 
-  defaultOptions: {
-    HTMLAttributes: {},
+  addOptions() {
+    return {
+      HTMLAttributes: {},
+    }
   },
 
   excludes: '_',
@@ -68,13 +70,13 @@ export default Mark.create<GapOptions>({
   addCommands() {
     return {
       setGap: () => ({ commands }) => {
-        return commands.setMark('gap')
+        return commands.setMark(this.name)
       },
       toggleGap: () => ({ commands }) => {
-        return commands.toggleMark('gap')
+        return commands.toggleMark(this.name)
       },
       unsetGap: () => ({ commands }) => {
-        return commands.unsetMark('gap')
+        return commands.unsetMark(this.name)
       },
     }
   },
@@ -87,13 +89,19 @@ export default Mark.create<GapOptions>({
 
   addInputRules() {
     return [
-      markInputRule(pipeInputRegex, this.type),
+      markInputRule({
+        find: pipeInputRegex,
+        type: this.type,
+      }),
     ]
   },
 
   addPasteRules() {
     return [
-      markPasteRule(pipePasteRegex, this.type),
+      markPasteRule({
+        find: pipePasteRegex,
+        type: this.type,
+      }),
     ]
   },
 })

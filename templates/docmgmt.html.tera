@@ -12,7 +12,7 @@
       <nav class="navbar" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
           <a class="navbar-item">
-            <img src="hci-bildung-logo.png" width="112" height="28">
+            <img src="assets/img/hci-bildung-logo.png" width="112" height="28">
           </a>
       
           <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
@@ -28,7 +28,7 @@
               Startseite
             </a>
       
-            <a class="navbar-item" href="docmgmt.html">
+            <a class="navbar-item" href="/documents">
               Dokumente
             </a>
       
