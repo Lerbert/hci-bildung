@@ -1,20 +1,21 @@
 <template>
-  <div class="py-3"><input v-model="title" class="input is-large has-text-weight-bold" type="text" placeholder="Titel eingeben"></div>
-  <div class="columns pt-5">
-    <div class="column is-half" id="editor">
-      <h1 class="title">Editor</h1>
-      <tiptap :initialContent="editorContent" @update:content="handleContentUpdate($event)" :saveStatus="saveStatus"></tiptap>
-      <input type="file" id="file-input" accept=".mp3, .ogg, .m4a">
-    </div>
-    <div class="column is-half" id="preview">
-      <div class="is-flex is-justify-content-space-between">
-        <h1 class="title">Vorschau</h1>
-        <share-button class=""></share-button>
+  <div>
+    <div class="py-3"><input v-model="title" class="input is-large has-text-weight-bold" type="text" placeholder="Titel eingeben"></div>
+    <div class="columns pt-5">
+      <div class="column is-half" id="editor">
+        <h1 class="title">Editor</h1>
+        <tiptap :initialContent="editorContent" @update:content="handleContentUpdate($event)" :saveStatus="saveStatus"></tiptap>
+        <input type="file" id="file-input" accept=".mp3, .ogg, .m4a">
       </div>
-      <sheet :editorJSON="editorContent"></sheet>
+      <div class="column is-half" id="preview">
+        <div class="is-flex is-justify-content-space-between">
+          <h1 class="title">Vorschau</h1>
+          <share-button class=""></share-button>
+        </div>
+        <sheet :editorJSON="editorContent"></sheet>
+      </div>
     </div>
   </div>
-  <p>{{ editorContent }}</p>
 </template>
 
 <script>

@@ -3,13 +3,23 @@ use std::collections::HashMap;
 #[macro_use]
 extern crate rocket;
 use rocket::fs::{relative, FileServer};
+use rocket::serde::Serialize;
 use rocket_dyn_templates::Template;
 use tera::{self, from_value, to_value, Function};
 
+#[derive(Serialize)]
+struct VueContext {
+    edit: bool,
+}
+
 #[get("/")]
 fn index() -> Template {
-    let context: HashMap<String, String> = HashMap::new();
-    Template::render("vue", &context)
+    Template::render("vue", &VueContext { edit: false })
+}
+
+#[get("/?edit")]
+fn edit() -> Template {
+    Template::render("vue", &VueContext { edit: true })
 }
 
 #[get("/documents")]
@@ -33,7 +43,7 @@ fn make_url_for(urls: HashMap<String, String>) -> impl Function {
 #[launch]
 fn rocket() -> _ {
     let r = rocket::build()
-        .mount("/", routes![index, documents])
+        .mount("/", routes![index, documents, edit])
         .mount("/vue", FileServer::from(relative!("vue_dist/vue")))
         .mount("/assets", FileServer::from(relative!("assets")));
     let map: HashMap<String, String> = r
