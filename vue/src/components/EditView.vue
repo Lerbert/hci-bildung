@@ -1,11 +1,22 @@
 <template>
   <div>
-    <div class="py-3"><input v-model="title" class="input is-large has-text-weight-bold" type="text" placeholder="Titel eingeben"></div>
+    <div class="py-3">
+      <input
+        v-model="title"
+        class="input is-large has-text-weight-bold"
+        type="text"
+        placeholder="Titel eingeben"
+      />
+    </div>
     <div class="columns pt-5">
       <div class="column is-half" id="editor">
         <h1 class="title">Editor</h1>
-        <tiptap :initialContent="editorContent" @update:content="handleContentUpdate($event)" :saveStatus="saveStatus"></tiptap>
-        <input type="file" id="file-input" accept=".mp3, .ogg, .m4a">
+        <tiptap
+          :initialContent="editorContent"
+          @update:content="handleContentUpdate($event)"
+          :saveStatus="saveStatus"
+        ></tiptap>
+        <input type="file" id="file-input" accept=".mp3, .ogg, .m4a" />
       </div>
       <div class="column is-half" id="preview">
         <div class="is-flex is-justify-content-space-between">
@@ -19,16 +30,16 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
-import debounce from 'lodash/debounce';
+import { defineComponent } from "vue";
+import debounce from "lodash/debounce";
 
-import { SaveStatus } from '../enums.ts';
-import Tiptap from './Tiptap.vue';
-import Sheet from './Sheet.vue';
-import ShareButton from './ShareButton.vue';
+import { SaveStatus } from "../enums";
+import Tiptap from "./Tiptap.vue";
+import Sheet from "./Sheet.vue";
+import ShareButton from "./ShareButton.vue";
 
 export default defineComponent({
-  name: 'EditView',
+  name: "EditView",
   components: {
     ShareButton,
     Sheet,
@@ -36,14 +47,18 @@ export default defineComponent({
   },
 
   props: {
+    docId: {
+      type: String,
+      required: true,
+    },
     docJSON: {
       type: Object,
-      default: () => ({type: 'doc', content: [{type: 'paragraph'}]}),
+      default: () => ({ type: "doc", content: [{ type: "paragraph" }] }),
     },
     docTitle: {
       type: String,
-      default: '',
-    }
+      default: "",
+    },
   },
 
   data() {
@@ -54,14 +69,8 @@ export default defineComponent({
       updatePreview: debounce((event) => {
         this.editorContent = event;
       }, 100),
-      save: debounce(async () => {
-        this.saveStatus = SaveStatus.SAVING;
-        await new Promise(r => setTimeout(r, 1000));
-        if (this.saveStatus === SaveStatus.SAVING) {
-          this.saveStatus = SaveStatus.SAVED;
-        }
-      }, 500),
-    }
+      save: debounce(this.saveHelper, 1000),
+    };
   },
 
   methods: {
@@ -70,13 +79,39 @@ export default defineComponent({
       this.updatePreview(event);
       this.save();
     },
+    async saveHelper() {
+      this.saveStatus = SaveStatus.SAVING;
+      let delay = new Promise(r => setTimeout(r, 500)); // Delay to show user that we are indeed saving
+      let response = await fetch(this.docId, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: this.docId,
+          title: this.title,
+          tiptap: this.editorContent,
+        }),
+      });
+      await delay;
+      if (response.status != 200) {
+        console.log("Saving failed");
+      } else if (this.saveStatus === SaveStatus.SAVING) {
+        this.saveStatus = SaveStatus.SAVED;
+      }
+    },
+  },
+
+  watch: {
+    title: function () {
+      this.save();
+    },
   },
 });
-
 </script>
 
 <style lang="scss" scoped>
-  input[type="file"]#file-input {
-    display: none;
-  }
+input[type="file"]#file-input {
+  display: none;
+}
 </style>

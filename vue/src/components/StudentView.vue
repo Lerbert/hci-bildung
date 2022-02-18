@@ -1,20 +1,26 @@
 <template>
-  <h1>{{ docTitle }}</h1>
-  <sheet :editorJSON="docJSON"></sheet>
+  <div>
+    <h1>{{ docTitle }}</h1>
+    <sheet :editorJSON="docJSON"></sheet>
+  </div>
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent } from "vue";
 
-import Sheet from './Sheet.vue';
+import Sheet from "./Sheet.vue";
 
 export default defineComponent({
-  name: 'EditView',
+  name: "EditView",
   components: {
     Sheet,
   },
 
   props: {
+    docId: {
+      type: String,
+      required: true,
+    },
     docJSON: {
       type: Object,
       required: true,
@@ -22,12 +28,10 @@ export default defineComponent({
     docTitle: {
       type: String,
       required: true,
-    }
+    },
   },
 });
-
 </script>
 
 <style>
-
 </style>

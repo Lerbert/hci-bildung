@@ -1,7 +1,7 @@
 <template>
   <div class="container is-fluid content" id="app">
-    <edit-view v-if="edit" :docJSON="docjson" :docTitle="doctitle"></edit-view>
-    <student-view v-else :docJSON="docjson" :docTitle="doctitle"></student-view>
+    <edit-view v-if="edit" :docId="docid" :docJSON="docjson" :docTitle="doctitle"></edit-view>
+    <student-view v-else :docId="docid" :docJSON="docjson" :docTitle="doctitle"></student-view>
   </div>
 </template>
 
