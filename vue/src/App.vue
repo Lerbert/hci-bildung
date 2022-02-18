@@ -36,6 +36,12 @@ export default defineComponent({
         required: true,
       },
   },
+
+  provide() {
+    return {
+      hostname: "https://www.example.com",
+    }
+  }
 });
 
 </script>
