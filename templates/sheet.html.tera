@@ -3,6 +3,6 @@
   Editor — {{ super() }}
 {% endblock title %}
 {% block content %}
-  <div id="app" data-edit='{{ edit }}' {% if id %} data-docid='"{{ id }}"' {% endif %} {% if title %} data-doctitle='"{{ title }}"' {% endif %} {% if tiptap %} data-docjson='{{ tiptap | safe }}' {% endif %}></div>
+  <div id="app" data-edit='{{ edit }}' data-docid='"{{ sheet.id }}"' data-doctitle='"{{ sheet.title }}"' data-docjson='{{ sheet.tiptap | safe }}'></div>
   {% include "vue_index" %}
 {% endblock content %}

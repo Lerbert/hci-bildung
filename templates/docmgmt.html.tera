@@ -52,24 +52,19 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>{{ symbols::directory() }}</td>
-                <td>2020/21_Klasse 9a</td>
-                <td>ich</td>
-                <td>01.01.1970 00:00</td>
-                <td>—</td>
-              </tr>
-              <tr>
-                <td>{{ symbols::file() }}</td>
-                <td>Cloze test reading media and politics</td>
-                <td>ich</td>
-                <td>01.01.1970 00:00</td>
-                <td>15 KB</td>
-              </tr>
+              {% for sheet in sheets | sort(attribute="title") %} 
+                <tr>
+                  <td>{{ symbols::file() }}</td>
+                  <td><a href='{{ url_for(endpoint="edit_sheet", id=sheet.id) }}'>{{ sheet.title }}</a></td>
+                  <td>ich</td>
+                  <td>{{ now() | date(format="%d.%m.%Y %H:%M") }}</td>
+                  <td>15 KB</td>
+                </tr>
+              {% endfor %}
               <tr>
                 <td>{{ symbols::file() }}</td>
                 <td colspan="4">
-                  <form action="" method="POST">
+                  <form action='{{ url_for(endpoint="sheets") }}' method="POST">
                     <div class="field has-addons">
                       <div class="control is-expanded">
                         <input class="input" name="title" type="text" placeholder="Neues Dokument">

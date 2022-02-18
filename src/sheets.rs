@@ -1,8 +1,6 @@
-use std::collections::HashMap;
-
 use log::{error, warn};
-use rocket::http::Status;
 use rocket::form::Form;
+use rocket::http::Status;
 use rocket::response::Redirect;
 use rocket::serde::json::Json;
 use rocket::serde::{Deserialize, Serialize};
@@ -32,22 +30,26 @@ impl Sheet {
 }
 
 #[derive(Serialize)]
-struct SheetContext {
-    edit: bool,
-    id: String,
-    title: String,
-    tiptap: String,
+struct DisplaySheet {
+    id: Option<String>,
+    title: Option<String>,
+    tiptap: Option<String>,
 }
 
-impl SheetContext {
-    fn from(sheet: Sheet, edit: bool) -> Self {
-        SheetContext {
-            edit,
-            id: sheet.id.to_string(),
-            title: sheet.title,
-            tiptap: sheet.tiptap.to_string(),
+impl DisplaySheet {
+    fn from(sheet: Sheet) -> Self {
+        DisplaySheet {
+            id: Some(sheet.id.to_string()),
+            title: Some(sheet.title),
+            tiptap: Some(sheet.tiptap.to_string()),
         }
     }
+}
+
+#[derive(Serialize)]
+struct SheetContext {
+    edit: bool,
+    sheet: DisplaySheet,
 }
 
 #[derive(FromForm)]
@@ -55,12 +57,34 @@ pub struct NewSheetForm {
     title: String,
 }
 
+#[derive(Serialize)]
+struct SheetManagementContext {
+    sheets: Vec<DisplaySheet>,
+}
+
 pub const MOUNT: &str = "/sheets";
 
 #[get("/")]
-pub fn sheets() -> Template {
-    let context: HashMap<String, String> = HashMap::new();
-    Template::render("docmgmt", &context)
+pub async fn sheets(db: Db) -> Result<Template, Status> {
+    match get_all_sheets(db).await {
+        Ok(sheets) => Ok(Template::render(
+            "docmgmt",
+            &SheetManagementContext {
+                sheets: sheets
+                    .into_iter()
+                    .map(|(id, title)| DisplaySheet {
+                        id: Some(id.to_string()),
+                        title: Some(title),
+                        tiptap: None,
+                    })
+                    .collect(),
+            },
+        )),
+        Err(e) => {
+            error!("Error reading from database: {}", e);
+            Err(Status::InternalServerError)
+        }
+    }
 }
 
 #[post("/", data = "<form>")]
@@ -78,7 +102,13 @@ pub async fn new_sheet(db: Db, form: Form<NewSheetForm>) -> Result<Redirect, Sta
 #[get("/<id>")]
 pub async fn view_sheet(db: Db, id: Id) -> Result<Template, Status> {
     match get_sheet_by_id(db, id).await {
-        Ok(Some(sheet)) => Ok(Template::render("sheet", &SheetContext::from(sheet, false))),
+        Ok(Some(sheet)) => Ok(Template::render(
+            "sheet",
+            &SheetContext {
+                edit: false,
+                sheet: DisplaySheet::from(sheet),
+            },
+        )),
         Ok(None) => Err(Status::NotFound),
         Err(e) => {
             error!("Error reading from database: {}", e);
@@ -90,7 +120,13 @@ pub async fn view_sheet(db: Db, id: Id) -> Result<Template, Status> {
 #[get("/<id>?edit")]
 pub async fn edit_sheet(db: Db, id: Id) -> Result<Template, Status> {
     match get_sheet_by_id(db, id).await {
-        Ok(Some(sheet)) => Ok(Template::render("sheet", &SheetContext::from(sheet, true))),
+        Ok(Some(sheet)) => Ok(Template::render(
+            "sheet",
+            &SheetContext {
+                edit: true,
+                sheet: DisplaySheet::from(sheet),
+            },
+        )),
         Ok(None) => Err(Status::NotFound),
         Err(e) => {
             error!("Error reading from database: {}", e);
@@ -114,6 +150,19 @@ pub async fn save_sheet(db: Db, id: Id, sheet: Json<Sheet>) -> Result<(), Status
             }
         }
     }
+}
+
+async fn get_all_sheets(db: Db) -> Result<Vec<(Id, String)>, Error> {
+    let rows = db
+        .run(move |c| {
+            c.query(
+                "select id, title
+            from sheets",
+                &[],
+            )
+        })
+        .await?;
+    Ok(rows.iter().map(|r| (r.get("id"), r.get("title"))).collect())
 }
 
 async fn get_sheet_by_id(db: Db, id: Id) -> Result<Option<Sheet>, Error> {
