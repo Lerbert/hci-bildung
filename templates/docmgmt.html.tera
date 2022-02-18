@@ -7,7 +7,7 @@
     <div class="column is-one-fifth">
       <aside class="box menu">
         <div>
-          <a class="button" href='{{ url_for(endpoint="edit_sheet", id="42") }}'>Neues Dokument erstellen</a>
+          <a class="button" href='{{ url_for(endpoint="edit_sheet", id="d0772347-c5b9-43fb-b910-665523ac3696") }}'>Neues Dokument erstellen</a>
         </div>
         <p class="menu-label">
           Dokumente

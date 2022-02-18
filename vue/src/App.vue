@@ -19,6 +19,10 @@ export default defineComponent({
   },
 
   props: {
+      docid: {
+        type: String,
+        required: true,
+      },
       docjson: {
         type: Object,
         default: () => ({type: 'doc', content: [{type: 'paragraph'}]}),
