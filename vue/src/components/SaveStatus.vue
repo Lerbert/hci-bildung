@@ -4,6 +4,9 @@
     <svg v-if="saveStatus === SaveStatus.SAVED" color="#48c774" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" height=18px stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
     </svg>
+    <svg v-if="saveStatus === SaveStatus.FAILED" color="#e31010" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" height=18px stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+    </svg>
     {{ text }}
   </div>
 </template>
@@ -33,6 +36,7 @@ export default defineComponent({
         case SaveStatus.WAITING: return "Dokument wird bearbeitet";
         case SaveStatus.SAVING: return "Dokument wird gespeichert";
         case SaveStatus.SAVED: return "Dokument gespeichert";
+        case SaveStatus.FAILED: return "Speichern fehlgeschlagen"
         default: return "";
       }
     }

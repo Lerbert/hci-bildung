@@ -70,6 +70,7 @@ export default defineComponent({
         this.editorContent = event;
       }, 100),
       save: debounce(this.saveHelper, 1000),
+      saveBackoff: 0,
     };
   },
 
@@ -81,23 +82,42 @@ export default defineComponent({
     },
     async saveHelper() {
       this.saveStatus = SaveStatus.SAVING;
-      let delay = new Promise(r => setTimeout(r, 500)); // Delay to show user that we are indeed saving
-      let response = await fetch(this.docId, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: this.docId,
-          title: this.title,
-          tiptap: this.editorContent,
-        }),
-      });
-      await delay;
-      if (response.status != 200) {
-        console.log("Saving failed");
-      } else if (this.saveStatus === SaveStatus.SAVING) {
-        this.saveStatus = SaveStatus.SAVED;
+      let delay = new Promise((r) => setTimeout(r, 500)); // Delay to show user that we are indeed saving
+      let saveOk = false;
+      try {
+        let response = await fetch(this.docId, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: this.docId,
+            title: this.title,
+            tiptap: this.editorContent,
+          }),
+        });
+        await delay;
+        saveOk = response.status === 200;
+      } catch (e) {
+        console.log("Error while saving:", e);
+        saveOk = false;
+      }
+      if (this.saveStatus === SaveStatus.SAVING) {
+        if (saveOk) {
+          this.saveStatus = SaveStatus.SAVED;
+          this.saveBackoff = 0;
+        } else if (this.saveBackoff >= 5000) {
+          this.saveStatus = SaveStatus.FAILED;
+          console.log("Saving failed. No further automatic retries");
+        } else {
+          this.saveBackoff += 1000;
+          console.log(
+            "Saving failed. Retrying automatically in",
+            this.saveBackoff / 1000,
+            "s"
+          );
+          setTimeout(this.save, this.saveBackoff);
+        }
       }
     },
   },
