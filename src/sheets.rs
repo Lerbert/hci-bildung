@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use std::convert::From;
 
+use log::warn;
+
 use rocket::http::Status;
 use rocket::serde::Serialize;
 use rocket_dyn_templates::Template;
@@ -51,35 +53,35 @@ pub fn sheets() -> Template {
 #[get("/<id>")]
 pub async fn view_sheet(db: Db, id: i32) -> Result<Template, Status> {
     match get_sheet_by_id(db, id).await {
-        Ok(row) => Ok(Template::render(
+        Ok(sheet) => Ok(Template::render(
             "sheet",
-            &SheetContext {
-                edit: false,
-                sheet: Sheet::from(&row),
-            },
+            &SheetContext { edit: false, sheet },
         )),
-        Err(Error::RowCount) => Err(Status::NotFound), // 404
-        Err(e) => Err(Status::InternalServerError),    // log and 500
+        Err(Error::RowCount) => Err(Status::NotFound),
+        Err(Error::Other(e)) => {
+            warn!("{}", e);
+            Err(Status::InternalServerError)
+        }
     }
 }
 
 #[get("/<id>?edit")]
 pub async fn edit_sheet(db: Db, id: i32) -> Result<Template, Status> {
     match get_sheet_by_id(db, id).await {
-        Ok(row) => Ok(Template::render(
+        Ok(sheet) => Ok(Template::render(
             "sheet",
-            &SheetContext {
-                edit: true,
-                sheet: Sheet::from(&row),
-            },
+            &SheetContext { edit: true, sheet },
         )),
-        Err(Error::RowCount) => Err(Status::NotFound), // 404
-        Err(e) => Err(Status::InternalServerError),    // log and 500
+        Err(Error::RowCount) => Err(Status::NotFound),
+        Err(Error::Other(e)) => {
+            warn!("{}", e);
+            Err(Status::InternalServerError)
+        }
     }
 }
 
-async fn get_sheet_by_id(db: Db, id: i32) -> Result<Row, Error> {
-    let mut rows = db
+async fn get_sheet_by_id(db: Db, id: i32) -> Result<Sheet, Error> {
+    let rows = db
         .run(move |c| {
             c.query(
                 "
@@ -91,7 +93,7 @@ async fn get_sheet_by_id(db: Db, id: i32) -> Result<Row, Error> {
         })
         .await?;
     if rows.len() == 1 {
-        Ok(rows.remove(0))
+        Ok(Sheet::from(rows.first().unwrap()))
     } else {
         Err(Error::RowCount)
     }
