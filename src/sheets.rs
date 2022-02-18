@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::convert::From;
 
 use log::{error, warn};
 use rocket::http::Status;
@@ -11,16 +10,7 @@ use rocket_sync_db_pools::postgres::{self, Row};
 
 use crate::{Db, Id};
 
-enum Error {
-    RowCount,
-    Other(postgres::Error),
-}
-
-impl From<postgres::Error> for Error {
-    fn from(e: postgres::Error) -> Self {
-        Self::Other(e)
-    }
-}
+type Error = postgres::Error;
 
 #[derive(Deserialize, Serialize)]
 pub struct Sheet {
@@ -81,9 +71,9 @@ pub async fn new_sheet(db: Db) -> Result<Redirect, Status> {
 #[get("/<id>")]
 pub async fn view_sheet(db: Db, id: Id) -> Result<Template, Status> {
     match get_sheet_by_id(db, id).await {
-        Ok(sheet) => Ok(Template::render("sheet", &SheetContext::from(sheet, false))),
-        Err(Error::RowCount) => Err(Status::NotFound),
-        Err(Error::Other(e)) => {
+        Ok(Some(sheet)) => Ok(Template::render("sheet", &SheetContext::from(sheet, false))),
+        Ok(None) => Err(Status::NotFound),
+        Err(e) => {
             error!("Error reading from database: {}", e);
             Err(Status::InternalServerError)
         }
@@ -93,9 +83,9 @@ pub async fn view_sheet(db: Db, id: Id) -> Result<Template, Status> {
 #[get("/<id>?edit")]
 pub async fn edit_sheet(db: Db, id: Id) -> Result<Template, Status> {
     match get_sheet_by_id(db, id).await {
-        Ok(sheet) => Ok(Template::render("sheet", &SheetContext::from(sheet, true))),
-        Err(Error::RowCount) => Err(Status::NotFound),
-        Err(Error::Other(e)) => {
+        Ok(Some(sheet)) => Ok(Template::render("sheet", &SheetContext::from(sheet, true))),
+        Ok(None) => Err(Status::NotFound),
+        Err(e) => {
             error!("Error reading from database: {}", e);
             Err(Status::InternalServerError)
         }
@@ -119,10 +109,10 @@ pub async fn save_sheet(db: Db, id: Id, sheet: Json<Sheet>) -> Result<(), Status
     }
 }
 
-async fn get_sheet_by_id(db: Db, id: Id) -> Result<Sheet, Error> {
-    let rows = db
+async fn get_sheet_by_id(db: Db, id: Id) -> Result<Option<Sheet>, Error> {
+    let row = db
         .run(move |c| {
-            c.query(
+            c.query_opt(
                 "select id, title, tiptap
                 from sheets
                 where id = $1",
@@ -130,14 +120,10 @@ async fn get_sheet_by_id(db: Db, id: Id) -> Result<Sheet, Error> {
             )
         })
         .await?;
-    if rows.len() == 1 {
-        Ok(Sheet::from(rows.first().unwrap()))
-    } else {
-        Err(Error::RowCount)
-    }
+    Ok(row.map(|r| Sheet::from(&r)))
 }
 
-async fn create_sheet(db: Db) -> Result<Id, postgres::Error> {
+async fn create_sheet(db: Db) -> Result<Id, Error> {
     let row = db
         .run(move |c| {
             c.query_one(
@@ -151,7 +137,7 @@ async fn create_sheet(db: Db) -> Result<Id, postgres::Error> {
     Ok(row.get("id"))
 }
 
-async fn update_sheet(db: Db, sheet: Sheet) -> Result<(), postgres::Error> {
+async fn update_sheet(db: Db, sheet: Sheet) -> Result<(), Error> {
     println!("Update");
     db.run(move |c| {
         c.execute(
