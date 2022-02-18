@@ -1,6 +1,6 @@
 {% extends "generic/base" %}
 {% block title %}
-  Editor - {{ super() }}
+  Editor — {{ super() }}
 {% endblock title %}
 {% block content %}
   <div id="app" data-edit='{{ edit }}' {% if id %} data-docid='"{{ id }}"' {% endif %} {% if title %} data-doctitle='"{{ title }}"' {% endif %} {% if tiptap %} data-docjson='{{ tiptap | safe }}' {% endif %}></div>

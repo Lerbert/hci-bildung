@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use log::{error, warn};
 use rocket::http::Status;
+use rocket::form::Form;
 use rocket::response::Redirect;
 use rocket::serde::json::Json;
 use rocket::serde::{Deserialize, Serialize};
@@ -49,6 +50,11 @@ impl SheetContext {
     }
 }
 
+#[derive(FromForm)]
+pub struct NewSheetForm {
+    title: String,
+}
+
 pub const MOUNT: &str = "/sheets";
 
 #[get("/")]
@@ -57,9 +63,10 @@ pub fn sheets() -> Template {
     Template::render("docmgmt", &context)
 }
 
-#[post("/")]
-pub async fn new_sheet(db: Db) -> Result<Redirect, Status> {
-    match create_sheet(db).await {
+#[post("/", data = "<form>")]
+pub async fn new_sheet(db: Db, form: Form<NewSheetForm>) -> Result<Redirect, Status> {
+    let form = form.into_inner();
+    match create_sheet(db, Some(form.title)).await {
         Ok(id) => Ok(Redirect::to(format!("{}{}", MOUNT, uri!(edit_sheet(id))))),
         Err(e) => {
             error!("Error writing to database: {}", e);
@@ -123,14 +130,14 @@ async fn get_sheet_by_id(db: Db, id: Id) -> Result<Option<Sheet>, Error> {
     Ok(row.map(|r| Sheet::from(&r)))
 }
 
-async fn create_sheet(db: Db) -> Result<Id, Error> {
+async fn create_sheet(db: Db, title: Option<String>) -> Result<Id, Error> {
     let row = db
         .run(move |c| {
             c.query_one(
                 "insert into sheets(title, tiptap)
-                values ('', '{\"type\": \"doc\", \"content\": [{\"type\": \"paragraph\"}]}'::json)
+                values ($1, '{\"type\": \"doc\", \"content\": [{\"type\": \"paragraph\"}]}'::json)
                 returning id",
-                &[],
+                &[&title.unwrap_or("".to_owned())],
             )
         })
         .await?;

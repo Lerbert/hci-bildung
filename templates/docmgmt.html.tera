@@ -1,14 +1,13 @@
+{% import "generic/symbols" as symbols %}
+
 {% extends "generic/base" %}
 {% block title %}
- Meine Dokumente - {{ super() }}
+ Meine Dokumente — {{ super() }}
 {% endblock title %}
 {% block content %} 
   <div class="mt-3 columns">
     <div class="column is-one-fifth">
       <aside class="box menu">
-        <div>
-          <a class="button" href='{{ url_for(endpoint="edit_sheet", id="d0772347-c5b9-43fb-b910-665523ac3696") }}'>Neues Dokument erstellen</a>
-        </div>
         <p class="menu-label">
           Dokumente
         </p>
@@ -54,103 +53,33 @@
             </thead>
             <tbody>
               <tr>
-                <td><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24px" height="24px">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                </svg></td>
+                <td>{{ symbols::directory() }}</td>
                 <td>2020/21_Klasse 9a</td>
                 <td>ich</td>
                 <td>01.01.1970 00:00</td>
                 <td>—</td>
               </tr>
               <tr>
-                <td><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24px" height="24px">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                </svg></td>
-                <td>2020/21_Klasse 9c</td>
-                <td>ich</td>
-                <td>01.01.1970 00:00</td>
-                <td>—</td>
-              </tr>
-              <tr>
-                <td><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24px" height="24px">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                </svg></td>
-                <td>2020/21_Klasse 10e</td>
-                <td>ich</td>
-                <td>01.01.1970 00:00</td>
-                <td>—</td>
-              </tr>
-              <tr>
-                <td><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24px" height="24px">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                </svg></td>
-                <td>2020/21_Oberstufe Englisch</td>
-                <td>ich</td>
-                <td>01.01.1970 00:00</td>
-                <td>—</td>
-              </tr>
-              <tr>
-                <td><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24px" height="24px">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                </svg></td>
-                <td>2020/21_Klasse 9a</td>
-                <td>ich</td>
-                <td>01.01.1970 00:00</td>
-                <td>—</td>
-              </tr>
-              <tr>
-                <td><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24px" height="24px">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                </svg></td>
-                <td>2020/21_Klasse 9a</td>
-                <td>ich</td>
-                <td>01.01.1970 00:00</td>
-                <td>—</td>
-              </tr>
-              <tr>
-                <td><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24px" height="24px">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg></td>
-                <td>Listening comprehension w/ cloze test - Globalization</td>
-                <td>ich</td>
-                <td>01.01.1970 00:00</td>
-                <td>776 KB</td>
-              </tr>
-              <tr>
-                <td><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24px" height="24px">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg></td>
+                <td>{{ symbols::file() }}</td>
                 <td>Cloze test reading media and politics</td>
                 <td>ich</td>
                 <td>01.01.1970 00:00</td>
                 <td>15 KB</td>
               </tr>
               <tr>
-                <td><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24px" height="24px">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg></td>
-                <td>Reading comprehension - Gender and Identity</td>
-                <td>ich</td>
-                <td>01.01.1970 00:00</td>
-                <td>2 MB</td>
-              </tr>
-              <tr>
-                <td><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24px" height="24px">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg></td>
-                <td>Quiz - Modern mobility</td>
-                <td>ich</td>
-                <td>01.01.1970 00:00</td>
-                <td>120 KB</td>
-              </tr>
-              <tr>
-                <td><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24px" height="24px">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg></td>
-                <td>Listening comprehension - US v. UK</td>
-                <td>ich</td>
-                <td>01.01.1970 00:00</td>
-                <td>3 MB</td>
+                <td>{{ symbols::file() }}</td>
+                <td colspan="4">
+                  <form action="" method="POST">
+                    <div class="field has-addons">
+                      <div class="control is-expanded">
+                        <input class="input" name="title" type="text" placeholder="Neues Dokument">
+                      </div>
+                      <div class="control">
+                        <button class="button is-success" type="submit">{{ symbols::plus() }}</button>
+                      </div>
+                    </div>
+                  </form>
+                </td>
               </tr>
             </tbody>
           </table>
