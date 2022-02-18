@@ -25,6 +25,7 @@ fn make_url_for(urls: HashMap<String, RouteUri<'static>>) -> impl Function {
     }
 }
 
+// Cannot use uri! Macro because we have to compute this dynamically
 fn instantiate_uri(
     uri: &RouteUri,
     args: &HashMap<String, tera::Value>,
@@ -54,7 +55,7 @@ fn instantiate_uri(
     let query = uri.origin.query().map(|q| {
         {
             q.segments().map(|(k, v)| {
-                if k.starts_with('<') && k.ends_with('>') {
+                let (k, v) = if k.starts_with('<') && k.ends_with('>') {
                     let mut name = &k[1..(k.len() - 1)];
 
                     if name.ends_with("..") {
@@ -65,7 +66,12 @@ fn instantiate_uri(
                         .get(name)
                         .and_then(|val| from_value::<String>(val.clone()).ok())
                         .unwrap_or(v.into());
-                    format!("{}={}", name, v)
+                    (name, v)
+                } else {
+                    (k, v.into())
+                };
+                if v == "" {
+                    format!("{}", k)
                 } else {
                     format!("{}={}", k, v)
                 }
