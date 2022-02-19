@@ -8,8 +8,8 @@
 </template>
 
 <script>
-import MenuItem from './MenuItem.vue'
-import { upload } from '../storage'
+import MenuItem from "./MenuItem.vue";
+import { upload } from "../storage";
 
 export default {
   components: {
@@ -27,104 +27,106 @@ export default {
     return {
       items: [
         {
-          icon: 'bold',
-          title: 'Fett (Strg + B)',
+          icon: "bold",
+          title: "Fett (Strg + B)",
           action: () => this.editor.chain().focus().toggleBold().run(),
-          isActive: () => this.editor.isActive('bold'),
+          isActive: () => this.editor.isActive("bold"),
         },
         {
-          icon: 'italic',
-          title: 'Kursiv (Strg + I)',
+          icon: "italic",
+          title: "Kursiv (Strg + I)",
           action: () => this.editor.chain().focus().toggleItalic().run(),
-          isActive: () => this.editor.isActive('italic'),
+          isActive: () => this.editor.isActive("italic"),
         },
         {
-          icon: 'strikethrough',
-          title: 'Durchstreichen (Strg + Shift + X)',
+          icon: "strikethrough",
+          title: "Durchstreichen (Strg + Shift + X)",
           action: () => this.editor.chain().focus().toggleStrike().run(),
-          isActive: () => this.editor.isActive('strike'),
+          isActive: () => this.editor.isActive("strike"),
         },
         {
-          type: 'divider',
+          type: "divider",
         },
         {
-          icon: 'h-1',
-          title: 'Große Überschrift (Strg + Alt + 1)',
-          action: () => this.editor.chain().focus().toggleHeading({ level: 1 }).run(),
-          isActive: () => this.editor.isActive('heading', { level: 1 }),
+          icon: "h-1",
+          title: "Große Überschrift (Strg + Alt + 1)",
+          action: () =>
+            this.editor.chain().focus().toggleHeading({ level: 1 }).run(),
+          isActive: () => this.editor.isActive("heading", { level: 1 }),
         },
         {
-          icon: 'h-2',
-          title: 'Kleine Überschrift (Strg + Alt + 2)',
-          action: () => this.editor.chain().focus().toggleHeading({ level: 2 }).run(),
-          isActive: () => this.editor.isActive('heading', { level: 2 }),
+          icon: "h-2",
+          title: "Kleine Überschrift (Strg + Alt + 2)",
+          action: () =>
+            this.editor.chain().focus().toggleHeading({ level: 2 }).run(),
+          isActive: () => this.editor.isActive("heading", { level: 2 }),
         },
         {
-          icon: 'text',
-          title: 'Absatz (Strg + Alt + 0)',
+          icon: "text",
+          title: "Absatz (Strg + Alt + 0)",
           action: () => this.editor.chain().focus().setParagraph().run(),
-          isActive: () => this.editor.isActive('paragraph'),
+          isActive: () => this.editor.isActive("paragraph"),
         },
         {
-          icon: 'list-unordered',
-          title: 'Auflistung einfügen (Strg + Shift + 8)',
+          icon: "list-unordered",
+          title: "Auflistung einfügen (Strg + Shift + 8)",
           action: () => this.editor.chain().focus().toggleBulletList().run(),
-          isActive: () => this.editor.isActive('bulletList'),
+          isActive: () => this.editor.isActive("bulletList"),
         },
         {
-          icon: 'list-ordered',
-          title: 'Aufzählung einfügen (Strg + Shift + 7)',
+          icon: "list-ordered",
+          title: "Aufzählung einfügen (Strg + Shift + 7)",
           action: () => this.editor.chain().focus().toggleOrderedList().run(),
-          isActive: () => this.editor.isActive('orderedList'),
+          isActive: () => this.editor.isActive("orderedList"),
         },
         {
-          type: 'divider',
+          type: "divider",
         },
         {
-          icon: 'text-wrap',
-          title: 'Zeilenumbruch erzwingen (Shift + Enter)',
+          icon: "text-wrap",
+          title: "Zeilenumbruch erzwingen (Shift + Enter)",
           action: () => this.editor.chain().focus().setHardBreak().run(),
         },
         {
-          icon: 'format-clear',
-          title: 'Formatierung entfernen',
-          action: () => this.editor.chain()
-            .focus()
-            .clearNodes()
-            .unsetAllMarks()
-            .run(),
+          icon: "format-clear",
+          title: "Formatierung entfernen",
+          action: () =>
+            this.editor.chain().focus().clearNodes().unsetAllMarks().run(),
         },
         {
-          type: 'divider',
+          type: "divider",
         },
         {
-          icon: 'arrow-go-back-line',
-          title: 'Änderung zurücknehmen (Strg + Z)',
+          icon: "arrow-go-back-line",
+          title: "Änderung zurücknehmen (Strg + Z)",
           action: () => this.editor.chain().focus().undo().run(),
         },
         {
-          icon: 'arrow-go-forward-line',
-          title: 'Änderung wiederholen (Strg + Shift + Z)',
+          icon: "arrow-go-forward-line",
+          title: "Änderung wiederholen (Strg + Shift + Z)",
           action: () => this.editor.chain().focus().redo().run(),
         },
         {
-          type: 'divider',
+          type: "divider",
         },
         {
-          icon: 'space',
-          title: 'Auswahl in Lücke umwandeln (Strg + G)',
+          icon: "space",
+          title: "Auswahl in Lücke umwandeln (Strg + G)",
           action: () => this.editor.chain().focus().toggleGap().run(),
-          isActive: () => this.editor.isActive('gap'),
+          isActive: () => this.editor.isActive("gap"),
         },
         {
-          icon: 'volume-up-line',
-          title: 'Audioelement hinzufügen (Strg + M)',
-          action: () => upload((url, type) => this.editor.chain().focus().setAudio(url, type).run()),
+          icon: "volume-up-line",
+          title: "Audioelement hinzufügen (Strg + M)",
+          action: () =>
+            upload((url, type) =>
+              this.editor.chain().focus().setAudio(url, type).run()
+            ),
         },
       ],
-    }
+    };
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>

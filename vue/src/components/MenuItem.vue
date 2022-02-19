@@ -1,12 +1,16 @@
 <template>
   <button
     class="menu-item"
-    :class="{ 'is-active': isActive ? isActive(): null }"
+    :class="{ 'is-active': isActive ? isActive() : null }"
     @click="action"
     :title="title"
   >
     <svg class="remix">
-      <use :xlink:href="require('remixicon/fonts/remixicon.symbol.svg') + `#ri-${icon}`" />
+      <use
+        :xlink:href="
+          require('remixicon/fonts/remixicon.symbol.svg') + `#ri-${icon}`
+        "
+      />
     </svg>
   </button>
 </template>
@@ -34,14 +38,14 @@ export default {
       default: null,
     },
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>
 .menu-item {
   width: 1.75rem;
   height: 1.75rem;
-  color: #0D0D0D;
+  color: #0d0d0d;
   border: none;
   background-color: transparent;
   border-radius: 0.4rem;
@@ -56,8 +60,8 @@ export default {
 
   &.is-active,
   &:hover {
-    color: #FFF;
-    background-color: #0D0D0D;
+    color: #fff;
+    background-color: #0d0d0d;
   }
 }
 </style>

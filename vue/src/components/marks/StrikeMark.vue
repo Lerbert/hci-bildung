@@ -1,13 +1,9 @@
 <template>
-  <s><slot/></s>
+  <s><slot /></s>
 </template>
 
 <script>
-export default {
-
-}
+export default {};
 </script>
 
-<style>
-
-</style>
+<style></style>

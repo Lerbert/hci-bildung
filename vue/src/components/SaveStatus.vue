@@ -1,45 +1,77 @@
 <template>
   <div class="spinner_container">
     <div v-if="saveStatus === SaveStatus.SAVING" class="spinner"></div>
-    <svg v-if="saveStatus === SaveStatus.SAVED" color="#48c774" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" height=18px stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+    <svg
+      v-if="saveStatus === SaveStatus.SAVED"
+      color="#48c774"
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-6 w-6"
+      fill="none"
+      viewBox="0 0 24 24"
+      height="18px"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M5 13l4 4L19 7"
+      />
     </svg>
-    <svg v-if="saveStatus === SaveStatus.FAILED" color="#e31010" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" height=18px stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+    <svg
+      v-if="saveStatus === SaveStatus.FAILED"
+      color="#e31010"
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-6 w-6"
+      fill="none"
+      viewBox="0 0 24 24"
+      height="18px"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M6 18L18 6M6 6l12 12"
+      />
     </svg>
     {{ text }}
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent } from "vue";
 
-import { SaveStatus } from '../enums';
-
+import { SaveStatus } from "../enums";
 
 export default defineComponent({
   props: {
     saveStatus: {
       required: true,
-    }
+    },
   },
 
   data() {
     return {
       SaveStatus,
-    }
+    };
   },
 
   computed: {
     text(): string {
       switch (this.saveStatus) {
-        case SaveStatus.WAITING: return "Dokument wird bearbeitet";
-        case SaveStatus.SAVING: return "Dokument wird gespeichert";
-        case SaveStatus.SAVED: return "Dokument gespeichert";
-        case SaveStatus.FAILED: return "Speichern fehlgeschlagen"
-        default: return "";
+        case SaveStatus.WAITING:
+          return "Dokument wird bearbeitet";
+        case SaveStatus.SAVING:
+          return "Dokument wird gespeichert";
+        case SaveStatus.SAVED:
+          return "Dokument gespeichert";
+        case SaveStatus.FAILED:
+          return "Speichern fehlgeschlagen";
+        default:
+          return "";
       }
-    }
+    },
   },
 });
 </script>
@@ -47,9 +79,9 @@ export default defineComponent({
 <style lang="scss" scoped>
 .spinner_container {
   display: flex;
-      align-items: space-between;
-      flex: 0 0 auto;
-      flex-wrap: wrap;
+  align-items: space-between;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
 }
 
 // Taken from bulma code
@@ -62,7 +94,7 @@ export default defineComponent({
 
 .spinner:after {
   animation: spinAround 500ms infinite linear;
-  border:  2px solid #fff;
+  border: 2px solid #fff;
   border-radius: 50%;
   border-top-color: #48c77480;
   border-right-color: #48c774;

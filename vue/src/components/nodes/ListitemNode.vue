@@ -1,20 +1,18 @@
 <template>
-  <li><slot/></li>
+  <li><slot /></li>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent } from "vue";
 
 export default defineComponent({
   props: {
     tiptapNode: {
       type: Object,
       required: true,
-    }
+    },
   },
 });
 </script>
 
-<style>
-
-</style>
+<style></style>

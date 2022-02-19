@@ -9,13 +9,13 @@
 </template>
 
 <script>
-import { Editor, EditorContent } from '@tiptap/vue-3'
-import StarterKit from '@tiptap/starter-kit'
+import { Editor, EditorContent } from "@tiptap/vue-3";
+import StarterKit from "@tiptap/starter-kit";
 
-import Gap from '../marks/Gap.ts'
-import Audio from '../nodes/Audio.ts'
-import MenuBar from './MenuBar.vue'
-import SaveStatus from './SaveStatus.vue'
+import Gap from "../marks/Gap.ts";
+import Audio from "../nodes/Audio.ts";
+import MenuBar from "./MenuBar.vue";
+import SaveStatus from "./SaveStatus.vue";
 
 export default {
   components: {
@@ -27,38 +27,34 @@ export default {
   props: {
     initialContent: {
       type: Object,
-      default: () => ({type: 'doc', content: [{type: 'paragraph'}]}),
+      default: () => ({ type: "doc", content: [{ type: "paragraph" }] }),
     },
     saveStatus: {
       required: true,
-    }
+    },
   },
 
   data() {
     return {
       editor: null,
       content: this.initialContent,
-    }
+    };
   },
 
   mounted() {
     this.editor = new Editor({
       content: this.content,
-      extensions: [
-        StarterKit,
-        Gap,
-        Audio,
-      ],
+      extensions: [StarterKit, Gap, Audio],
       onUpdate: () => {
-        this.$emit('update:content', this.editor.getJSON())
+        this.$emit("update:content", this.editor.getJSON());
       },
-    })
+    });
   },
 
   beforeUnmount() {
-    this.editor.destroy()
+    this.editor.destroy();
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -66,9 +62,9 @@ export default {
   display: flex;
   flex-direction: column;
   max-height: 400px;
-  color: #0D0D0D;
-  background-color: #FFFFFF;
-  border: 3px solid #0D0D0D;
+  color: #0d0d0d;
+  background-color: #ffffff;
+  border: 3px solid #0d0d0d;
   border-radius: 0.75rem;
 
   &__header {
@@ -77,7 +73,7 @@ export default {
     flex: 0 0 auto;
     flex-wrap: wrap;
     padding: 0.25rem;
-    border-bottom: 3px solid #0D0D0D;
+    border-bottom: 3px solid #0d0d0d;
   }
 
   &__content {
@@ -96,10 +92,10 @@ export default {
     justify-content: flex-end;
     flex-wrap: wrap;
     white-space: nowrap;
-    border-top: 3px solid #0D0D0D;
+    border-top: 3px solid #0d0d0d;
     font-size: 12px;
     font-weight: 600;
-    color: #0D0D0D;
+    color: #0d0d0d;
     white-space: nowrap;
     padding: 0.25rem 0.75rem;
   }
@@ -136,9 +132,9 @@ export default {
   }
 
   pre {
-    background: #0D0D0D;
-    color: #FFF;
-    font-family: 'JetBrainsMono', monospace;
+    background: #0d0d0d;
+    color: #fff;
+    font-family: "JetBrainsMono", monospace;
     padding: 0.75rem 1rem;
     border-radius: 0.5rem;
 
@@ -156,8 +152,8 @@ export default {
   }
 
   span[data-type="gap"] {
-    color: #FFFFFF;
-    background-color: #3D3D3D;
+    color: #ffffff;
+    background-color: #3d3d3d;
   }
 }
 </style>
