@@ -42,6 +42,7 @@
             Meine Dokumente
           </h1>
           <table class="table is-fullwidth is-hoverable">
+            {% set num_actions = 2 %}
             <thead>
               <tr>
                 <th class="is-narrow"></th>
@@ -49,21 +50,25 @@
                 <th class="is-narrow">Eigentümer</th>
                 <th class="is-narrow">Zuletzt geändert</th>
                 <th class="is-narrow">Erstellt am</th>
+                <th class="is-narrow" colspan="{{ num_actions }}">Aktionen</th>
               </tr>
             </thead>
             <tbody>
-              {% for sheet in sheets | sort(attribute="title") %} 
+              {% for sheet in sheets | sort(attribute="title") %}
+                {% set edit_url = url_for(endpoint="edit_sheet", id=sheet.id) %}
                 <tr>
                   <td class="is-narrow">{{ symbols::file() }}</td>
-                  <td><a href='{{ url_for(endpoint="edit_sheet", id=sheet.id) }}'>{{ sheet.title }}</a></td>
+                  <td><a href="{{ edit_url }}">{{ sheet.title }}</a></td>
                   <td class="is-narrow">Eva Vectes</td>
                   <td class="is-narrow">{{ sheet.changed | date(format="%d.%m.%Y %H:%M") }}</td>
                   <td class="is-narrow">{{ sheet.created | date(format="%d.%m.%Y %H:%M") }}</td>
+                  <td class="is-narrow"><a href="{{ edit_url }}" title="Bearbeiten">{{ symbols::pencil() }}</a></td>
+                  <td class="is-narrow"><a href="#" title="Löschen" class="has-text-danger">{{ symbols::trash() }}</a></td>
                 </tr>
               {% endfor %}
               <tr>
                 <td>{{ symbols::file() }}</td>
-                <td colspan="4">
+                <td colspan="{{ num_actions + 4 }}">
                   <form action='{{ url_for(endpoint="sheets") }}' method="POST">
                     <div class="field has-addons">
                       <div class="control is-expanded">
