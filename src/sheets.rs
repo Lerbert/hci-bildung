@@ -1,3 +1,6 @@
+use std::convert::From;
+
+use chrono::{DateTime, Local};
 use log::{error, warn};
 use rocket::form::Form;
 use rocket::http::Status;
@@ -11,55 +14,100 @@ use crate::{Db, Id};
 
 type Error = postgres::Error;
 
-#[derive(Deserialize, Serialize)]
 pub struct Sheet {
-    id: Id,
-    title: String,
+    metadata: SheetMetadata,
     tiptap: serde_json::Value,
 }
 
 impl Sheet {
     fn from(row: &Row) -> Self {
-        let json: serde_json::Value = row.get("tiptap");
         Sheet {
+            metadata: SheetMetadata::from(row),
+            tiptap: row.get("tiptap"),
+        }
+    }
+}
+
+pub struct SheetMetadata {
+    id: Id,
+    title: String,
+    created: DateTime<Local>,
+    changed: DateTime<Local>,
+}
+
+impl SheetMetadata {
+    fn from(row: &Row) -> Self {
+        SheetMetadata {
             id: row.get("id"),
             title: row.get("title"),
-            tiptap: json,
+            created: row.get("created"),
+            changed: row.get("changed"),
         }
     }
 }
 
-#[derive(Serialize)]
-struct DisplaySheet {
-    id: Option<String>,
-    title: Option<String>,
-    tiptap: Option<String>,
+// Transport
+
+#[derive(Deserialize, Serialize)]
+pub struct SheetTransport {
+    id: Option<Id>,
+    title: String,
+    tiptap: serde_json::Value,
 }
 
-impl DisplaySheet {
+impl From<Sheet> for SheetTransport {
     fn from(sheet: Sheet) -> Self {
-        DisplaySheet {
-            id: Some(sheet.id.to_string()),
-            title: Some(sheet.title),
-            tiptap: Some(sheet.tiptap.to_string()),
+        SheetTransport {
+            id: Some(sheet.metadata.id),
+            title: sheet.metadata.title,
+            tiptap: sheet.tiptap,
         }
     }
 }
 
 #[derive(Serialize)]
-struct SheetContext {
-    edit: bool,
-    sheet: DisplaySheet,
+pub struct SheetOverviewTransport {
+    id: String,
+    title: String,
+    created: DateTime<Local>,
+    changed: DateTime<Local>,
 }
+
+impl From<Sheet> for SheetOverviewTransport {
+    fn from(sheet: Sheet) -> Self {
+        SheetOverviewTransport::from(sheet.metadata)
+    }
+}
+
+impl From<SheetMetadata> for SheetOverviewTransport {
+    fn from(metadata: SheetMetadata) -> Self {
+        SheetOverviewTransport {
+            id: metadata.id.to_string(),
+            title: metadata.title,
+            created: metadata.created,
+            changed: metadata.changed,
+        }
+    }
+}
+
+// Forms
 
 #[derive(FromForm)]
 pub struct NewSheetForm {
     title: String,
 }
 
+// Contexts
+
+#[derive(Serialize)]
+struct SheetContext {
+    edit: bool,
+    sheet: SheetTransport,
+}
+
 #[derive(Serialize)]
 struct SheetManagementContext {
-    sheets: Vec<DisplaySheet>,
+    sheets: Vec<SheetOverviewTransport>,
 }
 
 pub const MOUNT: &str = "/sheets";
@@ -70,14 +118,7 @@ pub async fn sheets(db: Db) -> Result<Template, Status> {
         Ok(sheets) => Ok(Template::render(
             "docmgmt",
             &SheetManagementContext {
-                sheets: sheets
-                    .into_iter()
-                    .map(|(id, title)| DisplaySheet {
-                        id: Some(id.to_string()),
-                        title: Some(title),
-                        tiptap: None,
-                    })
-                    .collect(),
+                sheets: sheets.into_iter().map(|metadata| metadata.into()).collect(),
             },
         )),
         Err(e) => {
@@ -106,7 +147,7 @@ pub async fn view_sheet(db: Db, id: Id) -> Result<Template, Status> {
             "sheet",
             &SheetContext {
                 edit: false,
-                sheet: DisplaySheet::from(sheet),
+                sheet: sheet.into(),
             },
         )),
         Ok(None) => Err(Status::NotFound),
@@ -124,7 +165,7 @@ pub async fn edit_sheet(db: Db, id: Id) -> Result<Template, Status> {
             "sheet",
             &SheetContext {
                 edit: true,
-                sheet: DisplaySheet::from(sheet),
+                sheet: sheet.into(),
             },
         )),
         Ok(None) => Err(Status::NotFound),
@@ -136,40 +177,41 @@ pub async fn edit_sheet(db: Db, id: Id) -> Result<Template, Status> {
 }
 
 #[put("/<id>", format = "json", data = "<sheet>")]
-pub async fn save_sheet(db: Db, id: Id, sheet: Json<Sheet>) -> Result<(), Status> {
+pub async fn save_sheet(db: Db, id: Id, sheet: Json<SheetTransport>) -> Result<(), Status> {
     let sheet = sheet.into_inner();
-    if sheet.id != id {
-        warn!("Mismatched IDs: {} and {}", id, sheet.id);
-        Err(Status::BadRequest)
-    } else {
-        match update_sheet(db, sheet).await {
-            Ok(()) => Ok(()),
-            Err(e) => {
-                error!("Error writing to database: {}", e);
-                Err(Status::InternalServerError)
-            }
+    if let Some(sheet_id) = sheet.id {
+        if sheet_id != id {
+            warn!("Mismatched IDs: {} and {}", id, sheet_id);
+            return Err(Status::BadRequest);
+        }
+    }
+    match update_sheet(db, id, sheet.title, sheet.tiptap).await {
+        Ok(()) => Ok(()),
+        Err(e) => {
+            error!("Error writing to database: {}", e);
+            Err(Status::InternalServerError)
         }
     }
 }
 
-async fn get_all_sheets(db: Db) -> Result<Vec<(Id, String)>, Error> {
+async fn get_all_sheets(db: Db) -> Result<Vec<SheetMetadata>, Error> {
     let rows = db
         .run(move |c| {
             c.query(
-                "select id, title
-            from sheets",
+                "select id, title, created, changed
+                from sheets",
                 &[],
             )
         })
         .await?;
-    Ok(rows.iter().map(|r| (r.get("id"), r.get("title"))).collect())
+    Ok(rows.iter().map(|r| SheetMetadata::from(r)).collect())
 }
 
 async fn get_sheet_by_id(db: Db, id: Id) -> Result<Option<Sheet>, Error> {
     let row = db
         .run(move |c| {
             c.query_opt(
-                "select id, title, tiptap
+                "select id, title, created, changed, tiptap
                 from sheets
                 where id = $1",
                 &[&id],
@@ -193,14 +235,14 @@ async fn create_sheet(db: Db, title: Option<String>) -> Result<Id, Error> {
     Ok(row.get("id"))
 }
 
-async fn update_sheet(db: Db, sheet: Sheet) -> Result<(), Error> {
+async fn update_sheet(db: Db, id: Id, title: String, tiptap: serde_json::Value) -> Result<(), Error> {
     println!("Update");
     db.run(move |c| {
         c.execute(
             "update sheets
             set title = $2, tiptap = $3
             where id = $1",
-            &[&sheet.id, &sheet.title, &sheet.tiptap],
+            &[&id, &title, &tiptap],
         )
     })
     .await?;

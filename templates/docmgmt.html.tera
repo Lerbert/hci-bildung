@@ -48,7 +48,7 @@
                 <th>Name</th>
                 <th>Eigentümer</th>
                 <th>Zuletzt geändert</th>
-                <th>Dateigröße</th>
+                <th>Erstellt am</th>
               </tr>
             </thead>
             <tbody>
@@ -56,9 +56,9 @@
                 <tr>
                   <td>{{ symbols::file() }}</td>
                   <td><a href='{{ url_for(endpoint="edit_sheet", id=sheet.id) }}'>{{ sheet.title }}</a></td>
-                  <td>ich</td>
-                  <td>{{ now() | date(format="%d.%m.%Y %H:%M") }}</td>
-                  <td>15 KB</td>
+                  <td>Eva Vectes</td>
+                  <td>{{ sheet.changed | date(format="%d.%m.%Y %H:%M") }}</td>
+                  <td>{{ sheet.created | date(format="%d.%m.%Y %H:%M") }}</td>
                 </tr>
               {% endfor %}
               <tr>
