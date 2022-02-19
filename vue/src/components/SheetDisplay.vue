@@ -21,26 +21,29 @@
         &nbsp; Alle überprüfen
       </button>
     </div>
-    <node
+    <sheet-node
       class="sheet__content"
       :tiptapNode="editorJSON"
       :checkTrigger="checkTrigger"
       @grantPoints="grantPoints"
-    ></node>
+    ></sheet-node>
     <div class="sheet__footer">
-      <point-status :achievedPoints="achievedPoints" :totalPoints="totalPoints"></point-status>
+      <point-status
+        :achievedPoints="achievedPoints"
+        :totalPoints="totalPoints"
+      ></point-status>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import Node from "./nodes/Node.vue";
-import PointStatus from "./PointStatus.vue"
+import SheetNode from "./nodes/SheetNode.vue";
+import PointStatus from "./PointStatus.vue";
 
 export default defineComponent({
   components: {
-    Node,
+    SheetNode,
     PointStatus,
   },
 

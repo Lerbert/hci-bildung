@@ -15,7 +15,7 @@ import StrikeMark from './StrikeMark.vue';
 
 export default defineComponent({
   // For recursion
-  name: 'marking',
+  name: 'TextMarking',
 
   components: {
     BoldMark,

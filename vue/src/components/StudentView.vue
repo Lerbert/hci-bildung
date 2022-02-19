@@ -1,19 +1,19 @@
 <template>
   <div>
     <h1>{{ docTitle }}</h1>
-    <sheet :editorJSON="docJSON"></sheet>
+    <sheet-display :editorJSON="docJSON"></sheet-display>
   </div>
 </template>
 
 <script>
 import { defineComponent } from "vue";
 
-import Sheet from "./Sheet.vue";
+import SheetDisplay from "./SheetDisplay.vue";
 
 export default defineComponent({
   name: "EditView",
   components: {
-    Sheet,
+    SheetDisplay,
   },
 
   props: {

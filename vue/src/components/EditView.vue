@@ -12,11 +12,11 @@
     <div class="columns pt-5">
       <div class="column is-half" id="editor">
         <h1 class="title">Editor</h1>
-        <tiptap
+        <tiptap-editor
           :initialContent="editorContent"
           @update:content="handleContentUpdate($event)"
           :saveStatus="saveStatus"
-        ></tiptap>
+        ></tiptap-editor>
         <input type="file" id="file-input" accept=".mp3, .ogg, .m4a" />
       </div>
       <div class="column is-half" id="preview">
@@ -24,7 +24,7 @@
           <h1 class="title">Vorschau</h1>
           <share-button :docId="docId"></share-button>
         </div>
-        <sheet :editorJSON="editorContent"></sheet>
+        <sheet-display :editorJSON="editorContent"></sheet-display>
       </div>
     </div>
   </div>
@@ -35,16 +35,16 @@ import { defineComponent } from "vue";
 import debounce from "lodash/debounce";
 
 import { SaveStatus } from "../enums";
-import Tiptap from "./Tiptap.vue";
-import Sheet from "./Sheet.vue";
+import TiptapEditor from "./TiptapEditor.vue";
+import SheetDisplay from "./SheetDisplay.vue";
 import ShareButton from "./ShareButton.vue";
 
 export default defineComponent({
   name: "EditView",
   components: {
     ShareButton,
-    Sheet,
-    Tiptap,
+    SheetDisplay,
+    TiptapEditor,
   },
 
   props: {
