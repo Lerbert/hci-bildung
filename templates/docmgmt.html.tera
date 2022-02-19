@@ -44,21 +44,21 @@
           <table class="table is-fullwidth is-hoverable">
             <thead>
               <tr>
-                <th></th>
+                <th class="is-narrow"></th>
                 <th>Name</th>
-                <th>Eigentümer</th>
-                <th>Zuletzt geändert</th>
-                <th>Erstellt am</th>
+                <th class="is-narrow">Eigentümer</th>
+                <th class="is-narrow">Zuletzt geändert</th>
+                <th class="is-narrow">Erstellt am</th>
               </tr>
             </thead>
             <tbody>
               {% for sheet in sheets | sort(attribute="title") %} 
                 <tr>
-                  <td>{{ symbols::file() }}</td>
+                  <td class="is-narrow">{{ symbols::file() }}</td>
                   <td><a href='{{ url_for(endpoint="edit_sheet", id=sheet.id) }}'>{{ sheet.title }}</a></td>
-                  <td>Eva Vectes</td>
-                  <td>{{ sheet.changed | date(format="%d.%m.%Y %H:%M") }}</td>
-                  <td>{{ sheet.created | date(format="%d.%m.%Y %H:%M") }}</td>
+                  <td class="is-narrow">Eva Vectes</td>
+                  <td class="is-narrow">{{ sheet.changed | date(format="%d.%m.%Y %H:%M") }}</td>
+                  <td class="is-narrow">{{ sheet.created | date(format="%d.%m.%Y %H:%M") }}</td>
                 </tr>
               {% endfor %}
               <tr>
@@ -67,7 +67,7 @@
                   <form action='{{ url_for(endpoint="sheets") }}' method="POST">
                     <div class="field has-addons">
                       <div class="control is-expanded">
-                        <input class="input" name="title" type="text" placeholder="Neues Dokument">
+                        <input class="input js-validation" name="title" type="text" placeholder="Neues Dokument" required>
                       </div>
                       <div class="control">
                         <button class="button is-success" type="submit">{{ symbols::plus() }}</button>

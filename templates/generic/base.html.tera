@@ -19,6 +19,7 @@
     </main>
     {% block scripts %}
       <script src='{{ url_for(endpoint="FileServer: assets/", path="js/modal.js") }}'></script>
+      <script src='{{ url_for(endpoint="FileServer: assets/", path="js/validation.js") }}'></script>
     {% endblock %}
   </body>
 </html>

@@ -48,11 +48,17 @@ impl SheetMetadata {
 
 // Transport
 
-#[derive(Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct SheetTransport {
     id: Option<Id>,
     title: String,
     tiptap: serde_json::Value,
+}
+
+impl SheetTransport {
+    fn validate(&self) -> bool {
+        self.title != "" && self.id.is_none()
+    }
 }
 
 impl From<Sheet> for SheetTransport {
@@ -65,7 +71,7 @@ impl From<Sheet> for SheetTransport {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 pub struct SheetOverviewTransport {
     id: String,
     title: String,
@@ -94,6 +100,7 @@ impl From<SheetMetadata> for SheetOverviewTransport {
 
 #[derive(FromForm)]
 pub struct NewSheetForm {
+    #[field(validate = neq(""))]
     title: String,
 }
 
@@ -131,7 +138,7 @@ pub async fn sheets(db: Db) -> Result<Template, Status> {
 #[post("/", data = "<form>")]
 pub async fn new_sheet(db: Db, form: Form<NewSheetForm>) -> Result<Redirect, Status> {
     let form = form.into_inner();
-    match create_sheet(db, Some(form.title)).await {
+    match create_sheet(db, form.title).await {
         Ok(id) => Ok(Redirect::to(format!("{}{}", MOUNT, uri!(edit_sheet(id))))),
         Err(e) => {
             error!("Error writing to database: {}", e);
@@ -179,18 +186,17 @@ pub async fn edit_sheet(db: Db, id: Id) -> Result<Template, Status> {
 #[put("/<id>", format = "json", data = "<sheet>")]
 pub async fn save_sheet(db: Db, id: Id, sheet: Json<SheetTransport>) -> Result<(), Status> {
     let sheet = sheet.into_inner();
-    if let Some(sheet_id) = sheet.id {
-        if sheet_id != id {
-            warn!("Mismatched IDs: {} and {}", id, sheet_id);
-            return Err(Status::BadRequest);
+    if sheet.validate() {
+        match update_sheet(db, id, sheet.title, sheet.tiptap).await {
+            Ok(()) => Ok(()),
+            Err(e) => {
+                error!("Error writing to database: {}", e);
+                Err(Status::InternalServerError)
+            }
         }
-    }
-    match update_sheet(db, id, sheet.title, sheet.tiptap).await {
-        Ok(()) => Ok(()),
-        Err(e) => {
-            error!("Error writing to database: {}", e);
-            Err(Status::InternalServerError)
-        }
+    } else {
+        warn!("Sheet validation failed for {:?}", sheet);
+        return Err(Status::BadRequest);
     }
 }
 
@@ -221,22 +227,26 @@ async fn get_sheet_by_id(db: Db, id: Id) -> Result<Option<Sheet>, Error> {
     Ok(row.map(|r| Sheet::from(&r)))
 }
 
-async fn create_sheet(db: Db, title: Option<String>) -> Result<Id, Error> {
+async fn create_sheet(db: Db, title: String) -> Result<Id, Error> {
     let row = db
         .run(move |c| {
             c.query_one(
                 "insert into sheets(title, tiptap)
                 values ($1, '{\"type\": \"doc\", \"content\": [{\"type\": \"paragraph\"}]}'::json)
                 returning id",
-                &[&title.unwrap_or("".to_owned())],
+                &[&title],
             )
         })
         .await?;
     Ok(row.get("id"))
 }
 
-async fn update_sheet(db: Db, id: Id, title: String, tiptap: serde_json::Value) -> Result<(), Error> {
-    println!("Update");
+async fn update_sheet(
+    db: Db,
+    id: Id,
+    title: String,
+    tiptap: serde_json::Value,
+) -> Result<(), Error> {
     db.run(move |c| {
         c.execute(
             "update sheets

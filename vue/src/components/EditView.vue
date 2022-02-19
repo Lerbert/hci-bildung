@@ -4,6 +4,7 @@
       <input
         v-model="title"
         class="input is-large has-text-weight-bold"
+        :class="title === '' ? 'is-danger' : ''"
         type="text"
         placeholder="Titel eingeben"
       />
@@ -81,6 +82,10 @@ export default defineComponent({
       this.save();
     },
     async saveHelper() {
+      if (this.title === "") {
+        this.saveStatus = SaveStatus.FAILED;
+        return;
+      }
       this.saveStatus = SaveStatus.SAVING;
       let delay = new Promise((r) => setTimeout(r, 500)); // Delay to show user that we are indeed saving
       let saveOk = false;
@@ -91,7 +96,6 @@ export default defineComponent({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            id: this.docId,
             title: this.title,
             tiptap: this.editorContent,
           }),
