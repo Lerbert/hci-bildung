@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button class="button js-modal-trigger" data-target="share-modal">
+    <button class="button is-info js-modal-trigger" data-target="share-modal">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         class="h-6 w-6"
@@ -28,15 +28,13 @@
           <button class="delete" aria-label="close"></button>
         </header>
         <section class="modal-card-body">
-          <figure class="image is-square">
-            <img src="../assets/qr.png" alt="QR-Code" />
-          </figure>
+          <q-r-code :value="link"></q-r-code>
           <div class="field has-addons">
             <div class="control is-expanded">
               <input class="input" type="text" v-model="link" readonly />
             </div>
             <div class="control">
-              <button class="button" v-on:click="copy">
+              <button class="button is-success" v-on:click="copy">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="h-6 w-6"
@@ -66,17 +64,19 @@
 </template>
 
 <script>
-export default {
-  inject: ["hostname"],
+import { defineComponent } from "vue";
+
+import QRCode from "./QRCode.vue";
+
+export default defineComponent({
+  components: {
+    QRCode,
+  },
 
   props: {
     docId: {
       type: String,
       required: true,
-    },
-    isActive: {
-      type: Function,
-      default: null,
     },
   },
 
@@ -89,7 +89,7 @@ export default {
 
   computed: {
     link() {
-      return this.hostname + "/sheets/" + this.docId;
+      return window.location.origin + "/sheets/" + this.docId;
     },
   },
 
@@ -108,7 +108,7 @@ export default {
       );
     },
   },
-};
+});
 </script>
 
 <style lang="scss" scoped>
