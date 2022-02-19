@@ -21,7 +21,7 @@
       <div class="column is-half" id="preview">
         <div class="is-flex is-justify-content-space-between">
           <h1 class="title">Vorschau</h1>
-          <share-button class=""></share-button>
+          <share-button :docId="docId"></share-button>
         </div>
         <sheet :editorJSON="editorContent"></sheet>
       </div>

@@ -17,13 +17,18 @@ type Id = Uuid;
 pub struct Db(postgres::Client);
 
 fn make_url_for(urls: HashMap<String, RouteUri<'static>>) -> impl Function {
+    println!("{:?}", urls.keys());
     move |args: &HashMap<String, tera::Value>| -> tera::Result<tera::Value> {
         match args.get("endpoint") {
             Some(val) => match from_value::<String>(val.clone()) {
-                Ok(v) => instantiate_uri(urls.get(&v).unwrap(), &args),
-                Err(_) => Err("oops".into()),
+                Ok(v) => instantiate_uri(
+                    urls.get(&v)
+                        .ok_or::<tera::Error>(format!("Endpoint {} not found", v).into())?,
+                    &args,
+                ),
+                Err(e) => Err(format!("Error parsing JSON: {}", e).into()),
             },
-            None => Err("oops".into()),
+            None => Err("No endpoint argument specified".into()),
         }
     }
 }
