@@ -151,7 +151,7 @@ pub async fn new_sheet(db: Db, form: Form<NewSheetForm>) -> Result<Redirect, Sta
 pub async fn view_sheet(db: Db, id: Id) -> Result<Template, Status> {
     match get_sheet_by_id(db, id).await {
         Ok(Some(sheet)) => Ok(Template::render(
-            "sheet",
+            "sheet.html",
             &SheetContext {
                 edit: false,
                 sheet: sheet.into(),
@@ -169,7 +169,7 @@ pub async fn view_sheet(db: Db, id: Id) -> Result<Template, Status> {
 pub async fn edit_sheet(db: Db, id: Id) -> Result<Template, Status> {
     match get_sheet_by_id(db, id).await {
         Ok(Some(sheet)) => Ok(Template::render(
-            "sheet",
+            "sheet.html",
             &SheetContext {
                 edit: true,
                 sheet: sheet.into(),

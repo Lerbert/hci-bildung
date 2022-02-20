@@ -137,7 +137,7 @@ fn rocket() -> _ {
     r.attach(Template::custom(move |engines| {
         engines
             .tera
-            .add_template_file("vue_dist/index.html", Some("vue_index"))
+            .add_template_file("vue_dist/sheet.html.tera", Some("sheet.html"))
             .ok();
         engines
             .tera
