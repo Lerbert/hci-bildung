@@ -1,2 +1,5 @@
+[default]
+address = "0.0.0.0"
+
 [global.databases.hci_bildung]
 url = "postgresql://postgres:postgres@localhost/hci-bildung"
