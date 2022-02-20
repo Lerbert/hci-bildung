@@ -22,6 +22,7 @@ import { defineComponent } from "vue";
 import BoldMark from "./BoldMark.vue";
 import GapMark from "./GapMark.vue";
 import ItalicMark from "./ItalicMark.vue";
+import LatexMark from "./LatexMark.vue";
 import StrikeMark from "./StrikeMark.vue";
 
 export default defineComponent({
@@ -32,6 +33,7 @@ export default defineComponent({
     BoldMark,
     GapMark,
     ItalicMark,
+    LatexMark,
     StrikeMark,
   },
 
