@@ -116,6 +116,12 @@ export default {
           isActive: () => this.editor.isActive("gap"),
         },
         {
+          icon: "functions",
+          title: "Auswahl in Formel umwandeln (Alt + =)",
+          action: () => this.editor.chain().focus().toggleLatex().run(),
+          isActive: () => this.editor.isActive("latex"),
+        },
+        {
           icon: "volume-up-line",
           title: "Audioelement hinzufügen (Strg + M)",
           action: () =>

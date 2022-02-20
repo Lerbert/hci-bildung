@@ -5,35 +5,35 @@ import {
   mergeAttributes,
 } from "@tiptap/core";
 
-export interface GapOptions {
+export interface LatexOptions {
   HTMLAttributes: Record<string, any>;
 }
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
-    gap: {
+    latex: {
       /**
-       * Set a gap mark
+       * Set a latex mark
        */
-      setGap: () => ReturnType;
+      setLatex: () => ReturnType;
       /**
-       * Toggle a gap mark
+       * Toggle a latex mark
        */
-      toggleGap: () => ReturnType;
+      toggleLatex: () => ReturnType;
       /**
-       * Unset a gap mark
+       * Unset a latex mark
        */
-      unsetGap: () => ReturnType;
+      unsetLatex: () => ReturnType;
     };
   }
 }
 
-export const pipeInputRegex = /(?:^|\s)((?:\|\|)((?:[^|]+))(?:\|\|))$/;
-export const pipePasteRegex = /(?:^|\s)((?:\|\|)((?:[^|]+))(?:\|\|))/g;
+export const dollarInputRegex = /(?:^|\s)((?:\$\$)((?:[^$$]+))(?:\$\$))$/;
+export const dollarPasteRegex = /(?:^|\s)((?:\$\$)((?:[^$$]+))(?:\$\$))/g;
 
-const name = "gap";
+const name = "latex";
 
-export default Mark.create<GapOptions>({
+export default Mark.create<LatexOptions>({
   name: name,
 
   addOptions() {
@@ -75,17 +75,17 @@ export default Mark.create<GapOptions>({
 
   addCommands() {
     return {
-      setGap:
+      setLatex:
         () =>
         ({ commands }) => {
           return commands.setMark(this.name);
         },
-      toggleGap:
+      toggleLatex:
         () =>
         ({ commands }) => {
           return commands.toggleMark(this.name);
         },
-      unsetGap:
+      unsetLatex:
         () =>
         ({ commands }) => {
           return commands.unsetMark(this.name);
@@ -95,14 +95,14 @@ export default Mark.create<GapOptions>({
 
   addKeyboardShortcuts() {
     return {
-      "Mod-g": () => this.editor.commands.toggleGap(),
+      "Alt-=": () => this.editor.commands.toggleLatex(),
     };
   },
 
   addInputRules() {
     return [
       markInputRule({
-        find: pipeInputRegex,
+        find: dollarInputRegex,
         type: this.type,
       }),
     ];
@@ -111,7 +111,7 @@ export default Mark.create<GapOptions>({
   addPasteRules() {
     return [
       markPasteRule({
-        find: pipePasteRegex,
+        find: dollarPasteRegex,
         type: this.type,
       }),
     ];

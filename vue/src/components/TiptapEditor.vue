@@ -12,8 +12,9 @@
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 
-import Gap from "../marks/Gap.ts";
 import Audio from "../nodes/Audio.ts";
+import Gap from "../marks/Gap.ts";
+import Latex from "../marks/Latex.ts";
 import MenuBar from "./MenuBar.vue";
 import SaveStatus from "./SaveStatus.vue";
 
@@ -44,7 +45,7 @@ export default {
   mounted() {
     this.editor = new Editor({
       content: this.content,
-      extensions: [StarterKit, Gap, Audio],
+      extensions: [StarterKit, Audio, Gap, Latex],
       onUpdate: () => {
         this.$emit("update:content", this.editor.getJSON());
       },
@@ -154,6 +155,10 @@ export default {
   span[data-type="gap"] {
     color: #ffffff;
     background-color: #3d3d3d;
+  }
+
+  span[data-type="latex"] {
+    font-family: "Courier New", "Lucida Console", monospace;
   }
 }
 </style>
