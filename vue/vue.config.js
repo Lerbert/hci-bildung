@@ -6,12 +6,21 @@ module.exports = defineConfig({
   indexPath: "sheet.html.tera",
   assetsDir: "vue",
   chainWebpack: config => {
-    config
-      .plugin('html')
-      .tap(args => {
-        args[0].inject = false;
-        args[0].template = "public/sheet.html.tera";
-        return args;
-      })
+    if (process.env.DEV_STANDALONE) {
+      config
+        .plugin('html')
+        .tap(args => {
+          args[0].template = "public/index.html";
+          return args;
+        });
+    } else {
+      config
+        .plugin('html')
+        .tap(args => {
+          args[0].inject = false;
+          args[0].template = "public/sheet.html.tera";
+          return args;
+        });
+    }
   }
 });
