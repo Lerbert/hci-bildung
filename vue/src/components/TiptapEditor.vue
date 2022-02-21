@@ -62,6 +62,7 @@ export default {
 .editor {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
   max-height: 600px;
   color: #0d0d0d;
   background-color: #ffffff;

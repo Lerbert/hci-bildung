@@ -10,7 +10,7 @@
       />
     </div>
     <div class="columns pt-5">
-      <div class="column is-half" id="editor">
+      <div class="column is-half is-flex is-flex-direction-column" id="editor">
         <h1 class="title">Editor</h1>
         <tiptap-editor
           :initialContent="editorContent"
@@ -19,7 +19,7 @@
         ></tiptap-editor>
         <input type="file" id="file-input" accept=".mp3, .ogg, .m4a" />
       </div>
-      <div class="column is-half" id="preview">
+      <div class="column is-half is-flex is-flex-direction-column" id="preview">
         <div class="is-flex is-justify-content-space-between">
           <h1 class="title">Vorschau</h1>
           <share-button :docId="docId"></share-button>
