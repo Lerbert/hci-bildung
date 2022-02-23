@@ -1,0 +1,24 @@
+{% import "generic/symbols" as symbols %}
+{% import "forms/form_field" as form_field %}
+
+{% extends "generic/base" %}
+{% block title %}
+    Anmelden — {{ super() }}
+{% endblock title %}
+{% block content %}
+    <div class="mt-6 columns">
+        <div class="column"></div>
+        <div class="column is-two-fifths">
+            <form action='{{ url_for(endpoint="login") }}' method="POST">
+                {{ form_field::simple_field(type="text", name="username", display_name="Nutzername", attrs="required") }}
+                {{ form_field::simple_field(type="password", name="password", display_name="Passwort", attrs="required") }}
+                <div class="field">
+                    <div class="control">
+                        <button class="button is-success" type="submit">Anmelden</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="column"></div>
+    </div>
+{% endblock content %}

@@ -1,4 +1,4 @@
-<nav class="navbar" role="navigation" aria-label="main navigation">
+<nav class="navbar is-light" role="navigation" aria-label="main navigation">
   <div class="navbar-brand">
     <a class="navbar-item">
       <img src='{{ url_for(endpoint="FileServer: assets/", path="img/hci-bildung-logo.png") }}' width="112" height="28">
@@ -58,7 +58,7 @@
         </a>
 
         <div class="navbar-dropdown">
-          <a class="navbar-item">
+          <a class="navbar-item" href='{{ url_for(endpoint="logout") }}'>
             Logout
           </a>
         </div>

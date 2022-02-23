@@ -1,0 +1,8 @@
+{% macro simple_field(type, name, display_name, attrs="") -%}
+    <div class="field">
+        <label class="label">{{ display_name }}</label>
+        <div class="control">
+            <input class="input js-validation" type="{{ type }}" name="{{ name }}" placeholder="{{ display_name }}" {{ attrs }}>
+        </div>
+    </div>
+{%- endmacro %}
