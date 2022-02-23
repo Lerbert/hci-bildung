@@ -9,6 +9,7 @@ use rocket_dyn_templates::Template;
 use rocket_sync_db_pools::{database, postgres};
 use tera::{self, from_value, to_value, Function};
 
+mod session;
 mod sheets;
 
 type Id = Uuid;
@@ -127,6 +128,10 @@ fn rocket() -> _ {
                 sheets::edit_sheet,
                 sheets::save_sheet
             ],
+        )
+        .mount(
+            "/",
+            routes![session::login_form, session::login, session::logout],
         )
         .mount("/vue", FileServer::from(relative!("vue_dist/vue")))
         .mount("/assets", FileServer::from(relative!("assets")));
