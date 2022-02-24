@@ -2,7 +2,6 @@ use std::convert::From;
 use std::fmt::{self, Display};
 use std::io;
 
-
 use chrono::NaiveDateTime;
 use crypto::scrypt;
 use log::error;

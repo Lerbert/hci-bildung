@@ -9,6 +9,7 @@ use rocket_dyn_templates::Template;
 use rocket_sync_db_pools::{database, postgres};
 use tera::{self, from_value, to_value, Function};
 
+mod flash;
 mod login;
 mod sheets;
 
@@ -23,8 +24,9 @@ fn make_url_for(urls: HashMap<String, RouteUri<'static>>) -> impl Function {
         match args.get("endpoint") {
             Some(val) => match from_value::<String>(val.clone()) {
                 Ok(v) => instantiate_uri(
-                    urls.get(&v)
-                        .ok_or_else::<tera::Error, _>(|| format!("Endpoint {} not found", v).into())?,
+                    urls.get(&v).ok_or_else::<tera::Error, _>(|| {
+                        format!("Endpoint {} not found", v).into()
+                    })?,
                     args,
                 ),
                 Err(e) => Err(format!("Error parsing JSON: {}", e).into()),

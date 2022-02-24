@@ -2,12 +2,12 @@ use log::error;
 use rocket::form::Form;
 use rocket::http::{Cookie, CookieJar, Status};
 use rocket::outcome::IntoOutcome;
-use rocket::request::{FromRequest, Outcome, Request};
-use std::collections::HashMap;
-
+use rocket::request::{FlashMessage, FromRequest, Outcome, Request};
 use rocket::response::Redirect;
+use rocket::serde::Serialize;
 use rocket_dyn_templates::Template;
 
+use crate::flash::{FlashContext, FlashRedirect};
 use crate::sheets;
 use crate::Db;
 
@@ -54,10 +54,20 @@ impl<'r> FromRequest<'r> for &'r User {
     }
 }
 
+#[derive(Serialize)]
+struct LoginContext {
+    flash: Option<FlashContext>,
+}
+
 #[get("/login")]
-pub fn login_form() -> Template {
-    let c: HashMap<String, String> = HashMap::new();
-    Template::render("login", &c)
+pub fn login_form(flash: Option<FlashMessage>) -> Template {
+    println!("{:?}", flash);
+    Template::render(
+        "login",
+        &LoginContext {
+            flash: flash.map(|f| f.into()),
+        },
+    )
 }
 
 #[post("/login", data = "<form>")]
@@ -65,7 +75,7 @@ pub async fn login(
     db: Db,
     cookies: &CookieJar<'_>,
     form: Form<LoginForm>,
-) -> Result<Redirect, Status> {
+) -> Result<FlashRedirect, Status> {
     let form = form.into_inner();
     logic::login(&db, form)
         .await
@@ -73,13 +83,19 @@ pub async fn login(
         .and_then(|s| {
             s.map(|session_id| {
                 cookies.add_private(Cookie::new(SESSION_ID_COOKIE_NAME, session_id));
-                Ok(Redirect::to(format!(
+                Ok(FlashRedirect::no_flash(format!(
                     "{}{}",
                     sheets::MOUNT,
                     uri!(sheets::sheets)
                 )))
             })
-            .unwrap_or_else(|| Ok(Redirect::to(uri!(login_form))))
+            .unwrap_or_else(|| {
+                Ok(FlashRedirect::with_flash(
+                    uri!(login_form),
+                    "danger",
+                    "Nutzername oder Passwort ungültig",
+                ))
+            })
         })
 }
 
