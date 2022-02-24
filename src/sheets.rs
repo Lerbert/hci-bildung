@@ -10,8 +10,8 @@ use rocket::serde::{Deserialize, Serialize};
 use rocket_dyn_templates::Template;
 use rocket_sync_db_pools::postgres::{self, Row};
 
+use crate::login::User;
 use crate::{Db, Id};
-use crate::session::User;
 
 type Error = postgres::Error;
 
@@ -58,7 +58,7 @@ pub struct SheetTransport {
 
 impl SheetTransport {
     fn validate(&self) -> bool {
-        self.title != "" && self.id.is_none()
+        !self.title.is_empty() && self.id.is_none()
     }
 }
 
@@ -121,7 +121,7 @@ struct SheetManagementContext {
 pub const MOUNT: &str = "/sheets";
 
 #[get("/")]
-pub async fn sheets(db: Db, user: &User) -> Result<Template, Status> {
+pub async fn sheets(db: Db, _user: &User) -> Result<Template, Status> {
     match get_all_sheets(db).await {
         Ok(sheets) => Ok(Template::render(
             "docmgmt",
@@ -137,7 +137,7 @@ pub async fn sheets(db: Db, user: &User) -> Result<Template, Status> {
 }
 
 #[post("/", data = "<form>")]
-pub async fn new_sheet(db: Db, user: &User, form: Form<NewSheetForm>) -> Result<Redirect, Status> {
+pub async fn new_sheet(db: Db, _user: &User, form: Form<NewSheetForm>) -> Result<Redirect, Status> {
     let form = form.into_inner();
     match create_sheet(db, form.title).await {
         Ok(id) => Ok(Redirect::to(format!("{}{}", MOUNT, uri!(edit_sheet(id))))),
@@ -167,7 +167,7 @@ pub async fn view_sheet(db: Db, id: Id) -> Result<Template, Status> {
 }
 
 #[get("/<id>?edit")]
-pub async fn edit_sheet(db: Db, user: &User, id: Id) -> Result<Template, Status> {
+pub async fn edit_sheet(db: Db, _user: &User, id: Id) -> Result<Template, Status> {
     match get_sheet_by_id(db, id).await {
         Ok(Some(sheet)) => Ok(Template::render(
             "sheet.html",
@@ -185,7 +185,12 @@ pub async fn edit_sheet(db: Db, user: &User, id: Id) -> Result<Template, Status>
 }
 
 #[put("/<id>", format = "json", data = "<sheet>")]
-pub async fn save_sheet(db: Db, user: &User, id: Id, sheet: Json<SheetTransport>) -> Result<(), Status> {
+pub async fn save_sheet(
+    db: Db,
+    _user: &User,
+    id: Id,
+    sheet: Json<SheetTransport>,
+) -> Result<(), Status> {
     let sheet = sheet.into_inner();
     if sheet.validate() {
         match update_sheet(db, id, sheet.title, sheet.tiptap).await {
@@ -197,7 +202,7 @@ pub async fn save_sheet(db: Db, user: &User, id: Id, sheet: Json<SheetTransport>
         }
     } else {
         warn!("Sheet validation failed for {:?}", sheet);
-        return Err(Status::BadRequest);
+        Err(Status::BadRequest)
     }
 }
 
@@ -211,7 +216,7 @@ async fn get_all_sheets(db: Db) -> Result<Vec<SheetMetadata>, Error> {
             )
         })
         .await?;
-    Ok(rows.iter().map(|r| SheetMetadata::from(r)).collect())
+    Ok(rows.iter().map(SheetMetadata::from).collect())
 }
 
 async fn get_sheet_by_id(db: Db, id: Id) -> Result<Option<Sheet>, Error> {

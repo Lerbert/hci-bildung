@@ -9,7 +9,7 @@ use rocket_dyn_templates::Template;
 use rocket_sync_db_pools::{database, postgres};
 use tera::{self, from_value, to_value, Function};
 
-mod session;
+mod login;
 mod sheets;
 
 type Id = Uuid;
@@ -24,8 +24,8 @@ fn make_url_for(urls: HashMap<String, RouteUri<'static>>) -> impl Function {
             Some(val) => match from_value::<String>(val.clone()) {
                 Ok(v) => instantiate_uri(
                     urls.get(&v)
-                        .ok_or::<tera::Error>(format!("Endpoint {} not found", v).into())?,
-                    &args,
+                        .ok_or_else::<tera::Error, _>(|| format!("Endpoint {} not found", v).into())?,
+                    args,
                 ),
                 Err(e) => Err(format!("Error parsing JSON: {}", e).into()),
             },
@@ -53,7 +53,7 @@ fn instantiate_uri(
 
                 args.get(name)
                     .and_then(|val| from_value::<String>(val.clone()).ok())
-                    .unwrap_or(s.into())
+                    .unwrap_or_else(|| s.into())
             } else {
                 s.into()
             }
@@ -74,13 +74,13 @@ fn instantiate_uri(
                     let v = args
                         .get(name)
                         .and_then(|val| from_value::<String>(val.clone()).ok())
-                        .unwrap_or(v.into());
+                        .unwrap_or_else(|| v.into());
                     (name, v)
                 } else {
                     (k, v.into())
                 };
-                if v == "" {
-                    format!("{}", k)
+                if v.is_empty() {
+                    k.to_string()
                 } else {
                     format!("{}={}", k, v)
                 }
@@ -131,7 +131,11 @@ fn rocket() -> _ {
         )
         .mount(
             "/",
-            routes![session::login_form, session::login, session::logout],
+            routes![
+                login::routes::login_form,
+                login::routes::login,
+                login::routes::logout
+            ],
         )
         .mount("/vue", FileServer::from(relative!("vue_dist/vue")))
         .mount("/assets", FileServer::from(relative!("assets")));
