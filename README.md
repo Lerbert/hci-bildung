@@ -21,6 +21,25 @@ psql -d $DB_NAME < db_scripts/setup.sql
 url = "<your URL here>"
 ```
 
+### Setting up secrets
+
+1. Change `Rocket.toml` to reflect the location of your TLS certificate
+
+```toml
+[default.tls]
+certs = "<your certificate path here>"
+key = "<your key path here>"
+```
+
+2. For production builds: Set a secret key for encrypted cookies. This can be done in `Rocket.toml` or using the environment variable `ROCKET_SECRET_KEY`
+
+```toml
+[release]
+secret_key="<your secret key here>"
+```
+
+You can generate a suitable key with `openssl rand -base64 32`.
+
 ### Building the frontend
 
 1. Navigate to the `vue` directory
