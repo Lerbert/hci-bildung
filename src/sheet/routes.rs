@@ -23,7 +23,7 @@ impl ToStatus for logic::Error {
             Self::Forbidden(_) => {
                 info!("{}", self);
                 Status::Forbidden
-            },
+            }
             _ => {
                 error!("{}", self);
                 Status::InternalServerError

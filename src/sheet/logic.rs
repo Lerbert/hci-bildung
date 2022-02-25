@@ -63,23 +63,37 @@ pub async fn get_sheet(db: &Db, id: Id) -> Result<Option<Sheet>> {
 
 pub async fn get_sheet_for_edit(db: &Db, user: &User, id: Id) -> Result<Option<Sheet>> {
     let sheet = data::get_sheet_by_id(db, id).await?;
-    sheet.map(|sheet| {
-        if sheet.metadata.owner.id == user.id {
-            Ok(sheet)
-        } else {
-            Err(Error::Forbidden(format!("edit sheet {} by user {}", id, user.id)))
-        }
-    }).map_or(Ok(None), |v| v.map(Some))
+    sheet
+        .map(|sheet| {
+            if sheet.metadata.owner.id == user.id {
+                Ok(sheet)
+            } else {
+                Err(Error::Forbidden(format!(
+                    "edit sheet {} by user {}",
+                    id, user.id
+                )))
+            }
+        })
+        .map_or(Ok(None), |v| v.map(Some))
 }
 
-pub async fn update_sheet(db: &Db, user: &User, id: Id, title: String, tiptap: serde_json::Value) -> Result<Option<()>> {
+pub async fn update_sheet(
+    db: &Db,
+    user: &User,
+    id: Id,
+    title: String,
+    tiptap: serde_json::Value,
+) -> Result<Option<()>> {
     let sheet = data::get_sheet_by_id(db, id).await?;
     if let Some(sheet) = sheet {
         if sheet.metadata.owner.id == user.id {
             data::update_sheet(db, id, title, tiptap).await?;
             Ok(Some(()))
         } else {
-            Err(Error::Forbidden(format!("edit sheet {} by user {}", id, user.id)))
+            Err(Error::Forbidden(format!(
+                "edit sheet {} by user {}",
+                id, user.id
+            )))
         }
     } else {
         Ok(None)
