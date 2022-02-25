@@ -99,3 +99,20 @@ pub async fn update_sheet(
         Ok(None)
     }
 }
+
+pub async fn delete_sheet(db: &Db, user: &User, id: Id) -> Result<Option<()>> {
+    let sheet = data::get_sheet_by_id(db, id).await?;
+    if let Some(sheet) = sheet {
+        if sheet.metadata.owner.id == user.id {
+            data::delete_sheet(db, id).await?;
+            Ok(Some(()))
+        } else {
+            Err(Error::Forbidden(format!(
+                "delete sheet {} by user {}",
+                id, user.id
+            )))
+        }
+    } else {
+        Ok(None)
+    }
+}

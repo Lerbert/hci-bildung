@@ -176,6 +176,14 @@ pub async fn save_sheet(
     }
 }
 
+#[delete("/<id>")]
+pub async fn delete_sheet(db: Db, user: &User, id: Id) -> Result<(), Status> {
+    logic::delete_sheet(&db, user, id)
+        .await
+        .map_err(|e| e.to_status())
+        .and_then(|opt| opt.ok_or(Status::NotFound))
+}
+
 fn redirect_to_login() -> FlashRedirect {
     FlashRedirect::with_flash(
         uri!(login::routes::login),

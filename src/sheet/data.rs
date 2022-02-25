@@ -76,6 +76,18 @@ pub async fn update_sheet(
     Ok(())
 }
 
+pub async fn delete_sheet(db: &Db, id: Id) -> Result<(), Error> {
+    db.run(move |c| {
+        c.execute(
+            "delete from sheets
+            where id = $1",
+            &[&id],
+        )
+    })
+    .await?;
+    Ok(())
+}
+
 fn sheet_from_row(row: &Row) -> Sheet {
     Sheet {
         metadata: sheet_metadata_from_row(row),
