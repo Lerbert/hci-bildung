@@ -28,6 +28,8 @@ impl From<&User> for UserTransport {
 
 #[derive(FromForm)]
 pub struct LoginForm {
+    #[field(validate = neq(""))]
     pub username: String,
+    #[field(validate = neq(""))]
     pub password: String,
 }
