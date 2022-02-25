@@ -60,7 +60,7 @@
                 <tr>
                   <td class="is-narrow">{{ symbols::file() }}</td>
                   <td><a href="{{ edit_url }}">{{ sheet.title }}</a></td>
-                  <td class="is-narrow">{{ user.username }}</td>
+                  <td class="is-narrow">{{ sheet.owner.username }}</td>
                   <td class="is-narrow">{{ sheet.changed | date(format="%d.%m.%Y %H:%M") }}</td>
                   <td class="is-narrow">{{ sheet.created | date(format="%d.%m.%Y %H:%M") }}</td>
                   <td class="is-narrow"><a href="{{ edit_url }}" title="Bearbeiten">{{ symbols::pencil() }}</a></td>
