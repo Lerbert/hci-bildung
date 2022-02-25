@@ -1,4 +1,3 @@
-use std::convert::From;
 use std::fmt::{self, Display};
 use std::io;
 
@@ -11,7 +10,6 @@ use rand::RngCore;
 use crate::Db;
 
 use super::data;
-use super::transport::LoginForm;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
@@ -56,9 +54,9 @@ pub struct Session {
 
 const EXPIRY_DAYS: i64 = 5;
 
-pub async fn login(db: &Db, login_data: LoginForm) -> Result<Option<String>> {
-    if let Some(user) = data::get_user_by_name(db, login_data.username).await? {
-        login_user(db, &user, &login_data.password).await
+pub async fn login(db: &Db, username: String, password: String) -> Result<Option<String>> {
+    if let Some(user) = data::get_user_by_name(db, username).await? {
+        login_user(db, &user, &password).await
     } else {
         Ok(None)
     }

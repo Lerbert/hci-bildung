@@ -8,17 +8,14 @@ use rocket::serde::Serialize;
 use rocket_dyn_templates::Template;
 
 use crate::flash::{FlashContext, FlashRedirect};
-use crate::sheets;
+use crate::sheet;
+use crate::status::ToStatus;
 use crate::Db;
 
 use super::logic::{self, User};
 use super::transport::LoginForm;
 
 const SESSION_ID_COOKIE_NAME: &str = "session_id";
-
-trait ToStatus {
-    fn to_status(self) -> Status;
-}
 
 impl ToStatus for logic::Error {
     fn to_status(self) -> Status {
@@ -77,7 +74,7 @@ pub async fn login(
     form: Form<LoginForm>,
 ) -> Result<FlashRedirect, Status> {
     let form = form.into_inner();
-    logic::login(&db, form)
+    logic::login(&db, form.username, form.password)
         .await
         .map_err(|e| e.to_status())
         .and_then(|s| {
@@ -85,8 +82,8 @@ pub async fn login(
                 cookies.add_private(Cookie::new(SESSION_ID_COOKIE_NAME, session_id));
                 Ok(FlashRedirect::no_flash(format!(
                     "{}{}",
-                    sheets::MOUNT,
-                    uri!(sheets::sheets)
+                    sheet::routes::MOUNT,
+                    uri!(sheet::routes::sheets)
                 )))
             })
             .unwrap_or_else(|| {
