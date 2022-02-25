@@ -4,16 +4,15 @@ use std::collections::HashMap;
 extern crate rocket;
 use rocket::fs::{relative, FileServer};
 use rocket::route::RouteUri;
-use rocket::serde::uuid::Uuid;
 use rocket_dyn_templates::Template;
 use rocket_sync_db_pools::{database, postgres};
 use tera::{self, from_value, to_value, Function};
 
 mod flash;
 mod login;
-mod sheets;
-
-type Id = Uuid;
+mod sheet;
+mod status;
+mod validation;
 
 #[database("hci_bildung")]
 pub struct Db(postgres::Client);
@@ -122,13 +121,13 @@ fn rocket() -> _ {
     }
     let r = rocket::build()
         .mount(
-            sheets::MOUNT,
+            sheet::routes::MOUNT,
             routes![
-                sheets::sheets,
-                sheets::new_sheet,
-                sheets::view_sheet,
-                sheets::edit_sheet,
-                sheets::save_sheet
+                sheet::routes::sheets,
+                sheet::routes::new_sheet,
+                sheet::routes::view_sheet,
+                sheet::routes::edit_sheet,
+                sheet::routes::save_sheet
             ],
         )
         .mount(
