@@ -47,7 +47,7 @@ impl<'r> FromRequest<'r> for &'r User {
                 }
             })
             .await;
-        user.as_ref().into_outcome((Status::Unauthorized, ()))
+        user.as_ref().or_forward(())
     }
 }
 

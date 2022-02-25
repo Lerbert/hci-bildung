@@ -8,7 +8,8 @@ use rocket::serde::json::Json;
 use rocket::serde::Serialize;
 use rocket_dyn_templates::Template;
 
-use crate::login::{User, UserTransport};
+use crate::flash::FlashRedirect;
+use crate::login::{self, User, UserTransport};
 use crate::status::ToStatus;
 use crate::validation::Validate;
 use crate::Db;
@@ -90,6 +91,11 @@ pub async fn sheets(db: Db, user: &User) -> Result<Template, Status> {
         })
 }
 
+#[get("/", rank = 2)]
+pub fn sheets_login_req() -> FlashRedirect {
+    redirect_to_login()
+}
+
 #[post("/", data = "<form>")]
 pub async fn new_sheet(db: Db, _user: &User, form: Form<NewSheetForm>) -> Result<Redirect, Status> {
     let form = form.into_inner();
@@ -97,26 +103,6 @@ pub async fn new_sheet(db: Db, _user: &User, form: Form<NewSheetForm>) -> Result
         .await
         .map_err(|e| e.to_status())
         .map(|id| Redirect::to(format!("{}{}", MOUNT, uri!(edit_sheet(id)))))
-}
-
-#[get("/<id>")]
-pub async fn view_sheet(db: Db, user: Option<&User>, id: Id) -> Result<Template, Status> {
-    logic::get_sheet_by_id(&db, id)
-        .await
-        .map_err(|e| e.to_status())
-        .and_then(|s| {
-            s.map(|sheet| {
-                Ok(Template::render(
-                    "sheet.html",
-                    &SheetContext {
-                        edit: false,
-                        sheet: sheet.into(),
-                        user: user.map(|u| u.into()),
-                    },
-                ))
-            })
-            .unwrap_or_else(|| Err(Status::NotFound))
-        })
 }
 
 #[get("/<id>?edit")]
@@ -139,6 +125,31 @@ pub async fn edit_sheet(db: Db, user: &User, id: Id) -> Result<Template, Status>
         })
 }
 
+#[get("/<_>?edit", rank = 2)]
+pub fn edit_login_req() -> FlashRedirect {
+    redirect_to_login()
+}
+
+#[get("/<id>", rank = 3)]
+pub async fn view_sheet(db: Db, user: Option<&User>, id: Id) -> Result<Template, Status> {
+    logic::get_sheet_by_id(&db, id)
+        .await
+        .map_err(|e| e.to_status())
+        .and_then(|s| {
+            s.map(|sheet| {
+                Ok(Template::render(
+                    "sheet.html",
+                    &SheetContext {
+                        edit: false,
+                        sheet: sheet.into(),
+                        user: user.map(|u| u.into()),
+                    },
+                ))
+            })
+            .unwrap_or_else(|| Err(Status::NotFound))
+        })
+}
+
 #[put("/<id>", format = "json", data = "<sheet>")]
 pub async fn save_sheet(
     db: Db,
@@ -154,4 +165,12 @@ pub async fn save_sheet(
             .await
             .map_err(|e| e.to_status())
     }
+}
+
+fn redirect_to_login() -> FlashRedirect {
+    FlashRedirect::with_flash(
+        uri!(login::routes::login),
+        "danger",
+        "Anmeldung erforderlich",
+    )
 }
