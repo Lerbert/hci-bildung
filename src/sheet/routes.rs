@@ -8,7 +8,7 @@ use rocket::serde::json::Json;
 use rocket::serde::Serialize;
 use rocket_dyn_templates::Template;
 
-use crate::login::User;
+use crate::login::{User, UserTransport};
 use crate::status::ToStatus;
 use crate::validation::Validate;
 use crate::Db;
@@ -27,11 +27,13 @@ impl ToStatus for logic::Error {
 struct SheetContext {
     edit: bool,
     sheet: SheetTransport,
+    user: Option<UserTransport>,
 }
 
 #[derive(Serialize)]
 struct SheetManagementContext {
     sheets: Vec<SheetOverviewTransport>,
+    user: UserTransport,
 }
 
 #[derive(Debug)]
@@ -73,7 +75,7 @@ impl Validate for SheetTransport {
 pub const MOUNT: &str = "/sheets";
 
 #[get("/")]
-pub async fn sheets(db: Db, _user: &User) -> Result<Template, Status> {
+pub async fn sheets(db: Db, user: &User) -> Result<Template, Status> {
     logic::get_all_sheets(&db)
         .await
         .map_err(|e| e.to_status())
@@ -82,6 +84,7 @@ pub async fn sheets(db: Db, _user: &User) -> Result<Template, Status> {
                 "docmgmt",
                 &SheetManagementContext {
                     sheets: sheets.into_iter().map(|metadata| metadata.into()).collect(),
+                    user: user.into(),
                 },
             )
         })
@@ -97,7 +100,7 @@ pub async fn new_sheet(db: Db, _user: &User, form: Form<NewSheetForm>) -> Result
 }
 
 #[get("/<id>")]
-pub async fn view_sheet(db: Db, id: Id) -> Result<Template, Status> {
+pub async fn view_sheet(db: Db, user: Option<&User>, id: Id) -> Result<Template, Status> {
     logic::get_sheet_by_id(&db, id)
         .await
         .map_err(|e| e.to_status())
@@ -108,6 +111,7 @@ pub async fn view_sheet(db: Db, id: Id) -> Result<Template, Status> {
                     &SheetContext {
                         edit: false,
                         sheet: sheet.into(),
+                        user: user.map(|u| u.into()),
                     },
                 ))
             })
@@ -116,7 +120,7 @@ pub async fn view_sheet(db: Db, id: Id) -> Result<Template, Status> {
 }
 
 #[get("/<id>?edit")]
-pub async fn edit_sheet(db: Db, _user: &User, id: Id) -> Result<Template, Status> {
+pub async fn edit_sheet(db: Db, user: &User, id: Id) -> Result<Template, Status> {
     logic::get_sheet_by_id(&db, id)
         .await
         .map_err(|e| e.to_status())
@@ -127,6 +131,7 @@ pub async fn edit_sheet(db: Db, _user: &User, id: Id) -> Result<Template, Status
                     &SheetContext {
                         edit: true,
                         sheet: sheet.into(),
+                        user: Some(user.into()),
                     },
                 ))
             })
