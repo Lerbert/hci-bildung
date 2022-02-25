@@ -1,6 +1,8 @@
 use chrono::{DateTime, Local};
 use rocket::serde::{Deserialize, Serialize};
 
+use crate::login::UserTransport;
+
 pub use super::logic::Id;
 use super::logic::{Sheet, SheetMetadata};
 
@@ -31,6 +33,7 @@ impl From<Sheet> for SheetOverviewTransport {
 pub struct SheetOverviewTransport {
     pub id: String,
     pub title: String,
+    pub owner: UserTransport,
     pub created: DateTime<Local>,
     pub changed: DateTime<Local>,
 }
@@ -40,6 +43,7 @@ impl From<SheetMetadata> for SheetOverviewTransport {
         SheetOverviewTransport {
             id: metadata.id.to_string(),
             title: metadata.title,
+            owner: metadata.owner,
             created: metadata.created,
             changed: metadata.changed,
         }

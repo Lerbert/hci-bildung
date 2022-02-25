@@ -1,6 +1,6 @@
 use std::fmt::{self, Display};
 
-use log::error;
+use log::{error, info};
 use rocket::form::Form;
 use rocket::http::Status;
 use rocket::response::Redirect;
@@ -19,8 +19,16 @@ use super::transport::{Id, NewSheetForm, SheetOverviewTransport, SheetTransport}
 
 impl ToStatus for logic::Error {
     fn to_status(self) -> Status {
-        error!("{}", self);
-        Status::InternalServerError
+        match self {
+            Self::Forbidden(_) => {
+                info!("{}", self);
+                Status::Forbidden
+            },
+            _ => {
+                error!("{}", self);
+                Status::InternalServerError
+            }
+        }
     }
 }
 
@@ -77,7 +85,7 @@ pub const MOUNT: &str = "/sheets";
 
 #[get("/")]
 pub async fn sheets(db: Db, user: &User) -> Result<Template, Status> {
-    logic::get_all_sheets(&db)
+    logic::get_all_sheets(&db, user)
         .await
         .map_err(|e| e.to_status())
         .map(|sheets| {
@@ -97,9 +105,9 @@ pub fn sheets_login_req() -> FlashRedirect {
 }
 
 #[post("/", data = "<form>")]
-pub async fn new_sheet(db: Db, _user: &User, form: Form<NewSheetForm>) -> Result<Redirect, Status> {
+pub async fn new_sheet(db: Db, user: &User, form: Form<NewSheetForm>) -> Result<Redirect, Status> {
     let form = form.into_inner();
-    logic::create_sheet(&db, form.title)
+    logic::create_sheet(&db, user, form.title)
         .await
         .map_err(|e| e.to_status())
         .map(|id| Redirect::to(format!("{}{}", MOUNT, uri!(edit_sheet(id)))))
@@ -107,7 +115,7 @@ pub async fn new_sheet(db: Db, _user: &User, form: Form<NewSheetForm>) -> Result
 
 #[get("/<id>?edit")]
 pub async fn edit_sheet(db: Db, user: &User, id: Id) -> Result<Template, Status> {
-    logic::get_sheet_by_id(&db, id)
+    logic::get_sheet_for_edit(&db, user, id)
         .await
         .map_err(|e| e.to_status())
         .and_then(|s| {
@@ -132,7 +140,7 @@ pub fn edit_login_req() -> FlashRedirect {
 
 #[get("/<id>", rank = 3)]
 pub async fn view_sheet(db: Db, user: Option<&User>, id: Id) -> Result<Template, Status> {
-    logic::get_sheet_by_id(&db, id)
+    logic::get_sheet(&db, id)
         .await
         .map_err(|e| e.to_status())
         .and_then(|s| {
@@ -153,7 +161,7 @@ pub async fn view_sheet(db: Db, user: Option<&User>, id: Id) -> Result<Template,
 #[put("/<id>", format = "json", data = "<sheet>")]
 pub async fn save_sheet(
     db: Db,
-    _user: &User,
+    user: &User,
     id: Id,
     sheet: Json<SheetTransport>,
 ) -> Result<(), Status> {
@@ -161,9 +169,10 @@ pub async fn save_sheet(
     if let Err(e) = sheet.validate() {
         Err(e.to_status())
     } else {
-        logic::update_sheet(&db, id, sheet.title, sheet.tiptap)
+        logic::update_sheet(&db, user, id, sheet.title, sheet.tiptap)
             .await
             .map_err(|e| e.to_status())
+            .and_then(|opt| opt.ok_or(Status::NotFound))
     }
 }
 

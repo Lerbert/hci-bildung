@@ -58,7 +58,6 @@ struct LoginContext {
 
 #[get("/login")]
 pub fn login_form(flash: Option<FlashMessage>) -> Template {
-    println!("{:?}", flash);
     Template::render(
         "login",
         &LoginContext {
