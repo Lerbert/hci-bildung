@@ -1,19 +1,20 @@
 <nav class="navbar is-light" role="navigation" aria-label="main navigation">
+  {% set landing_page_link = url_for(endpoint="landing_page") %}
   <div class="navbar-brand">
-    <a class="navbar-item">
+    <a class="navbar-item" href='{{ landing_page_link }}'>
       <img src='{{ url_for(endpoint="FileServer: assets/", path="img/hci-bildung-logo.png") }}' width="112" height="28">
     </a>
 
-    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbar-hci-bildung">
       <span aria-hidden="true"></span>
       <span aria-hidden="true"></span>
       <span aria-hidden="true"></span>
     </a>
   </div>
 
-  <div class="navbar-menu">
+  <div id="navbar-hci-bildung" class="navbar-menu">
     <div class="navbar-start">
-      <a class="navbar-item">
+      <a class="navbar-item" href='{{ landing_page_link }}'>
         Startseite
       </a>
 

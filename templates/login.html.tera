@@ -6,8 +6,7 @@
     Anmelden — {{ super() }}
 {% endblock title %}
 {% block content %}
-    <div class="mt-6 columns">
-        <div class="column"></div>
+    <div class="mt-6 columns is-centered">
         <div class="column is-two-fifths">
             <form action='{{ url_for(endpoint="login") }}' method="POST">
                 {{ form_field::simple_field(type="text", name="username", display_name="Nutzername", attrs="required") }}
@@ -19,6 +18,5 @@
                 </div>
             </form>
         </div>
-        <div class="column"></div>
     </div>
 {% endblock content %}
