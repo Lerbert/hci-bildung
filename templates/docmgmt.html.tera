@@ -65,7 +65,7 @@
                   <td class="is-narrow">{{ sheet.created | date(format="%d.%m.%Y %H:%M") }}</td>
                   <td class="is-narrow"><a href="{{ edit_url }}" title="Bearbeiten">{{ symbols::pencil() }}</a></td>
                   <td class="is-narrow"><a href="{{ view_url }}" title="Ansehen">{{ symbols::eye() }}</a></td>
-                  <td class="is-narrow"><a href="#" title="Löschen" class="has-text-danger">{{ symbols::trash() }}</a></td>
+                  <td class="is-narrow"><a title="Löschen" class="has-text-danger js-modal-trigger" data-target="delete-modal-{{ sheet.id }}">{{ symbols::trash() }}</a></td>
                 </tr>
               {% endfor %}
               <tr>
@@ -86,6 +86,28 @@
             </tbody>
           </table>
         </div>
+        {% for sheet in sheets %}
+          {% set delete_url = url_for(endpoint="delete_sheet", id=sheet.id) %}
+          <div id="delete-modal-{{ sheet.id }}" class="modal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+              <header class="modal-card-head">
+                <span class="modal-card-title">{{ sheet.title }} wirklich löschen?</span>
+                <button class="delete" aria-label="close"></button>
+              </header>
+              <section class="modal-card-body">
+                Wollen Sie das Dokument "{{ sheet.title }}" wirklich löschen? Das Dokument kann nicht wiederhergestellt werden.
+              </section>
+              <footer class="modal-card-foot is-justify-content-flex-end">
+                <form class="mr-2" action='{{ delete_url }}' method="POST">
+                  <input type="hidden" name="_method" value="DELETE">
+                  <button class="button is-danger" type="submit">Löschen</button>
+                </form>
+                <button class="button">Abbrechen</button>
+              </footer>
+            </div>
+          </div>
+        {% endfor %}
       </section>
     </div>
   </div>
