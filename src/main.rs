@@ -136,6 +136,7 @@ fn rocket() -> _ {
         .mount(
             "/",
             routes![
+                login::routes::landing_page,
                 login::routes::login_form,
                 login::routes::login,
                 login::routes::logout

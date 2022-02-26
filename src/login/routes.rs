@@ -13,7 +13,7 @@ use crate::status::ToStatus;
 use crate::Db;
 
 use super::logic::{self, User};
-use super::transport::LoginForm;
+use super::transport::{LoginForm, UserTransport};
 
 const SESSION_ID_COOKIE_NAME: &str = "session_id";
 
@@ -52,8 +52,23 @@ impl<'r> FromRequest<'r> for &'r User {
 }
 
 #[derive(Serialize)]
+struct LandingPageContext {
+    user: Option<UserTransport>,
+}
+
+#[derive(Serialize)]
 struct LoginContext {
     flash: Option<FlashContext>,
+}
+
+#[get("/")]
+pub fn landing_page(user: Option<&User>) -> Template {
+    Template::render(
+        "landing_page",
+        &LandingPageContext {
+            user: user.map(|u| u.into()),
+        },
+    )
 }
 
 #[get("/login")]
