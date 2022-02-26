@@ -3,14 +3,14 @@
 
 {% extends "generic/base" %}
 {% block content %}
-    <div class="mt-6 columns is-centered">
+    <div class="columns is-centered">
         <div class="column is-two-thirds">
             <h1 class="title">HCI Bildung</h1>
             <p class="subtitle">Interaktives Lernmaterial einfach gestalten</p>
             <p>
-                Mit HCI Bildung können Sie einfach digitale Arbeitsmaterialien erstellen und diese mit Ihren Schüler*innen teilen.
+                Mit HCI Bildung können Sie einfach interaktive Arbeitsmaterialien erstellen und diese mit Ihren Schüler*innen teilen.
                 HCI Bildung wurde so entwickelt, dass der Umstieg von bekannten Textverarbeitungsprogrammen möglichst reibungslos verläuft.
-                Die Idee zu HCI Bildung ist in der <a href="https://www.uni-augsburg.de/de/fakultaet/fai/informatik/prof/hcm/news/digitale-teilhabe-in-zeiten-von-corona/">Vorlesung Human-Computer-Interaction</a> an der Universität Augsburg entstanden.
+                Die Idee zu HCI Bildung ist im Rahmen der <a href="https://www.uni-augsburg.de/de/fakultaet/fai/informatik/prof/hcm/news/digitale-teilhabe-in-zeiten-von-corona/">Vorlesung Human-Computer-Interaction</a> an der Universität Augsburg entstanden.
             </p>
             <div class="pt-5 container is-align-content-center">
                 <video controls>
