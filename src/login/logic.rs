@@ -52,6 +52,12 @@ pub struct Session {
     pub expires: NaiveDateTime,
 }
 
+impl Session {
+    fn is_valid(&self) -> bool {
+        self.expires > chrono::Utc::now().naive_local()
+    }
+}
+
 const EXPIRY_DAYS: i64 = 5;
 
 pub async fn login(db: &Db, username: String, password: String) -> Result<Option<String>> {
@@ -62,8 +68,18 @@ pub async fn login(db: &Db, username: String, password: String) -> Result<Option
     }
 }
 
-pub async fn get_session_user(db: &Db, session_id: String) -> Result<Option<User>> {
-    Ok(data::get_user_by_session_id(db, session_id).await?)
+pub async fn validate_session(db: &Db, session_id: String) -> Result<Option<User>> {
+    if let Some(user) = data::get_user_by_session_id(db, session_id).await? {
+        let session = user.session.as_ref().expect("user found by session_id should have session");
+        if session.is_valid() {
+            Ok(Some(user))
+        } else {
+            data::delete_session(db, user.id).await?;
+            Ok(None)
+        }
+    } else {
+        Ok(None)
+    }
 }
 
 pub async fn logout(db: &Db, user: &User) -> Result<()> {

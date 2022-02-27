@@ -37,7 +37,7 @@ impl<'r> FromRequest<'r> for &'r User {
                     .get_private(SESSION_ID_COOKIE_NAME)
                     .map(|cookie| cookie.value().to_owned())
                 {
-                    logic::get_session_user(&db, session_id)
+                    logic::validate_session(&db, session_id)
                         .await
                         .map_err(|e| error!("{}", e))
                         .ok()
