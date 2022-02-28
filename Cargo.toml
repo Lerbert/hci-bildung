@@ -22,7 +22,7 @@ features = ["serde"]
 
 [dependencies.rocket]
 version = "0.5.0-rc.1"
-features = ["json", "secrets", "tls", "uuid"]
+features = ["json", "secrets", "uuid"]
 
 [dependencies.postgres-types]
 version = "0.2.2"
