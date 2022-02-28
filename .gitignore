@@ -3,6 +3,7 @@ node_modules
 vue_dist
 target
 
+.env
 secrets
 
 # local env files
