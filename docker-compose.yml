@@ -20,7 +20,8 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
   nginx:
-    image: nginx:latest
+    build:
+      dockerfile: nginx.Dockerfile
     ports:
       - "80:80"
       - "443:443"
