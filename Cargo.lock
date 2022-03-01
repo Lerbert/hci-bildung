@@ -442,26 +442,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "212d0f5754cb6769937f4501cc0e67f4f4483c8d2c3e1e922ee9edbe4ab4c7c0"
 
 [[package]]
-name = "editor-server"
-version = "0.1.0"
-dependencies = [
- "base64",
- "chrono",
- "fern",
- "log",
- "postgres-types",
- "rand 0.8.4",
- "rocket",
- "rocket_dyn_templates",
- "rocket_sync_db_pools",
- "rust-crypto",
- "serde",
- "serde_json",
- "tera",
- "uuid",
-]
-
-[[package]]
 name = "either"
 version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -782,6 +762,26 @@ name = "hashbrown"
 version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ab5ef0d4909ef3724cc8cce6ccc8572c5c817592e9285f5464f8e86f8bd3726e"
+
+[[package]]
+name = "hci-bildung"
+version = "0.1.0"
+dependencies = [
+ "base64",
+ "chrono",
+ "fern",
+ "log",
+ "postgres-types",
+ "rand 0.8.4",
+ "rocket",
+ "rocket_dyn_templates",
+ "rocket_sync_db_pools",
+ "rust-crypto",
+ "serde",
+ "serde_json",
+ "tera",
+ "uuid",
+]
 
 [[package]]
 name = "hermit-abi"

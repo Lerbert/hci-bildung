@@ -10,23 +10,23 @@ RUN npm run build
 
 FROM rust:1.59 as rust-build
 
-RUN user=root cargo new --bin editor-server
-WORKDIR /editor-server
+RUN user=root cargo new --bin hci-bildung
+WORKDIR /hci-bildung
 COPY ./Cargo.toml ./Cargo.toml
 RUN cargo build --release
 RUN rm src/*.rs
 
 COPY ./src ./src
 
-RUN rm ./target/release/deps/editor_server*
+RUN rm ./target/release/deps/hci_bildung*
 RUN cargo build --release
 
 FROM debian:buster-slim
 
-WORKDIR /editor-server
+WORKDIR /hci-bildung
 
 COPY --from=vue-build /app/vue_dist ./vue_dist
-COPY --from=rust-build /editor-server/target/release/editor-server .
+COPY --from=rust-build /hci-bildung/target/release/hci-bildung .
 
 COPY ./deployment/launch_server.sh ./launch.sh
 COPY ./Rocket.toml ./Rocket.toml

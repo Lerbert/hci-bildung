@@ -1,5 +1,5 @@
 [package]
-name = "editor-server"
+name = "hci-bildung"
 version = "0.1.0"
 authors = ["Florian Lercher <florian.lercher@tum.de>"]
 edition = "2018"
