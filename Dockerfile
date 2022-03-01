@@ -28,9 +28,10 @@ WORKDIR /editor-server
 COPY --from=vue-build /app/vue_dist ./vue_dist
 COPY --from=rust-build /editor-server/target/release/editor-server .
 
+COPY ./deployment/launch_server.sh ./launch.sh
 COPY ./Rocket.toml ./Rocket.toml
 COPY ./assets ./assets
 COPY ./templates ./templates
 
 EXPOSE 8000
-CMD ["./editor-server"]
+CMD ["./launch.sh"]

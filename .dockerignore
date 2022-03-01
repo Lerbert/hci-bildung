@@ -1,1 +1,4 @@
+.git
+.env
+secrets
 vue/node_modules
