@@ -4,7 +4,30 @@
 
 This project relies on enriching static pages served from the rust backend with an vue app for the editor component. To do so, we use webpack to build a production ready version of the vue app, which our backend then picks up as a template.
 
-### Setting up the database
+### Setup with Docker Compose
+
+1. Create a `.env` file at the repository root. Have a look at `.env.example` to see how this file might look like
+You can generate a suitable secret key with `openssl rand -base64 32`.
+
+2. To start the backend in the background run
+
+```bash
+docker compose up -d
+```
+
+If you want to rebuild the docker images add `--build`
+
+3. You can stop the backend with
+
+```bash
+docker compose down
+```
+
+### Setup without Docker Compose
+
+As an alternative to using Docker Compose you can setup your development environment as follows.
+
+#### Setting up the database
 
 1. Create a new PostgreSQL database
 
@@ -14,21 +37,13 @@ This project relies on enriching static pages served from the rust backend with 
 psql -d $DB_NAME < db_scripts/setup.sql
 ```
 
-3. Update `Rocket.toml` with your database URL
+#### Configuring Rocket
+
+1. Update `Rocket.toml` with your database URL
 
 ```toml
 [global.databases.hci_bildung]
 url = "<your URL here>"
-```
-
-### Setting up secrets
-
-1. Change `Rocket.toml` to reflect the location of your TLS certificate
-
-```toml
-[default.tls]
-certs = "<your certificate path here>"
-key = "<your key path here>"
 ```
 
 2. For production builds: Set a secret key for encrypted cookies. This can be done in `Rocket.toml` or using the environment variable `ROCKET_SECRET_KEY`
@@ -40,7 +55,9 @@ secret_key="<your secret key here>"
 
 You can generate a suitable key with `openssl rand -base64 32`.
 
-### Building the frontend
+3. Further configuration can be done via `Rocket.toml` or environment variables as described in the [Rocket docs](https://rocket.rs/v0.5-rc/guide/configuration/#configuration)
+
+#### Building the frontend
 
 1. Navigate to the `vue` directory
 
@@ -64,7 +81,7 @@ This should produce the directory `vue_dist` at the root of the repository.
 The directory contains the file `sheet.html.tera`, which our backend loads as template, and the directory `vue` containing the assets.
 After starting the backend, the `vue` directory is available at `/vue` enabling the vue app to load its assets correctly.
 
-### Building and running the backend
+#### Building and running the backend
 
 1. Navigate back to the repository root, so if you previously built the frontend do
 

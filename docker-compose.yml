@@ -5,8 +5,6 @@ services:
     build: .
     depends_on:
       - db
-    ports:
-      - "8000:8000"
     environment:
       - PORT=8000
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
@@ -31,7 +29,7 @@ services:
       - "443:443"
     volumes:
       - ./deployment/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./secrets:/secrets
+      - ${CERT_PATH}:/secrets
 
 volumes:
   dbdata:
