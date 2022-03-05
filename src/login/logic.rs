@@ -70,7 +70,10 @@ pub async fn login(db: &Db, username: String, password: String) -> Result<Option
 
 pub async fn validate_session(db: &Db, session_id: String) -> Result<Option<User>> {
     if let Some(user) = data::get_user_by_session_id(db, session_id).await? {
-        let session = user.session.as_ref().expect("user found by session_id should have session");
+        let session = user
+            .session
+            .as_ref()
+            .expect("user found by session_id should have session");
         if session.is_valid() {
             Ok(Some(user))
         } else {

@@ -1,6 +1,6 @@
 use std::fmt::{self, Display};
 
-use chrono::{DateTime, Local};
+use chrono::{DateTime, Utc};
 
 use crate::login::{User, UserTransport};
 use crate::Db;
@@ -41,8 +41,8 @@ pub struct SheetMetadata {
     pub id: Id,
     pub title: String,
     pub owner: UserTransport,
-    pub created: DateTime<Local>,
-    pub changed: DateTime<Local>,
+    pub created: DateTime<Utc>,
+    pub changed: DateTime<Utc>,
 }
 
 pub async fn get_all_sheets(db: &Db, user: &User) -> Result<Vec<SheetMetadata>> {
@@ -50,7 +50,7 @@ pub async fn get_all_sheets(db: &Db, user: &User) -> Result<Vec<SheetMetadata>> 
 }
 
 pub async fn create_sheet(db: &Db, user: &User, title: String) -> Result<Id> {
-    let now = chrono::Local::now();
+    let now = chrono::Utc::now();
     let tiptap =
         serde_json::from_str("{\"type\": \"doc\", \"content\": [{\"type\": \"paragraph\"}]}")
             .expect("malformed JSON");

@@ -2,20 +2,29 @@ use std::collections::HashMap;
 
 #[macro_use]
 extern crate rocket;
+#[macro_use]
+extern crate diesel_migrations;
+#[macro_use]
+extern crate diesel;
+
+use log::error;
+use rocket::fairing::AdHoc;
 use rocket::fs::{relative, FileServer};
 use rocket::route::RouteUri;
+use rocket::{Build, Rocket};
 use rocket_dyn_templates::Template;
-use rocket_sync_db_pools::{database, postgres};
+use rocket_sync_db_pools::database;
 use tera::{self, from_value, to_value, Function};
 
 mod flash;
 mod login;
+mod schema;
 mod sheet;
 mod status;
 mod validation;
 
 #[database("hci_bildung")]
-pub struct Db(postgres::Client);
+pub struct Db(diesel::PgConnection);
 
 fn make_url_for(urls: HashMap<String, RouteUri<'static>>) -> impl Function {
     println!("{:?}", urls.keys());
@@ -114,6 +123,23 @@ fn setup_logging() -> Result<(), fern::InitError> {
     Ok(())
 }
 
+embed_migrations!();
+
+async fn migrate(rocket: Rocket<Build>) -> Result<Rocket<Build>, Rocket<Build>> {
+    if let Some(db) = Db::get_one(&rocket).await {
+        db.run(|c| match embedded_migrations::run(c) {
+            Ok(_) => Ok(rocket),
+            Err(e) => {
+                error!("Database migration failed: {}", e);
+                Err(rocket)
+            }
+        })
+        .await
+    } else {
+        Err(rocket)
+    }
+}
+
 #[launch]
 fn rocket() -> _ {
     if let Err(e) = setup_logging() {
@@ -158,4 +184,5 @@ fn rocket() -> _ {
             .register_function("url_for", make_url_for(map.clone()));
     }))
     .attach(Db::fairing())
+    .attach(AdHoc::try_on_ignite("Database Migrations", migrate))
 }

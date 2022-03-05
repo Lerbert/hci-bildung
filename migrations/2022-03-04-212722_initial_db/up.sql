@@ -1,0 +1,37 @@
+CREATE extension pgcrypto;
+
+-- Tables
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(20) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE sessions (
+    session_id VARCHAR(128) PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users ON UPDATE CASCADE ON DELETE CASCADE,
+    expires TIMESTAMP NOT NULL
+);
+
+CREATE TABLE sheets (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    title VARCHAR(256) NOT NULL,
+    owner_id INTEGER NOT NULL REFERENCES users ON UPDATE CASCADE ON DELETE RESTRICT,
+    created TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    changed TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    tiptap JSONB NOT NULL
+);
+
+-- Triggers
+
+CREATE FUNCTION update_changed_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.changed = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER sheet_changed BEFORE UPDATE ON sheets
+FOR EACH ROW EXECUTE PROCEDURE update_changed_timestamp();

@@ -1,42 +1,82 @@
 use chrono::NaiveDateTime;
-use rocket_sync_db_pools::postgres::{self, Row};
+use rocket_sync_db_pools::diesel;
 
 use crate::Db;
 
 use super::logic::{Session, User};
 
-pub type Error = postgres::Error;
+use self::diesel::prelude::*;
+use crate::schema::{sessions, users};
+
+pub type Error = diesel::result::Error;
+
+#[derive(Debug, Queryable)]
+struct UserDiesel {
+    id: i32,
+    username: String,
+    password_hash: String,
+}
+
+#[derive(Debug, Insertable, Queryable)]
+#[table_name = "sessions"]
+struct SessionDiesel {
+    #[column_name = "session_id"]
+    id: String,
+    user_id: i32,
+    expires: NaiveDateTime,
+}
+
+impl From<SessionDiesel> for Session {
+    fn from(session: SessionDiesel) -> Session {
+        Session {
+            id: session.id,
+            expires: session.expires,
+        }
+    }
+}
+
+impl From<(UserDiesel, Option<SessionDiesel>)> for User {
+    fn from(t: (UserDiesel, Option<SessionDiesel>)) -> User {
+        let (u, s) = t;
+        User {
+            id: u.id,
+            username: u.username,
+            password_hash: u.password_hash,
+            session: s.map(|s| s.into()),
+        }
+    }
+}
+
+impl From<(UserDiesel, SessionDiesel)> for User {
+    fn from(t: (UserDiesel, SessionDiesel)) -> User {
+        User::from((t.0, Some(t.1)))
+    }
+}
 
 pub async fn get_user_by_name(db: &Db, name: String) -> Result<Option<User>, Error> {
-    let row = db
+    let user: Option<(UserDiesel, Option<SessionDiesel>)> = db
         .run(move |c| {
-            c.query_opt(
-                "select u.id, u.username, u.password_hash, s.session_id, s.expires
-                from users u left join sessions s on u.id = s.user_id
-                where u.username = $1",
-                &[&name],
-            )
+            users::table
+                .left_join(sessions::table)
+                .filter(users::username.eq(name))
+                .first(c)
+                .optional()
         })
         .await?;
-    Ok(row.map(|r| {
-        let session_id: Option<String> = r.get("session_id");
-        let session = session_id.map(|_| session_from_row(&r));
-        user_from_row(&r, session)
-    }))
+    Ok(user.map(|u| u.into()))
 }
 
 pub async fn get_user_by_session_id(db: &Db, session_id: String) -> Result<Option<User>, Error> {
-    let row = db
+    let user: Option<(UserDiesel, SessionDiesel)> = db
         .run(move |c| {
-            c.query_opt(
-                "select u.id, u.username, u.password_hash, s.session_id, s.expires
-                from users u join sessions s on u.id = s.user_id
-                where s.session_id = $1",
-                &[&session_id],
-            )
+            users::table
+                .inner_join(sessions::table)
+                .filter(sessions::session_id.eq(session_id))
+                .first(c)
+                .optional()
         })
         .await?;
-    Ok(row.map(|r| user_from_row(&r, Some(session_from_row(&r)))))
+    Ok(user.map(|u| u.into()))
 }
 
 pub async fn create_session(
@@ -45,17 +85,19 @@ pub async fn create_session(
     session_id: String,
     expires: NaiveDateTime,
 ) -> Result<String, Error> {
-    let row = db
+    let session = SessionDiesel {
+        id: session_id,
+        user_id,
+        expires,
+    };
+    let session: SessionDiesel = db
         .run(move |c| {
-            c.query_one(
-                "insert into sessions(session_id, user_id, expires)
-                values ($1, $2, $3)
-                returning session_id",
-                &[&session_id, &user_id, &expires],
-            )
+            diesel::insert_into(sessions::table)
+                .values(&session)
+                .get_result(c)
         })
         .await?;
-    Ok(row.get("session_id"))
+    Ok(session.id)
 }
 
 pub async fn renew_session(
@@ -64,12 +106,9 @@ pub async fn renew_session(
     expires: NaiveDateTime,
 ) -> Result<(), Error> {
     db.run(move |c| {
-        c.execute(
-            "update sessions
-            set expires = $2
-            where session_id = $1",
-            &[&session_id, &expires],
-        )
+        diesel::update(sessions::table.find(session_id))
+            .set(sessions::expires.eq(expires))
+            .execute(c)
     })
     .await?;
     Ok(())
@@ -77,28 +116,8 @@ pub async fn renew_session(
 
 pub async fn delete_session(db: &Db, user_id: i32) -> Result<(), Error> {
     db.run(move |c| {
-        c.execute(
-            "delete from sessions
-            where user_id = $1",
-            &[&user_id],
-        )
+        diesel::delete(sessions::table.filter(sessions::user_id.eq(user_id))).execute(c)
     })
     .await?;
     Ok(())
-}
-
-fn user_from_row(row: &Row, session: Option<Session>) -> User {
-    User {
-        id: row.get("id"),
-        username: row.get("username"),
-        password_hash: row.get("password_hash"),
-        session,
-    }
-}
-
-fn session_from_row(row: &Row) -> Session {
-    Session {
-        id: row.get("session_id"),
-        expires: row.get("expires"),
-    }
 }

@@ -1,4 +1,4 @@
-use chrono::{DateTime, Local};
+use chrono::{DateTime, Utc};
 use rocket::serde::{Deserialize, Serialize};
 
 use crate::login::UserTransport;
@@ -34,8 +34,8 @@ pub struct SheetOverviewTransport {
     pub id: String,
     pub title: String,
     pub owner: UserTransport,
-    pub created: DateTime<Local>,
-    pub changed: DateTime<Local>,
+    pub created: DateTime<Utc>,
+    pub changed: DateTime<Utc>,
 }
 
 impl From<SheetMetadata> for SheetOverviewTransport {

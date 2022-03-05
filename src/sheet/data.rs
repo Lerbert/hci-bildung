@@ -1,5 +1,5 @@
-use chrono::{DateTime, Local};
-use rocket_sync_db_pools::postgres::{self, Row};
+use chrono::{DateTime, Utc};
+use rocket_sync_db_pools::diesel;
 
 use crate::login::UserTransport;
 use crate::Db;
@@ -7,34 +7,118 @@ use crate::Db;
 use super::logic::{Sheet, SheetMetadata};
 use super::transport::Id;
 
-pub type Error = postgres::Error;
+use self::diesel::prelude::*;
+use crate::schema::{sheets, users};
+
+pub type Error = diesel::result::Error;
+
+#[derive(Debug, Queryable)]
+struct SheetDiesel {
+    id: Id,
+    title: String,
+    _owner_id: i32,
+    created: DateTime<Utc>,
+    changed: DateTime<Utc>,
+    tiptap: serde_json::Value,
+}
+
+impl From<(SheetDiesel, UserTransportDiesel)> for Sheet {
+    fn from(t: (SheetDiesel, UserTransportDiesel)) -> Sheet {
+        let (s, u) = t;
+        Sheet {
+            metadata: SheetMetadata {
+                id: s.id,
+                title: s.title,
+                owner: u.into(),
+                created: s.created,
+                changed: s.changed,
+            },
+            tiptap: s.tiptap,
+        }
+    }
+}
+
+#[derive(Debug, Queryable)]
+struct UserTransportDiesel {
+    id: i32,
+    username: String,
+}
+
+impl From<UserTransportDiesel> for UserTransport {
+    fn from(u: UserTransportDiesel) -> UserTransport {
+        UserTransport {
+            id: u.id,
+            username: u.username,
+        }
+    }
+}
+
+#[derive(Debug, Queryable)]
+struct SheetMetadataDiesel {
+    id: Id,
+    title: String,
+    _owner_id: i32,
+    created: DateTime<Utc>,
+    changed: DateTime<Utc>,
+}
+
+impl From<(SheetMetadataDiesel, UserTransportDiesel)> for SheetMetadata {
+    fn from(t: (SheetMetadataDiesel, UserTransportDiesel)) -> SheetMetadata {
+        let (s, u) = t;
+        SheetMetadata {
+            id: s.id,
+            title: s.title,
+            owner: u.into(),
+            created: s.created,
+            changed: s.changed,
+        }
+    }
+}
 
 pub async fn get_all_sheets(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Error> {
-    let rows = db
+    let sheets: Vec<(SheetMetadataDiesel, UserTransportDiesel)> = db
         .run(move |c| {
-            c.query(
-                "select s.id as sheet_id, s.title, s.created, s.changed, u.id as user_id, u.username
-                from sheets s join users u on s.owner_id = u.id
-                where u.id = $1",
-                &[&user_id],
-            )
+            sheets::table
+                .inner_join(users::table)
+                .select((
+                    (
+                        sheets::id,
+                        sheets::title,
+                        sheets::owner_id,
+                        sheets::created,
+                        sheets::changed,
+                    ),
+                    (users::id, users::username),
+                ))
+                .filter(sheets::owner_id.eq(user_id))
+                .load(c)
         })
         .await?;
-    Ok(rows.iter().map(sheet_metadata_from_row).collect())
+    Ok(sheets.into_iter().map(|s| s.into()).collect())
 }
 
 pub async fn get_sheet_by_id(db: &Db, id: Id) -> Result<Option<Sheet>, Error> {
-    let row = db
+    let sheet: Option<(SheetDiesel, UserTransportDiesel)> = db
         .run(move |c| {
-            c.query_opt(
-                "select s.id as sheet_id, s.title, s.created, s.changed, s.tiptap, u.id as user_id, u.username
-                from sheets s join users u on s.owner_id = u.id
-                where s.id = $1",
-                &[&id],
-            )
+            sheets::table
+                .inner_join(users::table)
+                .select((
+                    (
+                        sheets::id,
+                        sheets::title,
+                        sheets::owner_id,
+                        sheets::created,
+                        sheets::changed,
+                        sheets::tiptap,
+                    ),
+                    (users::id, users::username),
+                ))
+                .filter(sheets::id.eq(id))
+                .first(c)
+                .optional()
         })
         .await?;
-    Ok(row.map(|r| sheet_from_row(&r)))
+    Ok(sheet.map(|s| s.into()))
 }
 
 pub async fn create_sheet(
@@ -42,20 +126,23 @@ pub async fn create_sheet(
     title: String,
     tiptap: serde_json::Value,
     owner_id: i32,
-    created: DateTime<Local>,
-    changed: DateTime<Local>,
+    created: DateTime<Utc>,
+    changed: DateTime<Utc>,
 ) -> Result<Id, Error> {
-    let row = db
+    let sheet: SheetDiesel = db
         .run(move |c| {
-            c.query_one(
-                "insert into sheets(title, tiptap, owner_id, created, changed)
-                values ($1, $2, $3, $4, $5)
-                returning id",
-                &[&title, &tiptap, &owner_id, &created, &changed],
-            )
+            diesel::insert_into(sheets::table)
+                .values(&(
+                    sheets::title.eq(title),
+                    sheets::owner_id.eq(owner_id),
+                    sheets::created.eq(created),
+                    sheets::changed.eq(changed),
+                    sheets::tiptap.eq(tiptap),
+                ))
+                .get_result(c)
         })
         .await?;
-    Ok(row.get("id"))
+    Ok(sheet.id)
 }
 
 pub async fn update_sheet(
@@ -65,49 +152,16 @@ pub async fn update_sheet(
     tiptap: serde_json::Value,
 ) -> Result<(), Error> {
     db.run(move |c| {
-        c.execute(
-            "update sheets
-            set title = $2, tiptap = $3
-            where id = $1",
-            &[&id, &title, &tiptap],
-        )
+        diesel::update(sheets::table.find(id))
+            .set((sheets::title.eq(title), sheets::tiptap.eq(tiptap)))
+            .execute(c)
     })
     .await?;
     Ok(())
 }
 
 pub async fn delete_sheet(db: &Db, id: Id) -> Result<(), Error> {
-    db.run(move |c| {
-        c.execute(
-            "delete from sheets
-            where id = $1",
-            &[&id],
-        )
-    })
-    .await?;
+    db.run(move |c| diesel::delete(sheets::table.find(id)).execute(c))
+        .await?;
     Ok(())
-}
-
-fn sheet_from_row(row: &Row) -> Sheet {
-    Sheet {
-        metadata: sheet_metadata_from_row(row),
-        tiptap: row.get("tiptap"),
-    }
-}
-
-fn sheet_metadata_from_row(row: &Row) -> SheetMetadata {
-    SheetMetadata {
-        id: row.get("sheet_id"),
-        title: row.get("title"),
-        owner: user_transport_from_row(row),
-        created: row.get("created"),
-        changed: row.get("changed"),
-    }
-}
-
-fn user_transport_from_row(row: &Row) -> UserTransport {
-    UserTransport {
-        id: row.get("user_id"),
-        username: row.get("username"),
-    }
 }
