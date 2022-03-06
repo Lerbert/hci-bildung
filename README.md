@@ -1,3 +1,5 @@
+[![Build Status](https://github.com/Lerbert/hci-bildung/actions/workflows/build_status.yml/badge.svg)](https://github.com/Lerbert/hci-bildung/actions/workflows/build_status.yml)
+
 # HCI Bildung
 
 ## Project setup
