@@ -31,22 +31,18 @@ As an alternative to using Docker Compose you can setup your development environ
 
 1. Create a new PostgreSQL database
 
-2. Initialize the database using
-
-```bash
-psql -d $DB_NAME < db_scripts/setup.sql
-```
-
-#### Configuring Rocket
-
-1. Update `Rocket.toml` with your database URL
+2. Update `Rocket.toml` with your database URL
 
 ```toml
 [global.databases.hci_bildung]
 url = "<your URL here>"
 ```
 
-2. For production builds: Set a secret key for encrypted cookies. This can be done in `Rocket.toml` or using the environment variable `ROCKET_SECRET_KEY`
+3. The database will be initialized by the Diesel migrations, which run automatically when the backend starts. If you want to use the Diesel CLI, you have to set `DATABASE_URL` in your `.env` file.
+
+#### Configuring Rocket
+
+1. For production builds: Set a secret key for encrypted cookies. This can be done in `Rocket.toml` or using the environment variable `ROCKET_SECRET_KEY`
 
 ```toml
 [release]
@@ -55,7 +51,7 @@ secret_key="<your secret key here>"
 
 You can generate a suitable key with `openssl rand -base64 32`.
 
-3. Further configuration can be done via `Rocket.toml` or environment variables as described in the [Rocket docs](https://rocket.rs/v0.5-rc/guide/configuration/#configuration)
+2. Further configuration can be done via `Rocket.toml` or environment variables as described in the [Rocket docs](https://rocket.rs/v0.5-rc/guide/configuration/#configuration)
 
 #### Building the frontend
 
