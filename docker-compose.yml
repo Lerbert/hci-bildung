@@ -8,11 +8,11 @@ services:
     environment:
       - PORT=8000
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      - DB_POOL_SIZE=20
       - ROCKET_SECRET_KEY=${ROCKET_SECRET_KEY}
   db:
     image: postgres:latest
     volumes:
-      - ./db_scripts/setup.sql:/docker-entrypoint-initdb.d/setup.sql
       - dbdata:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=${POSTGRES_USER}

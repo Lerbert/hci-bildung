@@ -16,12 +16,17 @@ COPY ./Cargo.toml ./Cargo.toml
 RUN cargo build --release
 RUN rm src/*.rs
 
+COPY ./migrations ./migrations
 COPY ./src ./src
 
 RUN rm ./target/release/deps/hci_bildung*
 RUN cargo build --release
 
 FROM debian:buster-slim
+
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /hci-bildung
 
