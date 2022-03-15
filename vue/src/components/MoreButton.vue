@@ -67,7 +67,7 @@ export default defineComponent({
       this.more = !this.more;
     },
 
-    clickHandler(event) {
+    clickHandler(event: Event) {
       const { target } = event;
       const { $el } = this;
       if (!$el.contains(target)) {

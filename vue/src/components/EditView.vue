@@ -25,7 +25,7 @@
           <div class="is-flex is-justify-content-right buttons">
             <share-button :docId="docId"></share-button>
             <more-button class="is-right">
-              <a class="dropdown-item icon-text">
+              <a class="dropdown-item icon-text" @click="exportDocument">
                 <span class="icon">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -56,6 +56,7 @@
 <script>
 import { defineComponent } from "vue";
 import debounce from "lodash/debounce";
+import download from "downloadjs";
 
 import MoreButton from "./MoreButton.vue";
 import { SaveStatus } from "../enums";
@@ -100,6 +101,15 @@ export default defineComponent({
     };
   },
 
+  computed: {
+    doc() {
+      return {
+        title: this.title,
+        tiptap: this.editorContent,
+      };
+    },
+  },
+
   methods: {
     handleContentUpdate(event) {
       this.saveStatus = SaveStatus.WAITING;
@@ -120,10 +130,7 @@ export default defineComponent({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            title: this.title,
-            tiptap: this.editorContent,
-          }),
+          body: JSON.stringify(this.doc),
         });
         await delay;
         saveOk = response.status === 200;
@@ -148,6 +155,9 @@ export default defineComponent({
           setTimeout(this.save, this.saveBackoff);
         }
       }
+    },
+    exportDocument() {
+      download(JSON.stringify(this.doc), this.title, "application/json");
     },
   },
 
