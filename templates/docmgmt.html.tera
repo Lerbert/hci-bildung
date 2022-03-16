@@ -123,7 +123,7 @@
                 <p>Wählen Sie die Datei aus, die Sie importieren wollen.</p>
                 <div id="import-file" class="mt-3 file has-name">
                   <label class="file-label">
-                    <input class="file-input" type="file" name="file" accept="application/json">
+                    <input class="file-input" type="file" name="file" accept="application/json" required>
                     <span class="file-cta">
                       <span class="file-icon">{{ symbols::upload() }}</span>
                       <span class="file-label">Datei auswählen</span>

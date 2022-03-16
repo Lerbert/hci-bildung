@@ -3,12 +3,13 @@ use std::fmt::{self, Display};
 use log::{error, info};
 use rocket::form::Form;
 use rocket::http::Status;
+use rocket::request::FlashMessage;
 use rocket::response::Redirect;
 use rocket::serde::json::Json;
 use rocket::serde::Serialize;
 use rocket_dyn_templates::Template;
 
-use crate::flash::FlashRedirect;
+use crate::flash::{FlashContext, FlashRedirect};
 use crate::login::{self, User, UserTransport};
 use crate::status::ToStatus;
 use crate::validation::Validate;
@@ -41,6 +42,7 @@ struct SheetContext {
 
 #[derive(Serialize)]
 struct SheetManagementContext {
+    flash: Option<FlashContext>,
     sheets: Vec<SheetOverviewTransport>,
     user: UserTransport,
 }
@@ -84,7 +86,11 @@ impl Validate for SheetTransport {
 pub const MOUNT: &str = "/sheets";
 
 #[get("/")]
-pub async fn sheets(db: Db, user: &User) -> Result<Template, Status> {
+pub async fn sheets(
+    db: Db,
+    user: &User,
+    flash: Option<FlashMessage<'_>>,
+) -> Result<Template, Status> {
     logic::get_all_sheets(&db, user)
         .await
         .map_err(|e| e.to_status())
@@ -92,6 +98,7 @@ pub async fn sheets(db: Db, user: &User) -> Result<Template, Status> {
             Template::render(
                 "docmgmt",
                 &SheetManagementContext {
+                    flash: flash.map(|f| f.into()),
                     sheets: sheets.into_iter().map(|metadata| metadata.into()).collect(),
                     user: user.into(),
                 },
@@ -118,20 +125,34 @@ pub async fn import_sheet(
     db: Db,
     user: &User,
     form: Form<ImportSheetForm>,
-) -> Result<Redirect, Status> {
+) -> Result<FlashRedirect, Status> {
     let form = form.into_inner();
-    let sheet: SheetTransport = serde_json::from_str(&form.file).map_err(|e| {
-        error!("JSON deserialization of sheet failed: {}", e);
-        Status::BadRequest
-    })?;
-    if let Err(e) = sheet.validate() {
-        Err(e.to_status())
-    } else {
-        logic::create_sheet(&db, user, sheet.title, sheet.tiptap)
+    match parse_sheet(&form.file) {
+        Ok(sheet) => logic::create_sheet(&db, user, sheet.title, sheet.tiptap)
             .await
             .map_err(|e| e.to_status())
-            .map(|id| Redirect::to(format!("{}{}", MOUNT, uri!(edit_sheet(id)))))
+            .map(|id| FlashRedirect::no_flash(format!("{}{}", MOUNT, uri!(edit_sheet(id))))),
+        Err(redirect) => Ok(redirect),
     }
+}
+
+fn parse_sheet(sheet: &str) -> Result<SheetTransport, FlashRedirect> {
+    let get_error_redirect = || {
+        FlashRedirect::with_flash(
+            format!("{}{}", MOUNT, uri!(sheets)),
+            "danger",
+            "Invalides Dateiformat",
+        )
+    };
+    let sheet: SheetTransport = serde_json::from_str(sheet).map_err(|e| {
+        error!("JSON deserialization of sheet failed: {}", e);
+        get_error_redirect()
+    })?;
+    sheet.validate().map_err(|e| {
+        error!("Sheet validation failed: {}", e);
+        get_error_redirect()
+    })?;
+    Ok(sheet)
 }
 
 #[get("/<id>?edit")]
