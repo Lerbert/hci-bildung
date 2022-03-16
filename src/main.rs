@@ -152,6 +152,7 @@ fn rocket() -> _ {
                 sheet::routes::sheets,
                 sheet::routes::sheets_login_req,
                 sheet::routes::new_sheet,
+                sheet::routes::import_sheet,
                 sheet::routes::view_sheet,
                 sheet::routes::edit_sheet,
                 sheet::routes::edit_login_req,

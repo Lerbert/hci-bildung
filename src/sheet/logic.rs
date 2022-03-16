@@ -49,11 +49,20 @@ pub async fn get_all_sheets(db: &Db, user: &User) -> Result<Vec<SheetMetadata>> 
     Ok(data::get_all_sheets(db, user.id).await?)
 }
 
-pub async fn create_sheet(db: &Db, user: &User, title: String) -> Result<Id> {
-    let now = chrono::Utc::now();
+pub async fn create_empty_sheet(db: &Db, user: &User, title: String) -> Result<Id> {
     let tiptap =
         serde_json::from_str("{\"type\": \"doc\", \"content\": [{\"type\": \"paragraph\"}]}")
             .expect("malformed JSON");
+    create_sheet(db, user, title, tiptap).await
+}
+
+pub async fn create_sheet(
+    db: &Db,
+    user: &User,
+    title: String,
+    tiptap: serde_json::Value,
+) -> Result<Id> {
+    let now = chrono::Utc::now();
     Ok(data::create_sheet(db, title, tiptap, user.id, now, now).await?)
 }
 

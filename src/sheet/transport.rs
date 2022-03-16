@@ -50,8 +50,13 @@ impl From<SheetMetadata> for SheetOverviewTransport {
     }
 }
 
-#[derive(FromForm)]
+#[derive(Debug, FromForm)]
 pub struct NewSheetForm {
     #[field(validate = neq(""))]
     pub title: String,
+}
+
+#[derive(Debug, FromForm)]
+pub struct ImportSheetForm {
+    pub file: String,
 }

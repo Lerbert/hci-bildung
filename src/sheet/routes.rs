@@ -15,7 +15,7 @@ use crate::validation::Validate;
 use crate::Db;
 
 use super::logic;
-use super::transport::{Id, NewSheetForm, SheetOverviewTransport, SheetTransport};
+use super::transport::{Id, ImportSheetForm, NewSheetForm, SheetOverviewTransport, SheetTransport};
 
 impl ToStatus for logic::Error {
     fn to_status(self) -> Status {
@@ -107,10 +107,31 @@ pub fn sheets_login_req() -> FlashRedirect {
 #[post("/", data = "<form>")]
 pub async fn new_sheet(db: Db, user: &User, form: Form<NewSheetForm>) -> Result<Redirect, Status> {
     let form = form.into_inner();
-    logic::create_sheet(&db, user, form.title)
+    logic::create_empty_sheet(&db, user, form.title)
         .await
         .map_err(|e| e.to_status())
         .map(|id| Redirect::to(format!("{}{}", MOUNT, uri!(edit_sheet(id)))))
+}
+
+#[post("/import", data = "<form>")]
+pub async fn import_sheet(
+    db: Db,
+    user: &User,
+    form: Form<ImportSheetForm>,
+) -> Result<Redirect, Status> {
+    let form = form.into_inner();
+    let sheet: SheetTransport = serde_json::from_str(&form.file).map_err(|e| {
+        error!("JSON deserialization of sheet failed: {}", e);
+        Status::BadRequest
+    })?;
+    if let Err(e) = sheet.validate() {
+        Err(e.to_status())
+    } else {
+        logic::create_sheet(&db, user, sheet.title, sheet.tiptap)
+            .await
+            .map_err(|e| e.to_status())
+            .map(|id| Redirect::to(format!("{}{}", MOUNT, uri!(edit_sheet(id)))))
+    }
 }
 
 #[get("/<id>?edit")]
