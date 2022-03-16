@@ -7,12 +7,12 @@
     :checkTrigger="checkTrigger"
     @grantPoints="(event) => $emit('grantPoints', event)"
   >
-    <marking
+    <text-marking
       :tiptapNode="{ ...tiptapNode, marks: marks.slice(1) }"
       :checkTrigger="checkTrigger"
       @grantPoints="(event) => $emit('grantPoints', event)"
       ><slot
-    /></marking>
+    /></text-marking>
   </component>
 </template>
 

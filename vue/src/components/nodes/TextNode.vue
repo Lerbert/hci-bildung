@@ -1,5 +1,5 @@
 <template>
-  {{ tiptapNode.text }}
+  <span>{{ tiptapNode.text }}</span>
 </template>
 
 <script lang="ts">
