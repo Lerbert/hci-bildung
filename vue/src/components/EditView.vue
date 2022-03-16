@@ -157,7 +157,11 @@ export default defineComponent({
       }
     },
     exportDocument() {
-      download(JSON.stringify(this.doc), this.title, "application/json");
+      download(
+        new Blob([JSON.stringify(this.doc)]),
+        this.title + ".json",
+        "application/json"
+      );
     },
   },
 
