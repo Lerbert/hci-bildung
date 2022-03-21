@@ -31,10 +31,8 @@ declare module "@tiptap/core" {
 export const dollarInputRegex = /(?:^|\s)((?:\$\$)((?:[^$$]+))(?:\$\$))$/;
 export const dollarPasteRegex = /(?:^|\s)((?:\$\$)((?:[^$$]+))(?:\$\$))/g;
 
-const name = "latex";
-
 export default Mark.create<LatexOptions>({
-  name: name,
+  name: "latex",
 
   addOptions() {
     return {
@@ -47,16 +45,7 @@ export default Mark.create<LatexOptions>({
   parseHTML() {
     return [
       {
-        tag: "span",
-        getAttrs: (element) => {
-          const dataType = (element as HTMLElement).getAttribute("data-type");
-
-          if (!dataType || dataType != name) {
-            return false;
-          }
-
-          return {};
-        },
+        tag: `span[data-type="${this.name}"]`,
       },
     ];
   },
@@ -65,7 +54,7 @@ export default Mark.create<LatexOptions>({
     return [
       "span",
       mergeAttributes(
-        { "data-type": name },
+        { "data-type": this.name },
         this.options.HTMLAttributes,
         HTMLAttributes
       ),

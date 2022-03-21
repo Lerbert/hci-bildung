@@ -31,10 +31,8 @@ declare module "@tiptap/core" {
 export const pipeInputRegex = /(?:^|\s)((?:\|\|)((?:[^|]+))(?:\|\|))$/;
 export const pipePasteRegex = /(?:^|\s)((?:\|\|)((?:[^|]+))(?:\|\|))/g;
 
-const name = "gap";
-
 export default Mark.create<GapOptions>({
-  name: name,
+  name: "gap",
 
   addOptions() {
     return {
@@ -47,16 +45,7 @@ export default Mark.create<GapOptions>({
   parseHTML() {
     return [
       {
-        tag: "span",
-        getAttrs: (element) => {
-          const dataType = (element as HTMLElement).getAttribute("data-type");
-
-          if (!dataType || dataType != name) {
-            return false;
-          }
-
-          return {};
-        },
+        tag: `span[data-type="${this.name}"]`,
       },
     ];
   },
@@ -65,7 +54,7 @@ export default Mark.create<GapOptions>({
     return [
       "span",
       mergeAttributes(
-        { "data-type": name },
+        { "data-type": this.name },
         this.options.HTMLAttributes,
         HTMLAttributes
       ),
