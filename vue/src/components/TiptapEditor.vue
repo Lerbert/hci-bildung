@@ -13,9 +13,11 @@ import { Editor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 
 import Audio from "../nodes/Audio.ts";
+import MultipleChoice from "../nodes/MultipleChoice.ts";
 import Gap from "../marks/Gap.ts";
 import Latex from "../marks/Latex.ts";
 import MenuBar from "./MenuBar.vue";
+import MultipleChoiceItem from "../nodes/MultipleChoiceItem.ts";
 import SaveStatus from "./SaveStatus.vue";
 
 export default {
@@ -45,7 +47,14 @@ export default {
   mounted() {
     this.editor = new Editor({
       content: this.content,
-      extensions: [StarterKit, Audio, Gap, Latex],
+      extensions: [
+        StarterKit,
+        Audio,
+        MultipleChoice,
+        Gap,
+        Latex,
+        MultipleChoiceItem,
+      ],
       onUpdate: () => {
         this.$emit("update:content", this.editor.getJSON());
       },
@@ -117,6 +126,26 @@ export default {
   ul,
   ol {
     padding: 0 1rem;
+  }
+
+  ul[data-type="multipleChoice"] {
+    list-style: none;
+    padding: 0;
+
+    li {
+      align-items: center;
+      display: flex;
+
+      > label {
+        flex: 0 0 auto;
+        margin-right: 0.5rem;
+        user-select: none;
+      }
+
+      > div {
+        flex: 1 1 auto;
+      }
+    }
   }
 
   h1,

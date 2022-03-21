@@ -122,6 +122,13 @@ export default {
           isActive: () => this.editor.isActive("latex"),
         },
         {
+          icon: "list-check-2",
+          title: "Multiple Choice Frage einfügen (Strg + Shift + M)",
+          action: () =>
+            this.editor.chain().focus().toggleMultipleChoice().run(),
+          isActive: () => this.editor.isActive("multipleChoice"),
+        },
+        {
           icon: "volume-up-line",
           title: "Audioelement hinzufügen (Strg + M)",
           action: () =>
