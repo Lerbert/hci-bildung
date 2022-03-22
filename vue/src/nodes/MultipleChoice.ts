@@ -1,5 +1,4 @@
-import { Node, mergeAttributes, getNodeType } from "@tiptap/core";
-import { setBlockType } from "prosemirror-commands";
+import { Node, mergeAttributes } from "@tiptap/core";
 
 export interface ChoiceOptions {
   answerTypeName: string;
@@ -8,7 +7,7 @@ export interface ChoiceOptions {
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
-    choice: {
+    multipleChoice: {
       /**
        * Toggle a multiple choice input
        */

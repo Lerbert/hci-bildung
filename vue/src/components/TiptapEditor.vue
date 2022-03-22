@@ -13,11 +13,11 @@ import { Editor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 
 import Audio from "../nodes/Audio.ts";
-import MultipleChoice from "../nodes/MultipleChoice.ts";
 import Gap from "../marks/Gap.ts";
 import Latex from "../marks/Latex.ts";
 import MenuBar from "./MenuBar.vue";
 import MultipleChoiceAnswer from "../nodes/MultipleChoiceAnswer.ts";
+import MultipleChoice from "../nodes/MultipleChoice.ts";
 import SaveStatus from "./SaveStatus.vue";
 
 export default {
@@ -50,10 +50,10 @@ export default {
       extensions: [
         StarterKit,
         Audio,
-        MultipleChoiceAnswer,
-        MultipleChoice,
         Gap,
         Latex,
+        MultipleChoiceAnswer,
+        MultipleChoice,
       ],
       onUpdate: () => {
         this.$emit("update:content", this.editor.getJSON());
