@@ -175,5 +175,12 @@ export default defineComponent({
     color: #ffffff;
     background-color: #3d3d3d;
   }
+
+  .correct {
+    background-color: rgba(#00ff00, 0.5);
+  }
+  .incorrect {
+    background-color: rgba(#ff0000, 0.5);
+  }
 }
 </style>

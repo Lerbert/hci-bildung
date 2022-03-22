@@ -79,11 +79,4 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
-.correct {
-  background-color: rgba(#00ff00, 0.5);
-}
-.incorrect {
-  background-color: rgba(#ff0000, 0.5);
-}
-</style>
+<style lang="scss" scoped></style>

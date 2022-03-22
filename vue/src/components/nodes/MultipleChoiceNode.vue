@@ -130,11 +130,4 @@ ul[data-type="multipleChoice"] {
   list-style: none;
   padding: 0;
 }
-
-.correct {
-  background-color: rgba(#00ff00, 0.5);
-}
-.incorrect {
-  background-color: rgba(#ff0000, 0.5);
-}
 </style>
