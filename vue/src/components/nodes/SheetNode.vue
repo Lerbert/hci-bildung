@@ -43,15 +43,15 @@ import { defineComponent } from "vue";
 import TextMarking from "../marks/TextMarking.vue";
 
 import AudioNode from "./AudioNode.vue";
-import BulletlistNode from "./BulletlistNode.vue";
+import BulletListNode from "./BulletListNode.vue";
 import CodeblockNode from "./CodeblockNode.vue";
 import DocNode from "./DocNode.vue";
 import HardbreakNode from "./HardbreakNode.vue";
 import HeadingNode from "./HeadingNode.vue";
-import ListitemNode from "./ListitemNode.vue";
+import ListItemNode from "./ListItemNode.vue";
 import MultipleChoiceAnswerNode from "./MultipleChoiceAnswerNode.vue";
 import MultipleChoiceNode from "./MultipleChoiceNode.vue";
-import OrderedlistNode from "./OrderedlistNode.vue";
+import OrderedListNode from "./OrderedListNode.vue";
 import ParagraphNode from "./ParagraphNode.vue";
 import TextNode from "./TextNode.vue";
 
@@ -62,15 +62,15 @@ export default defineComponent({
   components: {
     TextMarking,
     AudioNode,
-    BulletlistNode,
+    BulletlistNode: BulletListNode,
     CodeblockNode,
     DocNode,
     HardbreakNode,
     HeadingNode,
-    ListitemNode,
+    ListitemNode: ListItemNode,
     MultiplechoiceanswerNode: MultipleChoiceAnswerNode,
     MultiplechoiceNode: MultipleChoiceNode,
-    OrderedlistNode,
+    OrderedlistNode: OrderedListNode,
     ParagraphNode,
     TextNode,
   },

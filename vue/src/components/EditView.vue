@@ -4,7 +4,7 @@
       <input
         v-model="title"
         class="input is-large has-text-weight-bold"
-        :class="title === '' ? 'is-danger' : ''"
+        :class="{ 'is-danger': title === '' }"
         type="text"
         placeholder="Titel eingeben"
       />

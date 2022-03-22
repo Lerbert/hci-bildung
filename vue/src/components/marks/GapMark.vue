@@ -1,7 +1,10 @@
 <template>
   <input
     v-model="value"
-    v-bind:class="!checked ? '' : correct ? 'correct' : 'incorrect'"
+    :class="{
+      correct: checked && correct,
+      incorrect: checked && !correct,
+    }"
   />
 </template>
 
