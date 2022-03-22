@@ -45,6 +45,12 @@ export default {
           isActive: () => this.editor.isActive("strike"),
         },
         {
+          icon: "functions",
+          title: "Auswahl in Formel umwandeln (Alt + =)",
+          action: () => this.editor.chain().focus().toggleLatex().run(),
+          isActive: () => this.editor.isActive("latex"),
+        },
+        {
           type: "divider",
         },
         {
@@ -110,16 +116,21 @@ export default {
           type: "divider",
         },
         {
+          icon: "volume-up-line",
+          title: "Audioelement hinzufügen (Strg + M)",
+          action: () =>
+            upload((url, type) =>
+              this.editor.chain().focus().setAudio(url, type).run()
+            ),
+        },
+        {
+          type: "divider",
+        },
+        {
           icon: "space",
           title: "Auswahl in Lücke umwandeln (Strg + G)",
           action: () => this.editor.chain().focus().toggleGap().run(),
           isActive: () => this.editor.isActive("gap"),
-        },
-        {
-          icon: "functions",
-          title: "Auswahl in Formel umwandeln (Alt + =)",
-          action: () => this.editor.chain().focus().toggleLatex().run(),
-          isActive: () => this.editor.isActive("latex"),
         },
         {
           icon: "list-check-2",
@@ -127,14 +138,6 @@ export default {
           action: () =>
             this.editor.chain().focus().toggleMultipleChoice().run(),
           isActive: () => this.editor.isActive("multipleChoice"),
-        },
-        {
-          icon: "volume-up-line",
-          title: "Audioelement hinzufügen (Strg + M)",
-          action: () =>
-            upload((url, type) =>
-              this.editor.chain().focus().setAudio(url, type).run()
-            ),
         },
       ],
     };
