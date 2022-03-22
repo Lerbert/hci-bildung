@@ -8,6 +8,7 @@
     <component
       :is="nodeType"
       :tiptapNode="tiptapNode"
+      :checkTrigger="checkTrigger"
       @grantPoints="(event) => $emit('grantPoints', event)"
     >
       <sheet-node
@@ -23,6 +24,7 @@
     v-else
     :is="nodeType"
     :tiptapNode="tiptapNode"
+    :checkTrigger="checkTrigger"
     @grantPoints="(event) => $emit('grantPoints', event)"
   >
     <sheet-node
@@ -47,6 +49,8 @@ import DocNode from "./DocNode.vue";
 import HardbreakNode from "./HardbreakNode.vue";
 import HeadingNode from "./HeadingNode.vue";
 import ListitemNode from "./ListitemNode.vue";
+import MultipleChoiceAnswerNode from "./MultipleChoiceAnswerNode.vue";
+import MultipleChoiceNode from "./MultipleChoiceNode.vue";
 import OrderedlistNode from "./OrderedlistNode.vue";
 import ParagraphNode from "./ParagraphNode.vue";
 import TextNode from "./TextNode.vue";
@@ -64,6 +68,8 @@ export default defineComponent({
     HardbreakNode,
     HeadingNode,
     ListitemNode,
+    MultiplechoiceanswerNode: MultipleChoiceAnswerNode,
+    MultiplechoiceNode: MultipleChoiceNode,
     OrderedlistNode,
     ParagraphNode,
     TextNode,

@@ -17,7 +17,7 @@ import MultipleChoice from "../nodes/MultipleChoice.ts";
 import Gap from "../marks/Gap.ts";
 import Latex from "../marks/Latex.ts";
 import MenuBar from "./MenuBar.vue";
-import MultipleChoiceItem from "../nodes/MultipleChoiceItem.ts";
+import MultipleChoiceAnswer from "../nodes/MultipleChoiceAnswer.ts";
 import SaveStatus from "./SaveStatus.vue";
 
 export default {
@@ -50,10 +50,10 @@ export default {
       extensions: [
         StarterKit,
         Audio,
+        MultipleChoiceAnswer,
         MultipleChoice,
         Gap,
         Latex,
-        MultipleChoiceItem,
       ],
       onUpdate: () => {
         this.$emit("update:content", this.editor.getJSON());
