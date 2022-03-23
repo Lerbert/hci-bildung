@@ -49,7 +49,6 @@ export default defineComponent({
       this.$emit("answerCorrect", {
         correct: this.correct,
       });
-      console.log("emitted");
     },
   },
 
