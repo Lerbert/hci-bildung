@@ -128,6 +128,11 @@ export default defineComponent({
 <style lang="scss" scoped>
 ul[data-type="multipleChoice"] {
   list-style: none;
-  padding: 0;
+
+  &.correct,
+  &.incorrect {
+    border-width: 1px;
+    border-style: solid;
+  }
 }
 </style>

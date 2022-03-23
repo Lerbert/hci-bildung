@@ -177,10 +177,12 @@ export default defineComponent({
   }
 
   .correct {
-    background-color: rgba(#00ff00, 0.5);
+    background-color: rgba(#48c774, 0.1);
+    border-color: #48c774;
   }
   .incorrect {
-    background-color: rgba(#ff0000, 0.5);
+    background-color: rgba(#f14668, 0.1);
+    border-color: #f14668;
   }
 }
 </style>

@@ -1,11 +1,55 @@
 <template>
-  <input
-    v-model="value"
-    :class="{
-      correct: checked && correct,
-      incorrect: checked && !correct,
-    }"
-  />
+  <div class="is-inline-block">
+    <div class="field has-addons">
+      <div class="control has-icons-right">
+        <input
+          v-model="value"
+          class="input"
+          :class="{
+            correct: right,
+            incorrect: wrong,
+          }"
+          :style="{ width: `${width}rem` }"
+        />
+        <span v-if="right" class="icon is-small is-right">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            width="20px"
+            height="20px"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </span>
+        <span v-if="wrong" class="icon is-small is-right">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            width="20px"
+            height="20px"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </span>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -43,6 +87,16 @@ export default defineComponent({
     solution(): string {
       return this.tiptapNode.text;
     },
+    width(): number {
+      // Lower resolution to multiples of 5 to not reveal the exact solution length
+      return Math.ceil(this.solution.length / 5) * 5;
+    },
+    right(): boolean {
+      return this.checked && this.correct;
+    },
+    wrong(): boolean {
+      return this.checked && !this.correct;
+    },
   },
 
   mounted() {
@@ -79,4 +133,16 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.input {
+  height: auto;
+  padding: 1px 2px;
+  margin-bottom: 3px;
+  border-radius: 2px;
+  vertical-align: baseline;
+}
+.icon {
+  width: 28px !important;
+  height: 28px !important;
+}
+</style>
