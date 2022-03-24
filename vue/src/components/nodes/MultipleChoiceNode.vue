@@ -1,37 +1,46 @@
 <template>
-  <ul
-    data-type="multipleChoice"
+  <div
     :class="{
-      correct: checked && correct,
-      incorrect: checked && !correct,
+      correct: right,
+      incorrect: wrong,
     }"
   >
-    <multiple-choice-answer-node
-      v-for="(c, index) in tiptapNode.content"
-      :key="index"
-      :tiptapNode="c"
-      :checkTrigger="checkAnswersTrigger"
-      @grantPoints="(event) => $emit('grantPoints', event)"
-      @answerCorrect="countAnswerCorrect"
-    >
-      <sheet-node
-        v-for="(c, index) in c.content"
+    <ul data-type="multipleChoice">
+      <multiple-choice-answer-node
+        v-for="(c, index) in tiptapNode.content"
         :key="index"
         :tiptapNode="c"
-        :checkTrigger="checkTrigger"
+        :checkTrigger="checkAnswersTrigger"
         @grantPoints="(event) => $emit('grantPoints', event)"
-      ></sheet-node>
-    </multiple-choice-answer-node>
-  </ul>
+        @answerCorrect="countAnswerCorrect"
+      >
+        <sheet-node
+          v-for="(c, index) in c.content"
+          :key="index"
+          :tiptapNode="c"
+          :checkTrigger="checkTrigger"
+          @grantPoints="(event) => $emit('grantPoints', event)"
+        ></sheet-node>
+      </multiple-choice-answer-node>
+    </ul>
+    <span class="icon">
+      <check-symbol v-if="right"></check-symbol>
+      <cross-symbol v-if="wrong"></cross-symbol>
+    </span>
+  </div>
 </template>
 
 <script>
 import { defineAsyncComponent, defineComponent } from "vue";
 
+import CheckSymbol from "../feedback_symbols/CheckSymbol.vue";
+import CrossSymbol from "../feedback_symbols/CrossSymbol.vue";
 import MultipleChoiceAnswerNode from "./MultipleChoiceAnswerNode.vue";
 
 export default defineComponent({
   components: {
+    CheckSymbol,
+    CrossSymbol,
     MultipleChoiceAnswerNode,
     SheetNode: defineAsyncComponent(() => import("./SheetNode.vue")),
   },
@@ -71,6 +80,12 @@ export default defineComponent({
   computed: {
     expectedAnswers() {
       return this.tiptapNode.content.length;
+    },
+    right() {
+      return this.checked && this.correct;
+    },
+    wrong() {
+      return this.checked && !this.correct;
     },
   },
 
@@ -126,13 +141,21 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-ul[data-type="multipleChoice"] {
-  list-style: none;
+div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
   &.correct,
   &.incorrect {
     border-width: 1px;
     border-style: solid;
+  }
+
+  ul[data-type="multipleChoice"] {
+    list-style: none;
+    padding: 0;
+    min-width: 0%;
   }
 }
 </style>
