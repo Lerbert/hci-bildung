@@ -20,96 +20,65 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { computed, onBeforeUnmount, onMounted, ref, toRefs, watch } from "vue";
 
 import CheckSymbol from "../feedback_symbols/CheckSymbol.vue";
 import CrossSymbol from "../feedback_symbols/CrossSymbol.vue";
 
-export default defineComponent({
-  components: {
-    CheckSymbol,
-    CrossSymbol,
-  },
+const propsDef = defineProps<{
+  checkTrigger: boolean;
+  tiptapNode: Record<string, any>;
+}>();
 
-  props: {
-    checkTrigger: {
-      type: Boolean,
-      required: true,
-    },
-    tiptapNode: {
-      type: Object,
-      required: true,
-    },
-  },
+const props = toRefs(propsDef);
 
-  emits: {
-    grantPoints(payload: { achievedPoints: number; totalPoints: number }) {
-      return (
-        payload.achievedPoints <= payload.totalPoints ||
-        (payload.totalPoints < 0 && payload.achievedPoints <= 0)
-      );
-    },
-  },
-
-  data() {
-    return {
-      value: "",
-      checked: false,
-      correct: false,
-      achievedPoints: 0,
-      totalPoints: 1,
-    };
-  },
-
-  computed: {
-    solution(): string {
-      return this.tiptapNode.text;
-    },
-    width(): number {
-      // Lower resolution to multiples of 5 to not reveal the exact solution length
-      return Math.ceil(this.solution.length / 5) * 5;
-    },
-    right(): boolean {
-      return this.checked && this.correct;
-    },
-    wrong(): boolean {
-      return this.checked && !this.correct;
-    },
-  },
-
-  mounted() {
-    this.$emit("grantPoints", {
-      achievedPoints: this.achievedPoints,
-      totalPoints: this.totalPoints,
-    });
-  },
-
-  beforeUnmount() {
-    this.$emit("grantPoints", {
-      achievedPoints: -this.achievedPoints,
-      totalPoints: -this.totalPoints,
-    });
-  },
-
-  methods: {
-    check() {
-      this.checked = true;
-      this.correct = this.value === this.solution;
-      this.achievedPoints = this.correct ? this.totalPoints : 0;
-      this.$emit("grantPoints", {
-        achievedPoints: this.achievedPoints,
-        totalPoints: this.totalPoints,
-      });
-    },
-  },
-
-  watch: {
-    checkTrigger() {
-      this.check();
-    },
+const emit = defineEmits({
+  grantPoints(payload: { achievedPoints: number; totalPoints: number }) {
+    return (
+      payload.achievedPoints <= payload.totalPoints ||
+      (payload.totalPoints < 0 && payload.achievedPoints <= 0)
+    );
   },
 });
+
+const value = ref("");
+const checked = ref(false);
+const correct = ref(false);
+const achievedPoints = ref(0);
+const totalPoints = ref(1);
+
+const solution = computed(() => props.tiptapNode.value.text);
+// Lower resolution to multiples of 5 to not reveal the exact solution length
+const width = computed(() => Math.ceil(solution.value.length / 5) * 5);
+const right = computed(() => checked.value && correct.value);
+const wrong = computed(() => checked.value && !correct.value);
+
+onMounted(() =>
+  emit("grantPoints", {
+    achievedPoints: achievedPoints.value,
+    totalPoints: totalPoints.value,
+  })
+);
+
+onBeforeUnmount(() =>
+  emit("grantPoints", {
+    achievedPoints: -achievedPoints.value,
+    totalPoints: -totalPoints.value,
+  })
+);
+
+function check() {
+  checked.value = true;
+  correct.value = value.value === solution.value;
+  achievedPoints.value = correct.value ? totalPoints.value : 0;
+  emit("grantPoints", {
+    achievedPoints: achievedPoints.value,
+    totalPoints: totalPoints.value,
+  });
+}
+
+watch(props.checkTrigger, () => check());
 </script>
 
 <style lang="scss" scoped>
