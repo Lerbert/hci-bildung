@@ -1,7 +1,7 @@
 <template>
   <div class="is-inline-block">
     <div class="field has-addons">
-      <div class="control has-icons-right">
+      <div class="control" :class="{ 'has-icons-right': right || wrong }">
         <input
           v-model="value"
           class="input"
@@ -119,6 +119,11 @@ export default defineComponent({
   margin-bottom: 3px;
   border-radius: 2px;
   vertical-align: baseline;
+
+  &.correct,
+  &.incorrect {
+    padding-right: 28px;
+  }
 }
 .icon {
   width: 28px !important;
