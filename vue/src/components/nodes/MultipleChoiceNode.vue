@@ -33,6 +33,8 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, toRefs, watch } from "vue";
 
+import { useCheckable, withCheckableEmit } from "../../composables/Checkable";
+
 import CheckSymbol from "../feedback_symbols/CheckSymbol.vue";
 import CrossSymbol from "../feedback_symbols/CrossSymbol.vue";
 import MultipleChoiceAnswerNode from "./MultipleChoiceAnswerNode.vue";
@@ -51,49 +53,20 @@ const propsDef = defineProps({
     },
   },
 });
-
 const props = toRefs(propsDef);
 
 const emit = defineEmits({
-  grantPoints(payload: { achievedPoints: number; totalPoints: number }) {
-    return (
-      payload.achievedPoints <= payload.totalPoints ||
-      (payload.totalPoints < 0 && payload.achievedPoints <= 0)
-    );
-  },
+  ...withCheckableEmit(),
 });
 
 const checkAnswersTrigger = ref(false);
-const checked = ref(false);
-const correct = ref(false);
 const correctAnswers = ref(0);
 const totalAnswers = ref(0);
-const achievedPoints = ref(0);
-const totalPoints = ref(1);
-
 const expectedAnswers = computed(() => props.tiptapNode.value.content.length);
-const right = computed(() => checked.value && correct.value);
-const wrong = computed(() => checked.value && !correct.value);
-
-onMounted(() =>
-  emit("grantPoints", {
-    achievedPoints: achievedPoints.value,
-    totalPoints: totalPoints.value,
-  })
-);
-
-onBeforeUnmount(() =>
-  emit("grantPoints", {
-    achievedPoints: -achievedPoints.value,
-    totalPoints: -totalPoints.value,
-  })
-);
-
 function resetCorrectAnswerCount() {
   correctAnswers.value = 0;
   totalAnswers.value = 0;
 }
-
 function countAnswerCorrect(event) {
   if (event.correct) {
     correctAnswers.value++;
@@ -101,26 +74,27 @@ function countAnswerCorrect(event) {
   totalAnswers.value++;
   // If we got all responses check this element
   if (totalAnswers.value === expectedAnswers.value) {
-    check();
+    allCheckedTrigger.value = !allCheckedTrigger.value;
   }
 }
-
-function check() {
-  checked.value = true;
-  correct.value = correctAnswers.value === totalAnswers.value;
-  achievedPoints.value = correct.value ? totalPoints.value : 0;
-  emit("grantPoints", {
-    achievedPoints: achievedPoints.value,
-    totalPoints: totalPoints.value,
-  });
-}
-
 watch(props.checkTrigger, () => {
   // First reset answers ...
   resetCorrectAnswerCount();
   // ... and trigger answer check only once we are done with this
   checkAnswersTrigger.value = !checkAnswersTrigger.value;
 });
+
+const totalPoints = 1;
+const allCheckedTrigger = ref(false);
+function check() {
+  return correctAnswers.value === totalAnswers.value ? totalPoints : 0;
+}
+const { right, wrong } = useCheckable(
+  allCheckedTrigger,
+  emit,
+  check,
+  totalPoints
+);
 </script>
 
 <style lang="scss" scoped>
