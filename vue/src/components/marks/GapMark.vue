@@ -45,7 +45,10 @@ export default defineComponent({
 
   emits: {
     grantPoints(payload: { achievedPoints: number; totalPoints: number }) {
-      return payload.achievedPoints <= payload.totalPoints;
+      return (
+        payload.achievedPoints <= payload.totalPoints ||
+        (payload.totalPoints < 0 && payload.achievedPoints <= 0)
+      );
     },
   },
 
