@@ -11,41 +11,9 @@
           }"
           :style="{ width: `${width}rem` }"
         />
-        <span v-if="right" class="icon is-small is-right">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            width="20px"
-            height="20px"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
-        </span>
-        <span v-if="wrong" class="icon is-small is-right">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            width="20px"
-            height="20px"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
+        <span class="icon is-small is-right">
+          <check-symbol v-if="right"></check-symbol>
+          <cross-symbol v-if="wrong"></cross-symbol>
         </span>
       </div>
     </div>
@@ -55,7 +23,15 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 
+import CheckSymbol from "../feedback_symbols/CheckSymbol.vue";
+import CrossSymbol from "../feedback_symbols/CrossSymbol.vue";
+
 export default defineComponent({
+  components: {
+    CheckSymbol,
+    CrossSymbol,
+  },
+
   props: {
     checkTrigger: {
       type: Boolean,
@@ -144,5 +120,6 @@ export default defineComponent({
 .icon {
   width: 28px !important;
   height: 28px !important;
+  color: unset !important;
 }
 </style>
