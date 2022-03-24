@@ -30,116 +30,96 @@
   </div>
 </template>
 
-<script>
-import { defineAsyncComponent, defineComponent } from "vue";
+<script setup lang="ts">
+import { computed, onBeforeUnmount, onMounted, ref, toRefs, watch } from "vue";
 
 import CheckSymbol from "../feedback_symbols/CheckSymbol.vue";
 import CrossSymbol from "../feedback_symbols/CrossSymbol.vue";
 import MultipleChoiceAnswerNode from "./MultipleChoiceAnswerNode.vue";
+import SheetNode from "./SheetNode.vue";
 
-export default defineComponent({
-  components: {
-    CheckSymbol,
-    CrossSymbol,
-    MultipleChoiceAnswerNode,
-    SheetNode: defineAsyncComponent(() => import("./SheetNode.vue")),
+const propsDef = defineProps({
+  checkTrigger: {
+    type: Boolean,
+    required: true,
   },
-
-  props: {
-    checkTrigger: {
-      type: Boolean,
-      required: true,
-    },
-    tiptapNode: {
-      type: Object,
-      required: true,
-      validator(value) {
-        return value.content.every((c) => c.type === "multipleChoiceAnswer");
-      },
+  tiptapNode: {
+    type: Object,
+    required: true,
+    validator(value: Record<string, any>) {
+      return value.content.every((c) => c.type === "multipleChoiceAnswer");
     },
   },
+});
 
-  emits: {
-    grantPoints(payload) {
-      return (
-        payload.achievedPoints <= payload.totalPoints ||
-        (payload.totalPoints < 0 && payload.achievedPoints <= 0)
-      );
-    },
-  },
+const props = toRefs(propsDef);
 
-  data() {
-    return {
-      checkAnswersTrigger: false,
-      checked: false,
-      correct: false,
-      correctAnswers: 0,
-      totalAnswers: 0,
-      achievedPoints: 0,
-      totalPoints: 1,
-    };
+const emit = defineEmits({
+  grantPoints(payload: { achievedPoints: number; totalPoints: number }) {
+    return (
+      payload.achievedPoints <= payload.totalPoints ||
+      (payload.totalPoints < 0 && payload.achievedPoints <= 0)
+    );
   },
+});
 
-  computed: {
-    expectedAnswers() {
-      return this.tiptapNode.content.length;
-    },
-    right() {
-      return this.checked && this.correct;
-    },
-    wrong() {
-      return this.checked && !this.correct;
-    },
-  },
+const checkAnswersTrigger = ref(false);
+const checked = ref(false);
+const correct = ref(false);
+const correctAnswers = ref(0);
+const totalAnswers = ref(0);
+const achievedPoints = ref(0);
+const totalPoints = ref(1);
 
-  mounted() {
-    this.$emit("grantPoints", {
-      achievedPoints: this.achievedPoints,
-      totalPoints: this.totalPoints,
-    });
-  },
+const expectedAnswers = computed(() => props.tiptapNode.value.content.length);
+const right = computed(() => checked.value && correct.value);
+const wrong = computed(() => checked.value && !correct.value);
 
-  beforeUnmount() {
-    this.$emit("grantPoints", {
-      achievedPoints: -this.achievedPoints,
-      totalPoints: -this.totalPoints,
-    });
-  },
+onMounted(() =>
+  emit("grantPoints", {
+    achievedPoints: achievedPoints.value,
+    totalPoints: totalPoints.value,
+  })
+);
 
-  methods: {
-    resetCorrectAnswerCount() {
-      this.correctAnswers = 0;
-      this.totalAnswers = 0;
-    },
-    countAnswerCorrect(event) {
-      if (event.correct) {
-        this.correctAnswers++;
-      }
-      this.totalAnswers++;
-      // If we got all responses check this element
-      if (this.totalAnswers === this.expectedAnswers) {
-        this.check();
-      }
-    },
-    check() {
-      this.checked = true;
-      this.correct = this.correctAnswers === this.totalAnswers;
-      this.achievedPoints = this.correct ? this.totalPoints : 0;
-      this.$emit("grantPoints", {
-        achievedPoints: this.achievedPoints,
-        totalPoints: this.totalPoints,
-      });
-    },
-  },
+onBeforeUnmount(() =>
+  emit("grantPoints", {
+    achievedPoints: -achievedPoints.value,
+    totalPoints: -totalPoints.value,
+  })
+);
 
-  watch: {
-    checkTrigger() {
-      // First reset answers ...
-      this.resetCorrectAnswerCount();
-      // ... and trigger answer check only once we are done with this
-      this.checkAnswersTrigger = !this.checkAnswersTrigger;
-    },
-  },
+function resetCorrectAnswerCount() {
+  correctAnswers.value = 0;
+  totalAnswers.value = 0;
+}
+
+function countAnswerCorrect(event) {
+  if (event.correct) {
+    correctAnswers.value++;
+  }
+  totalAnswers.value++;
+  // If we got all responses check this element
+  if (totalAnswers.value === expectedAnswers.value) {
+    check();
+  }
+}
+
+function check() {
+  checked.value = true;
+  correct.value = correctAnswers.value === totalAnswers.value;
+  achievedPoints.value = correct.value ? totalPoints.value : 0;
+  emit("grantPoints", {
+    achievedPoints: achievedPoints.value,
+    totalPoints: totalPoints.value,
+  });
+}
+
+watch(props.checkTrigger, () => {
+  // First reset answers ...
+  resetCorrectAnswerCount();
+  // ... and trigger answer check only once we are done with this
+  checkAnswersTrigger.value = !checkAnswersTrigger.value;
 });
 </script>
 
