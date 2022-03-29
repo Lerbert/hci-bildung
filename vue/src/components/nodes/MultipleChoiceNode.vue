@@ -30,117 +30,71 @@
   </div>
 </template>
 
-<script>
-import { defineAsyncComponent, defineComponent } from "vue";
+<script setup lang="ts">
+import { computed, onBeforeUnmount, onMounted, ref, toRefs, watch } from "vue";
+
+import { useCheckable, withCheckableEmit } from "../../composables/Checkable";
 
 import CheckSymbol from "../feedback_symbols/CheckSymbol.vue";
 import CrossSymbol from "../feedback_symbols/CrossSymbol.vue";
 import MultipleChoiceAnswerNode from "./MultipleChoiceAnswerNode.vue";
+import SheetNode from "./SheetNode.vue";
 
-export default defineComponent({
-  components: {
-    CheckSymbol,
-    CrossSymbol,
-    MultipleChoiceAnswerNode,
-    SheetNode: defineAsyncComponent(() => import("./SheetNode.vue")),
+const propsDef = defineProps({
+  checkTrigger: {
+    type: Boolean,
+    required: true,
   },
-
-  props: {
-    checkTrigger: {
-      type: Boolean,
-      required: true,
-    },
-    tiptapNode: {
-      type: Object,
-      required: true,
-      validator(value) {
-        return value.content.every((c) => c.type === "multipleChoiceAnswer");
-      },
-    },
-  },
-
-  emits: {
-    grantPoints(payload) {
-      return (
-        payload.achievedPoints <= payload.totalPoints ||
-        (payload.totalPoints < 0 && payload.achievedPoints <= 0)
-      );
-    },
-  },
-
-  data() {
-    return {
-      checkAnswersTrigger: false,
-      checked: false,
-      correct: false,
-      correctAnswers: 0,
-      totalAnswers: 0,
-      achievedPoints: 0,
-      totalPoints: 1,
-    };
-  },
-
-  computed: {
-    expectedAnswers() {
-      return this.tiptapNode.content.length;
-    },
-    right() {
-      return this.checked && this.correct;
-    },
-    wrong() {
-      return this.checked && !this.correct;
-    },
-  },
-
-  mounted() {
-    this.$emit("grantPoints", {
-      achievedPoints: this.achievedPoints,
-      totalPoints: this.totalPoints,
-    });
-  },
-
-  beforeUnmount() {
-    this.$emit("grantPoints", {
-      achievedPoints: -this.achievedPoints,
-      totalPoints: -this.totalPoints,
-    });
-  },
-
-  methods: {
-    resetCorrectAnswerCount() {
-      this.correctAnswers = 0;
-      this.totalAnswers = 0;
-    },
-    countAnswerCorrect(event) {
-      if (event.correct) {
-        this.correctAnswers++;
-      }
-      this.totalAnswers++;
-      // If we got all responses check this element
-      if (this.totalAnswers === this.expectedAnswers) {
-        this.check();
-      }
-    },
-    check() {
-      this.checked = true;
-      this.correct = this.correctAnswers === this.totalAnswers;
-      this.achievedPoints = this.correct ? this.totalPoints : 0;
-      this.$emit("grantPoints", {
-        achievedPoints: this.achievedPoints,
-        totalPoints: this.totalPoints,
-      });
-    },
-  },
-
-  watch: {
-    checkTrigger() {
-      // First reset answers ...
-      this.resetCorrectAnswerCount();
-      // ... and trigger answer check only once we are done with this
-      this.checkAnswersTrigger = !this.checkAnswersTrigger;
+  tiptapNode: {
+    type: Object,
+    required: true,
+    validator(value: Record<string, any>) {
+      return value.content.every((c) => c.type === "multipleChoiceAnswer");
     },
   },
 });
+const props = toRefs(propsDef);
+
+const emit = defineEmits({
+  ...withCheckableEmit(),
+});
+
+const checkAnswersTrigger = ref(false);
+const correctAnswers = ref(0);
+const totalAnswers = ref(0);
+const expectedAnswers = computed(() => props.tiptapNode.value.content.length);
+function resetCorrectAnswerCount() {
+  correctAnswers.value = 0;
+  totalAnswers.value = 0;
+}
+function countAnswerCorrect(event) {
+  if (event.correct) {
+    correctAnswers.value++;
+  }
+  totalAnswers.value++;
+  // If we got all responses check this element
+  if (totalAnswers.value === expectedAnswers.value) {
+    allCheckedTrigger.value = !allCheckedTrigger.value;
+  }
+}
+watch(props.checkTrigger, () => {
+  // First reset answers ...
+  resetCorrectAnswerCount();
+  // ... and trigger answer check only once we are done with this
+  checkAnswersTrigger.value = !checkAnswersTrigger.value;
+});
+
+const totalPoints = 1;
+const allCheckedTrigger = ref(false);
+function check() {
+  return correctAnswers.value === totalAnswers.value ? totalPoints : 0;
+}
+const { right, wrong } = useCheckable(
+  allCheckedTrigger,
+  emit,
+  check,
+  totalPoints
+);
 </script>
 
 <style lang="scss" scoped>
