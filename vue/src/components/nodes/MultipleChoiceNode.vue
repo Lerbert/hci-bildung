@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, toRefs, watch } from "vue";
+import { computed, ref, toRefs, watch } from "vue";
 
 import { useCheckable, withCheckableEmit } from "../../composables/Checkable";
 
