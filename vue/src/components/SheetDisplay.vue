@@ -108,6 +108,12 @@ export default defineComponent({
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    white-space: break-spaces;
+    -webkit-font-variant-ligatures: none;
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0;
   }
 
   &__footer {
@@ -174,6 +180,15 @@ export default defineComponent({
   span[data-type="gap"] {
     color: #ffffff;
     background-color: #3d3d3d;
+  }
+
+  .correct {
+    background-color: rgba(#48c774, 0.1);
+    border-color: #48c774;
+  }
+  .incorrect {
+    background-color: rgba(#f14668, 0.1);
+    border-color: #f14668;
   }
 }
 </style>
