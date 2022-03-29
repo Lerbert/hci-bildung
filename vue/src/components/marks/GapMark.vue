@@ -11,9 +11,11 @@
           }"
           :style="{ width: `${width}rem` }"
         />
-        <span class="icon is-small is-right">
-          <check-symbol v-if="right"></check-symbol>
-          <cross-symbol v-if="wrong"></cross-symbol>
+        <span v-if="right" class="icon is-small is-right">
+          <check-symbol></check-symbol>
+        </span>
+        <span v-if="wrong" class="icon is-small is-right">
+          <cross-symbol></cross-symbol>
         </span>
       </div>
     </div>
