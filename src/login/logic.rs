@@ -15,20 +15,20 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug)]
 pub enum Error {
-    DbError(data::Error),
+    Db(data::Error),
 }
 
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::DbError(e) => write!(f, "Error interacting with database: {}", e),
+            Self::Db(e) => write!(f, "Error interacting with database: {}", e),
         }
     }
 }
 
 impl From<data::Error> for Error {
     fn from(e: data::Error) -> Self {
-        Self::DbError(e)
+        Self::Db(e)
     }
 }
 

@@ -29,8 +29,4 @@ table! {
 joinable!(sessions -> users (user_id));
 joinable!(sheets -> users (owner_id));
 
-allow_tables_to_appear_in_same_query!(
-    sessions,
-    sheets,
-    users,
-);
+allow_tables_to_appear_in_same_query!(sessions, sheets, users,);

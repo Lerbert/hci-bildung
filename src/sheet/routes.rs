@@ -1,6 +1,6 @@
 use std::fmt::{self, Display};
 
-use log::{error, info};
+use log::{debug, error, info};
 use rocket::form::Form;
 use rocket::http::Status;
 use rocket::request::FlashMessage;
@@ -21,6 +21,10 @@ use super::transport::{Id, ImportSheetForm, NewSheetForm, SheetOverviewTransport
 impl ToStatus for logic::Error {
     fn to_status(self) -> Status {
         match self {
+            Self::NotFound(_) => {
+                debug!("{}", self);
+                Status::NotFound
+            }
             Self::Forbidden(_) => {
                 info!("{}", self);
                 Status::Forbidden
@@ -182,18 +186,15 @@ pub async fn edit_sheet(db: Db, user: &User, id: Id) -> Result<Template, Status>
     logic::get_sheet_for_edit(&db, user, id)
         .await
         .map_err(|e| e.to_status())
-        .and_then(|s| {
-            s.map(|sheet| {
-                Ok(Template::render(
-                    "sheet.html",
-                    &SheetContext {
-                        edit: true,
-                        sheet: sheet.into(),
-                        user: Some(user.into()),
-                    },
-                ))
-            })
-            .unwrap_or_else(|| Err(Status::NotFound))
+        .map(|sheet| {
+            Template::render(
+                "sheet.html",
+                &SheetContext {
+                    edit: true,
+                    sheet: sheet.into(),
+                    user: Some(user.into()),
+                },
+            )
         })
 }
 
@@ -207,18 +208,15 @@ pub async fn view_sheet(db: Db, user: Option<&User>, id: Id) -> Result<Template,
     logic::get_sheet(&db, id)
         .await
         .map_err(|e| e.to_status())
-        .and_then(|s| {
-            s.map(|sheet| {
-                Ok(Template::render(
-                    "sheet.html",
-                    &SheetContext {
-                        edit: false,
-                        sheet: sheet.into(),
-                        user: user.map(|u| u.into()),
-                    },
-                ))
-            })
-            .unwrap_or_else(|| Err(Status::NotFound))
+        .map(|sheet| {
+            Template::render(
+                "sheet.html",
+                &SheetContext {
+                    edit: false,
+                    sheet: sheet.into(),
+                    user: user.map(|u| u.into()),
+                },
+            )
         })
 }
 
@@ -236,7 +234,6 @@ pub async fn save_sheet(
         logic::update_sheet(&db, user, id, sheet.title, sheet.tiptap)
             .await
             .map_err(|e| e.to_status())
-            .and_then(|opt| opt.ok_or(Status::NotFound))
     }
 }
 
@@ -245,14 +242,11 @@ pub async fn delete_sheet(db: Db, user: &User, id: Id) -> Result<Redirect, Statu
     logic::delete_sheet(&db, user, id)
         .await
         .map_err(|e| e.to_status())
-        .and_then(|opt| {
-            opt.map(|outcome| match outcome {
-                logic::DeleteOutcome::Trashed => Redirect::to(format!("{}{}", MOUNT, uri!(sheets))),
-                logic::DeleteOutcome::Deleted => {
-                    Redirect::to(format!("{}{}", MOUNT, uri!(trashed_sheets)))
-                }
-            })
-            .ok_or(Status::NotFound)
+        .map(|outcome| match outcome {
+            logic::DeleteOutcome::Trashed => Redirect::to(format!("{}{}", MOUNT, uri!(sheets))),
+            logic::DeleteOutcome::Deleted => {
+                Redirect::to(format!("{}{}", MOUNT, uri!(trashed_sheets)))
+            }
         })
 }
 
@@ -261,10 +255,7 @@ pub async fn restore_sheet(db: Db, user: &User, id: Id) -> Result<Redirect, Stat
     logic::restore_sheet(&db, user, id)
         .await
         .map_err(|e| e.to_status())
-        .and_then(|opt| {
-            opt.map(|_| Redirect::to(format!("{}{}", MOUNT, uri!(sheets))))
-                .ok_or(Status::NotFound)
-        })
+        .map(|_| Redirect::to(format!("{}{}", MOUNT, uri!(sheets))))
 }
 
 fn redirect_to_login() -> FlashRedirect {

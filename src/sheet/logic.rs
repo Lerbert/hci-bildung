@@ -13,14 +13,16 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug)]
 pub enum Error {
-    DbError(data::Error),
+    Db(data::Error),
+    NotFound(String),
     Forbidden(String),
 }
 
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::DbError(e) => write!(f, "Error interacting with database: {}", e),
+            Self::Db(e) => write!(f, "Error interacting with database: {}", e),
+            Self::NotFound(msg) => write!(f, "Resource not found: {}", msg),
             Self::Forbidden(msg) => write!(f, "Forbidden resource access: {}", msg),
         }
     }
@@ -28,7 +30,7 @@ impl Display for Error {
 
 impl From<data::Error> for Error {
     fn from(e: data::Error) -> Self {
-        Self::DbError(e)
+        Self::Db(e)
     }
 }
 
@@ -76,24 +78,26 @@ pub async fn create_sheet(
     Ok(data::create_sheet(db, title, tiptap, user.id, now, now).await?)
 }
 
-pub async fn get_sheet(db: &Db, id: Id) -> Result<Option<Sheet>> {
-    Ok(data::get_sheet_by_id(db, id).await?)
+pub async fn get_sheet(db: &Db, id: Id) -> Result<Sheet> {
+    Ok(data::get_sheet_by_id(db, id)
+        .await?
+        .ok_or_else(|| Error::NotFound(format!("sheet {}", id)))?)
 }
 
-pub async fn get_sheet_for_edit(db: &Db, user: &User, id: Id) -> Result<Option<Sheet>> {
-    let sheet = data::get_sheet_by_id(db, id).await?;
-    sheet
-        .map(|sheet| {
-            if sheet.metadata.owner.id == user.id {
-                Ok(sheet)
-            } else {
-                Err(Error::Forbidden(format!(
-                    "edit sheet {} by user {}",
-                    id, user.id
-                )))
-            }
-        })
-        .map_or(Ok(None), |v| v.map(Some))
+async fn get_sheet_owned_by_user(db: &Db, user: &User, id: Id) -> Result<Sheet> {
+    let sheet = get_sheet(db, id).await?;
+    if sheet.metadata.owner.id == user.id {
+        Ok(sheet)
+    } else {
+        Err(Error::Forbidden(format!(
+            "user {} is not owner of sheet {}",
+            user.id, id
+        )))
+    }
+}
+
+pub async fn get_sheet_for_edit(db: &Db, user: &User, id: Id) -> Result<Sheet> {
+    get_sheet_owned_by_user(db, user, id).await
 }
 
 pub async fn update_sheet(
@@ -102,58 +106,24 @@ pub async fn update_sheet(
     id: Id,
     title: String,
     tiptap: serde_json::Value,
-) -> Result<Option<()>> {
-    let sheet = data::get_sheet_by_id(db, id).await?;
-    if let Some(sheet) = sheet {
-        if sheet.metadata.owner.id == user.id {
-            data::update_sheet(db, id, title, tiptap).await?;
-            Ok(Some(()))
-        } else {
-            Err(Error::Forbidden(format!(
-                "edit sheet {} by user {}",
-                id, user.id
-            )))
-        }
+) -> Result<()> {
+    get_sheet_owned_by_user(db, user, id).await?; // We don't care about the sheet here, we just need to check ownership
+    Ok(data::update_sheet(db, id, title, tiptap).await?)
+}
+
+pub async fn delete_sheet(db: &Db, user: &User, id: Id) -> Result<DeleteOutcome> {
+    let sheet = get_sheet_owned_by_user(db, user, id).await?;
+    if sheet.metadata.trashed.is_some() {
+        data::delete_sheet(db, id).await?;
+        Ok(DeleteOutcome::Deleted)
     } else {
-        Ok(None)
+        data::move_sheet_to_trash(db, id).await?;
+        Ok(DeleteOutcome::Trashed)
     }
 }
 
-pub async fn delete_sheet(db: &Db, user: &User, id: Id) -> Result<Option<DeleteOutcome>> {
-    let sheet = data::get_sheet_by_id(db, id).await?;
-    if let Some(sheet) = sheet {
-        if sheet.metadata.owner.id == user.id {
-            if sheet.metadata.trashed.is_some() {
-                data::delete_sheet(db, id).await?;
-                Ok(Some(DeleteOutcome::Deleted))
-            } else {
-                data::move_sheet_to_trash(db, id).await?;
-                Ok(Some(DeleteOutcome::Trashed))
-            }
-        } else {
-            Err(Error::Forbidden(format!(
-                "delete sheet {} by user {}",
-                id, user.id
-            )))
-        }
-    } else {
-        Ok(None)
-    }
+pub async fn restore_sheet(db: &Db, user: &User, id: Id) -> Result<()> {
+    get_sheet_owned_by_user(db, user, id).await?; // We don't care about the sheet here, we just need to check ownership
+    data::restore_sheet(db, id).await?;
+    Ok(())
 }
-
-pub async fn restore_sheet(db: &Db, user: &User, id: Id) -> Result<Option<()>> {
-    let sheet = data::get_sheet_by_id(db, id).await?;
-    if let Some(sheet) = sheet {
-        if sheet.metadata.owner.id == user.id {
-            data::restore_sheet(db, id).await?;
-            Ok(Some(()))
-        } else {
-            Err(Error::Forbidden(format!(
-                "restore sheet {} by user {}",
-                id, user.id
-            )))
-        }
-    } else {
-        Ok(None)
-    }
-}	
