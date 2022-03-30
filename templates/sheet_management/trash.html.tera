@@ -1,0 +1,66 @@
+{% import "generic/symbols" as symbols %}
+{% import "sheet_management/sidebar" as sidebar %}
+
+{% extends "sheet_management/base" %}
+{% block title %}
+  Papierkorb — {{ super() }}
+{% endblock title %}
+
+{% block sidebar %}
+  {{ sidebar::sidebar(active="trash") }}
+{% endblock sidebar %}
+
+{% block heading %}
+  Papierkorb
+{% endblock heading %}
+
+{% block header %}
+  <th class="is-narrow"></th>
+  <th>Name</th>
+  <th class="is-narrow">Eigentümer</th>
+  <th class="is-narrow">Gelöscht am</th>
+  <th class="is-narrow">Erstellt am</th>
+  <th class="is-narrow" colspan="{{ num_actions }}">Aktionen</th>
+{% endblock header %}
+
+{% block rows %}
+  {% for sheet in sheets | sort(attribute="title") %} 
+    {% set restore_url = url_for(endpoint="restore_sheet", id=sheet.id) %}
+    <tr>
+      <td class="is-narrow">{{ symbols::file() }}</td>
+      <td>{{ sheet.title }}</td>
+      <td class="is-narrow">{{ sheet.owner.username }}</td>
+      <td class="is-narrow">{{ sheet.trashed | date(format="%d.%m.%Y %H:%M") }}</td>
+      <td class="is-narrow">{{ sheet.created | date(format="%d.%m.%Y %H:%M") }}</td>
+      <td class="is-narrow"><a href="{{ restore_url }}" title="Wiederherstellen">{{ symbols::restore() }}</a></td>
+      <td class="is-narrow"><a title="Endgültig löschen" class="has-text-danger js-modal-trigger" data-target="delete-modal-{{ sheet.id }}">{{ symbols::trash() }}</a></td>
+    </tr>
+  {% endfor %}
+{% endblock rows %}
+
+{% block content %}
+  {% set num_actions = 2 %}
+  {{ super() }}
+  {% for sheet in sheets %}
+    {% set delete_url = url_for(endpoint="delete_sheet", id=sheet.id) %}
+    <div id="delete-modal-{{ sheet.id }}" class="modal">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <span class="modal-card-title">{{ sheet.title }} wirklich endgültig löschen?</span>
+          <button class="delete" aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+          Wollen Sie das Dokument "{{ sheet.title }}" wirklich endgültig löschen? Das Dokument kann nicht wiederhergestellt werden.
+        </section>
+        <footer class="modal-card-foot is-justify-content-flex-end">
+          <form class="mr-2" action='{{ delete_url }}' method="POST">
+            <input type="hidden" name="_method" value="DELETE">
+            <button class="button is-danger" type="submit">Löschen</button>
+          </form>
+          <button class="button abort">Abbrechen</button>
+        </footer>
+      </div>
+    </div>
+  {% endfor %}
+{% endblock content %}

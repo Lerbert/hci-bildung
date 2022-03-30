@@ -1,0 +1,33 @@
+{% import "generic/symbols" as symbols %}
+
+{% extends "generic/base" %}
+{% block content %} 
+  <div class="mt-3 columns">
+    <div class="column is-one-fifth">
+      {% block sidebar %}
+      {% endblock sidebar %}
+    </div>
+    <div class="column">
+      <section class="section">
+        <div class="container is-fluid">
+          <h1 class="title">
+            {% block heading %}
+            {% endblock heading %}
+          </h1>
+          <table class="table is-fullwidth is-hoverable">
+            <thead>
+              <tr>
+                {% block header %}
+                {% endblock header %}
+              </tr>
+            </thead>
+            <tbody>
+              {% block rows %}
+              {% endblock rows %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+{% endblock content %}
