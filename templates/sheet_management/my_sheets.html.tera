@@ -33,9 +33,9 @@
       <td class="is-narrow">{{ sheet.owner.username }}</td>
       <td class="is-narrow">{{ sheet.changed | date(format="%d.%m.%Y %H:%M") }}</td>
       <td class="is-narrow">{{ sheet.created | date(format="%d.%m.%Y %H:%M") }}</td>
-      <td class="is-narrow"><a href="{{ edit_url }}" title="Bearbeiten">{{ symbols::pencil() }}</a></td>
-      <td class="is-narrow"><a href="{{ view_url }}" title="Ansehen">{{ symbols::eye() }}</a></td>
-      <td class="is-narrow"><a title="Löschen" class="has-text-danger js-modal-trigger" data-target="delete-modal-{{ sheet.id }}">{{ symbols::trash() }}</a></td>
+      <td class="is-narrow"><a href="{{ edit_url }}" title="Bearbeiten" class="button is-small is-ghost p-0">{{ symbols::pencil() }}</a></td>
+      <td class="is-narrow"><a href="{{ view_url }}" title="Ansehen" class="button is-small is-ghost p-0">{{ symbols::eye() }}</a></td>
+      <td class="is-narrow"><a title="Löschen" class="button is-small is-ghost p-0 has-text-danger js-modal-trigger" data-target="delete-modal-{{ sheet.id }}">{{ symbols::trash() }}</a></td>
     </tr>
   {% endfor %}
   <tr>
@@ -74,7 +74,7 @@
           Wollen Sie das Dokument "{{ sheet.title }}" wirklich in den Papierkorb verschieben? Dokumente im Papierkorb werden nach 30 Tagen automatisch gelöscht.
         </section>
         <footer class="modal-card-foot is-justify-content-flex-end">
-          <form class="mr-2" action='{{ delete_url }}' method="POST">
+          <form class="mr-2" action="{{ delete_url }}" method="POST">
             <input type="hidden" name="_method" value="DELETE">
             <button class="button is-danger" type="submit">Löschen</button>
           </form>

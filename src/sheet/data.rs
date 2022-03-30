@@ -207,3 +207,13 @@ pub async fn move_sheet_to_trash(db: &Db, id: Id) -> Result<(), Error> {
     .await?;
     Ok(())
 }
+
+pub async fn restore_sheet(db: &Db, id: Id) -> Result<(), Error> {
+    db.run(move |c| {
+        diesel::update(sheets::table.find(id))
+            .set(sheets::trashed.eq(None::<DateTime<Utc>>))
+            .execute(c)
+    })
+    .await?;
+    Ok(())
+}

@@ -32,8 +32,12 @@
       <td class="is-narrow">{{ sheet.owner.username }}</td>
       <td class="is-narrow">{{ sheet.trashed | date(format="%d.%m.%Y %H:%M") }}</td>
       <td class="is-narrow">{{ sheet.created | date(format="%d.%m.%Y %H:%M") }}</td>
-      <td class="is-narrow"><a href="{{ restore_url }}" title="Wiederherstellen">{{ symbols::restore() }}</a></td>
-      <td class="is-narrow"><a title="Endgültig löschen" class="has-text-danger js-modal-trigger" data-target="delete-modal-{{ sheet.id }}">{{ symbols::trash() }}</a></td>
+      <td class="is-narrow">
+        <form action="{{ restore_url }}" method="POST">
+          <button title="Wiederherstellen" class="button is-small is-ghost p-0" type="submit">{{ symbols::restore() }}</button>
+        </form>
+      </td>
+      <td class="is-narrow"><a title="Endgültig löschen" class="button is-small is-ghost p-0 has-text-danger js-modal-trigger" data-target="delete-modal-{{ sheet.id }}">{{ symbols::trash() }}</a></td>
     </tr>
   {% endfor %}
 {% endblock rows %}
@@ -54,7 +58,7 @@
           Wollen Sie das Dokument "{{ sheet.title }}" wirklich endgültig löschen? Das Dokument kann nicht wiederhergestellt werden.
         </section>
         <footer class="modal-card-foot is-justify-content-flex-end">
-          <form class="mr-2" action='{{ delete_url }}' method="POST">
+          <form class="mr-2" action="{{ delete_url }}" method="POST">
             <input type="hidden" name="_method" value="DELETE">
             <button class="button is-danger" type="submit">Löschen</button>
           </form>

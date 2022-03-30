@@ -152,13 +152,15 @@ fn rocket() -> _ {
                 sheet::routes::sheets,
                 sheet::routes::sheets_login_req,
                 sheet::routes::trashed_sheets,
+                sheet::routes::trashed_sheets_login_req,
                 sheet::routes::new_sheet,
                 sheet::routes::import_sheet,
                 sheet::routes::view_sheet,
                 sheet::routes::edit_sheet,
                 sheet::routes::edit_login_req,
                 sheet::routes::save_sheet,
-                sheet::routes::delete_sheet
+                sheet::routes::delete_sheet,
+                sheet::routes::restore_sheet
             ],
         )
         .mount(
