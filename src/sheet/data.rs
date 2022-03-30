@@ -20,6 +20,7 @@ struct SheetDiesel {
     created: DateTime<Utc>,
     changed: DateTime<Utc>,
     tiptap: serde_json::Value,
+    trashed: Option<DateTime<Utc>>,
 }
 
 impl From<(SheetDiesel, UserTransportDiesel)> for Sheet {
@@ -32,6 +33,7 @@ impl From<(SheetDiesel, UserTransportDiesel)> for Sheet {
                 owner: u.into(),
                 created: s.created,
                 changed: s.changed,
+                trashed: s.trashed,
             },
             tiptap: s.tiptap,
         }
@@ -60,6 +62,7 @@ struct SheetMetadataDiesel {
     _owner_id: i32,
     created: DateTime<Utc>,
     changed: DateTime<Utc>,
+    trashed: Option<DateTime<Utc>>,
 }
 
 impl From<(SheetMetadataDiesel, UserTransportDiesel)> for SheetMetadata {
@@ -71,6 +74,7 @@ impl From<(SheetMetadataDiesel, UserTransportDiesel)> for SheetMetadata {
             owner: u.into(),
             created: s.created,
             changed: s.changed,
+            trashed: s.trashed,
         }
     }
 }
@@ -87,10 +91,36 @@ pub async fn get_all_sheets(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>,
                         sheets::owner_id,
                         sheets::created,
                         sheets::changed,
+                        sheets::trashed,
                     ),
                     (users::id, users::username),
                 ))
                 .filter(sheets::owner_id.eq(user_id))
+                .filter(sheets::trashed.is_null())
+                .load(c)
+        })
+        .await?;
+    Ok(sheets.into_iter().map(|s| s.into()).collect())
+}
+
+pub async fn get_trash(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Error> {
+    let sheets: Vec<(SheetMetadataDiesel, UserTransportDiesel)> = db
+        .run(move |c| {
+            sheets::table
+                .inner_join(users::table)
+                .select((
+                    (
+                        sheets::id,
+                        sheets::title,
+                        sheets::owner_id,
+                        sheets::created,
+                        sheets::changed,
+                        sheets::trashed,
+                    ),
+                    (users::id, users::username),
+                ))
+                .filter(sheets::owner_id.eq(user_id))
+                .filter(sheets::trashed.is_not_null())
                 .load(c)
         })
         .await?;
@@ -110,6 +140,7 @@ pub async fn get_sheet_by_id(db: &Db, id: Id) -> Result<Option<Sheet>, Error> {
                         sheets::created,
                         sheets::changed,
                         sheets::tiptap,
+                        sheets::trashed,
                     ),
                     (users::id, users::username),
                 ))
@@ -138,6 +169,7 @@ pub async fn create_sheet(
                     sheets::created.eq(created),
                     sheets::changed.eq(changed),
                     sheets::tiptap.eq(tiptap),
+                    sheets::trashed.eq(None::<DateTime<Utc>>),
                 ))
                 .get_result(c)
         })
@@ -163,5 +195,15 @@ pub async fn update_sheet(
 pub async fn delete_sheet(db: &Db, id: Id) -> Result<(), Error> {
     db.run(move |c| diesel::delete(sheets::table.find(id)).execute(c))
         .await?;
+    Ok(())
+}
+
+pub async fn move_sheet_to_trash(db: &Db, id: Id) -> Result<(), Error> {
+    db.run(move |c| {
+        diesel::update(sheets::table.find(id))
+            .set(sheets::trashed.eq(Some(Utc::now())))
+            .execute(c)
+    })
+    .await?;
     Ok(())
 }

@@ -36,6 +36,7 @@ pub struct SheetOverviewTransport {
     pub owner: UserTransport,
     pub created: DateTime<Utc>,
     pub changed: DateTime<Utc>,
+    pub trashed: Option<DateTime<Utc>>,
 }
 
 impl From<SheetMetadata> for SheetOverviewTransport {
@@ -46,6 +47,7 @@ impl From<SheetMetadata> for SheetOverviewTransport {
             owner: metadata.owner,
             created: metadata.created,
             changed: metadata.changed,
+            trashed: metadata.trashed,
         }
     }
 }

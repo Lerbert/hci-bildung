@@ -96,7 +96,7 @@ pub async fn sheets(
         .map_err(|e| e.to_status())
         .map(|sheets| {
             Template::render(
-                "docmgmt",
+                "sheet_management/my_sheets",
                 &SheetManagementContext {
                     flash: flash.map(|f| f.into()),
                     sheets: sheets.into_iter().map(|metadata| metadata.into()).collect(),
@@ -118,6 +118,23 @@ pub async fn new_sheet(db: Db, user: &User, form: Form<NewSheetForm>) -> Result<
         .await
         .map_err(|e| e.to_status())
         .map(|id| Redirect::to(format!("{}{}", MOUNT, uri!(edit_sheet(id)))))
+}
+
+#[get("/trash")]
+pub async fn trashed_sheets(db: Db, user: &User) -> Result<Template, Status> {
+    logic::get_trash(&db, user)
+        .await
+        .map_err(|e| e.to_status())
+        .map(|sheets| {
+            Template::render(
+                "sheet_management/trash",
+                &SheetManagementContext {
+                    flash: None,
+                    sheets: sheets.into_iter().map(|metadata| metadata.into()).collect(),
+                    user: user.into(),
+                },
+            )
+        })
 }
 
 #[post("/import", data = "<form>")]
@@ -224,8 +241,13 @@ pub async fn delete_sheet(db: Db, user: &User, id: Id) -> Result<Redirect, Statu
         .await
         .map_err(|e| e.to_status())
         .and_then(|opt| {
-            opt.map(|_| Redirect::to(format!("{}{}", MOUNT, uri!(sheets))))
-                .ok_or(Status::NotFound)
+            opt.map(|outcome| match outcome {
+                logic::DeleteOutcome::Trashed => Redirect::to(format!("{}{}", MOUNT, uri!(sheets))),
+                logic::DeleteOutcome::Deleted => {
+                    Redirect::to(format!("{}{}", MOUNT, uri!(trashed_sheets)))
+                }
+            })
+            .ok_or(Status::NotFound)
         })
 }
 

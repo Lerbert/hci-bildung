@@ -43,10 +43,20 @@ pub struct SheetMetadata {
     pub owner: UserTransport,
     pub created: DateTime<Utc>,
     pub changed: DateTime<Utc>,
+    pub trashed: Option<DateTime<Utc>>,
+}
+
+pub enum DeleteOutcome {
+    Deleted,
+    Trashed,
 }
 
 pub async fn get_all_sheets(db: &Db, user: &User) -> Result<Vec<SheetMetadata>> {
     Ok(data::get_all_sheets(db, user.id).await?)
+}
+
+pub async fn get_trash(db: &Db, user: &User) -> Result<Vec<SheetMetadata>> {
+    Ok(data::get_trash(db, user.id).await?)
 }
 
 pub async fn create_empty_sheet(db: &Db, user: &User, title: String) -> Result<Id> {
@@ -109,12 +119,17 @@ pub async fn update_sheet(
     }
 }
 
-pub async fn delete_sheet(db: &Db, user: &User, id: Id) -> Result<Option<()>> {
+pub async fn delete_sheet(db: &Db, user: &User, id: Id) -> Result<Option<DeleteOutcome>> {
     let sheet = data::get_sheet_by_id(db, id).await?;
     if let Some(sheet) = sheet {
         if sheet.metadata.owner.id == user.id {
-            data::delete_sheet(db, id).await?;
-            Ok(Some(()))
+            if sheet.metadata.trashed.is_some() {
+                data::delete_sheet(db, id).await?;
+                Ok(Some(DeleteOutcome::Deleted))
+            } else {
+                data::move_sheet_to_trash(db, id).await?;
+                Ok(Some(DeleteOutcome::Trashed))
+            }
         } else {
             Err(Error::Forbidden(format!(
                 "delete sheet {} by user {}",
