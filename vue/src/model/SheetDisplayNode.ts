@@ -49,7 +49,7 @@ export class Codeblock extends Node {
 
   constructor(tiptapNode: JSONContent) {
     super(tiptapNode);
-    this.language = tiptapNode.attrs?.language ?? "";
+    this.language = tiptapNode.attrs?.language ?? "plain";
   }
 }
 

@@ -2,8 +2,14 @@
   <em><slot /></em>
 </template>
 
-<script>
-export default {};
+<script setup lang="ts">
+import { Mark } from "../../model/SheetDisplayMark";
+
+const props = defineProps<{
+  checkTrigger: boolean;
+  mark: Mark;
+  markExport: Mark;
+}>();
 </script>
 
 <style></style>

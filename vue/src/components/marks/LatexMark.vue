@@ -2,46 +2,31 @@
   <span ref="latex"></span>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { computed, onMounted, ref, Ref, toRefs, watch } from "vue";
 import Katex from "katex";
 
-export default defineComponent({
-  props: {
-    mark: {
-      type: Object,
-      required: true,
-    },
-  },
+import { Latex } from "../../model/SheetDisplayMark";
 
-  data() {
-    return {};
-  },
+const propsDef = defineProps<{
+  checkTrigger: boolean;
+  mark: Latex;
+  markExport: Latex;
+}>();
+const props = toRefs(propsDef);
 
-  computed: {
-    latexSource(): string {
-      return this.mark.source;
-    },
-  },
+const latex: Ref<HTMLSpanElement | null> = ref(null);
+const latexSource = computed(() => props.mark.value.source);
 
-  mounted() {
-    this.renderLatex();
-  },
+function renderLatex() {
+  Katex.render(latexSource.value, latex.value, {
+    throwOnError: false,
+  });
+}
 
-  methods: {
-    renderLatex() {
-      Katex.render(this.latexSource, this.$refs.latex as HTMLElement, {
-        throwOnError: false,
-      });
-    },
-  },
+onMounted(renderLatex);
 
-  watch: {
-    latexSource: function () {
-      this.renderLatex();
-    },
-  },
-});
+watch(latexSource, renderLatex);
 </script>
 
 <style lang="css" scoped>

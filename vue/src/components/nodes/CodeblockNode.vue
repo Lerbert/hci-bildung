@@ -6,25 +6,19 @@
   </pre>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { computed, toRefs } from "vue";
 
-export default defineComponent({
-  props: {
-    sheet: {
-      type: Object,
-      required: true,
-    },
-  },
+import { Codeblock } from "../../model/SheetDisplayNode";
 
-  computed: {
-    language(): string {
-      return this.sheet.language === ""
-        ? ""
-        : `language-${this.sheet.language}`;
-    },
-  },
-});
+const propsDef = defineProps<{
+  checkTrigger: boolean;
+  sheet: Codeblock;
+  sheetExport: Codeblock;
+}>();
+const props = toRefs(propsDef);
+
+const language = computed(() => `language-${props.sheet.value.language}`);
 </script>
 
 <style></style>

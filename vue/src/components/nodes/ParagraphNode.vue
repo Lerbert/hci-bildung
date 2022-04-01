@@ -5,17 +5,14 @@
   </p>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { Node } from "../../model/SheetDisplayNode";
 
-export default defineComponent({
-  props: {
-    sheet: {
-      type: Object,
-      required: true,
-    },
-  },
-});
+const props = defineProps<{
+  checkTrigger: boolean;
+  sheet: Node;
+  sheetExport: Node;
+}>();
 </script>
 
 <style></style>

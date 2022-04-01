@@ -1,22 +1,18 @@
-<script>
-import { defineComponent, h } from "vue";
+<template>
+  <component :is="`h${sheet.level}`">
+    <slot />
+    <br v-if="sheet.content.length === 0" />
+  </component>
+</template>
 
-export default defineComponent({
-  props: {
-    sheet: {
-      type: Object,
-      required: true,
-    },
-  },
+<script setup lang="ts">
+import { Node } from "../../model/SheetDisplayNode";
 
-  render() {
-    if (this.sheet.content.length > 0) {
-      return h("h" + this.sheet.level, {}, this.$slots.default());
-    } else {
-      return h("h" + this.sheet.level, {}, [this.$slots.default(), h("br")]);
-    }
-  },
-});
+const props = defineProps<{
+  checkTrigger: boolean;
+  sheet: Node;
+  sheetExport: Node;
+}>();
 </script>
 
 <style></style>
