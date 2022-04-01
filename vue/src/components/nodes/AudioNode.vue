@@ -1,9 +1,6 @@
 <template>
   <audio controls="true">
-    <source
-      v-bind:src="tiptapNode.attrs.source"
-      v-bind:type="tiptapNode.attrs.mimetype"
-    />
+    <source :src="sheet.source" :type="sheet.mimetype" />
   </audio>
 </template>
 
@@ -12,7 +9,7 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   props: {
-    tiptapNode: {
+    sheet: {
       type: Object,
       required: true,
     },

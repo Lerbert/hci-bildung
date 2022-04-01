@@ -8,45 +8,43 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { onBeforeUnmount, onMounted, ref, Ref, toRefs } from "vue";
+
+import { JSONContent } from "@tiptap/core";
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 
-import Audio from "../nodes/Audio.ts";
-import Gap from "../marks/Gap.ts";
-import Latex from "../marks/Latex.ts";
+import Audio from "../nodes/Audio";
+import Gap from "../marks/Gap";
+import Latex from "../marks/Latex";
+import MultipleChoiceAnswer from "../nodes/MultipleChoiceAnswer";
+import MultipleChoice from "../nodes/MultipleChoice";
+import { SaveStatus as SaveStatusEnum } from "../enums";
+
 import MenuBar from "./MenuBar.vue";
-import MultipleChoiceAnswer from "../nodes/MultipleChoiceAnswer.ts";
-import MultipleChoice from "../nodes/MultipleChoice.ts";
 import SaveStatus from "./SaveStatus.vue";
 
-export default {
-  components: {
-    EditorContent,
-    MenuBar,
-    SaveStatus,
-  },
+const propsDef = withDefaults(
+  defineProps<{
+    initialContent?: JSONContent;
+    saveStatus: SaveStatusEnum;
+  }>(),
+  { initialContent: () => ({ type: "doc", content: [{ type: "paragraph" }] }) }
+);
+const props = toRefs(propsDef);
 
-  props: {
-    initialContent: {
-      type: Object,
-      default: () => ({ type: "doc", content: [{ type: "paragraph" }] }),
-    },
-    saveStatus: {
-      required: true,
-    },
-  },
+const emit = defineEmits<{
+  (e: "update:content", content: JSONContent): void;
+}>();
 
-  data() {
-    return {
-      editor: null,
-      content: this.initialContent,
-    };
-  },
+let editor: Ref<Editor | null> = ref(null);
+let content = ref(props.initialContent.value);
 
-  mounted() {
-    this.editor = new Editor({
-      content: this.content,
+onMounted(
+  () =>
+    (editor.value = new Editor({
+      content: content.value,
       extensions: [
         StarterKit,
         Audio,
@@ -56,15 +54,12 @@ export default {
         MultipleChoice,
       ],
       onUpdate: () => {
-        this.$emit("update:content", this.editor.getJSON());
+        emit("update:content", editor.value.getJSON());
       },
-    });
-  },
+    }))
+);
 
-  beforeUnmount() {
-    this.editor.destroy();
-  },
-};
+onBeforeUnmount(() => editor.value.destroy());
 </script>
 
 <style lang="scss" scoped>

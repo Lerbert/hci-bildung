@@ -1,6 +1,6 @@
 <template>
   <pre>
-    <code v-bind:class="tiptapNode.attrs.language == null ? '' : 'language-' + tiptapNode.attrs.language">
+    <code :class="language">
       <slot/>
     </code>
   </pre>
@@ -11,9 +11,17 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   props: {
-    tiptapNode: {
+    sheet: {
       type: Object,
       required: true,
+    },
+  },
+
+  computed: {
+    language(): string {
+      return this.sheet.language === ""
+        ? ""
+        : `language-${this.sheet.language}`;
     },
   },
 });

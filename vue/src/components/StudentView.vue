@@ -1,17 +1,19 @@
 <template>
   <div>
     <h1>{{ docTitle }}</h1>
-    <sheet-display :editorJSON="docJSON"></sheet-display>
+    <sheet-display :sheet="sheet"></sheet-display>
   </div>
 </template>
 
 <script>
 import { defineComponent } from "vue";
 
+import { Node } from "../model/SheetDisplayNode";
+
 import SheetDisplay from "./SheetDisplay.vue";
 
 export default defineComponent({
-  name: "EditView",
+  name: "StudentView",
   components: {
     SheetDisplay,
   },
@@ -28,6 +30,12 @@ export default defineComponent({
     docTitle: {
       type: String,
       required: true,
+    },
+  },
+
+  computed: {
+    sheet() {
+      return Node.fromTiptap(this.docJSON);
     },
   },
 });

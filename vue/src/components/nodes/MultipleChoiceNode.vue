@@ -7,9 +7,9 @@
   >
     <ul data-type="multipleChoice">
       <multiple-choice-answer-node
-        v-for="(c, index) in tiptapNode.content"
+        v-for="(c, index) in sheet.content"
         :key="index"
-        :tiptapNode="c"
+        :sheet="c"
         :checkTrigger="checkAnswersTrigger"
         @grantPoints="(event) => $emit('grantPoints', event)"
         @answerCorrect="countAnswerCorrect"
@@ -17,7 +17,7 @@
         <sheet-node
           v-for="(c, index) in c.content"
           :key="index"
-          :tiptapNode="c"
+          :sheet="c"
           :checkTrigger="checkTrigger"
           @grantPoints="(event) => $emit('grantPoints', event)"
         ></sheet-node>
@@ -45,7 +45,7 @@ const propsDef = defineProps({
     type: Boolean,
     required: true,
   },
-  tiptapNode: {
+  sheet: {
     type: Object,
     required: true,
     validator(value: Record<string, any>) {
@@ -62,7 +62,7 @@ const emit = defineEmits({
 const checkAnswersTrigger = ref(false);
 const correctAnswers = ref(0);
 const totalAnswers = ref(0);
-const expectedAnswers = computed(() => props.tiptapNode.value.content.length);
+const expectedAnswers = computed(() => props.sheet.value.content.length);
 function resetCorrectAnswerCount() {
   correctAnswers.value = 0;
   totalAnswers.value = 0;

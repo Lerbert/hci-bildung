@@ -47,7 +47,7 @@
             </more-button>
           </div>
         </div>
-        <sheet-display :editorJSON="editorContent"></sheet-display>
+        <sheet-display :sheet="sheet"></sheet-display>
       </div>
     </div>
   </div>
@@ -58,8 +58,10 @@ import { defineComponent } from "vue";
 import debounce from "lodash/debounce";
 import download from "downloadjs";
 
-import MoreButton from "./MoreButton.vue";
+import { Node } from "../model/SheetDisplayNode";
 import { SaveStatus } from "../enums";
+
+import MoreButton from "./MoreButton.vue";
 import ShareButton from "./ShareButton.vue";
 import SheetDisplay from "./SheetDisplay.vue";
 import TiptapEditor from "./TiptapEditor.vue";
@@ -107,6 +109,9 @@ export default defineComponent({
         title: this.title,
         tiptap: this.editorContent,
       };
+    },
+    sheet() {
+      return Node.fromTiptap(this.editorContent);
     },
   },
 

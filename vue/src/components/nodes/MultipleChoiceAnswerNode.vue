@@ -16,7 +16,7 @@ export default defineComponent({
       type: Boolean,
       required: true,
     },
-    tiptapNode: {
+    sheet: {
       type: Object,
       required: true,
     },
@@ -30,7 +30,7 @@ export default defineComponent({
 
   data() {
     return {
-      ticked: false,
+      ticked: this.sheet.answer,
       checked: false,
       correct: false,
     };
@@ -38,7 +38,7 @@ export default defineComponent({
 
   computed: {
     solution(): boolean {
-      return this.tiptapNode.attrs.checked;
+      return this.sheet.solution;
     },
   },
 

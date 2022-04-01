@@ -7,7 +7,7 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   props: {
-    tiptapNode: {
+    sheet: {
       type: Object,
       required: true,
     },

@@ -1,5 +1,5 @@
 <template>
-  <span>{{ tiptapNode.text }}</span>
+  <span>{{ sheet.text }}</span>
 </template>
 
 <script lang="ts">
@@ -7,7 +7,7 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   props: {
-    tiptapNode: {
+    sheet: {
       type: Object,
       required: true,
     },

@@ -1,7 +1,7 @@
 <template>
   <p>
     <slot />
-    <br v-if="!tiptapNode.content" />
+    <br v-if="sheet.content.length === 0" />
   </p>
 </template>
 
@@ -10,7 +10,7 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   props: {
-    tiptapNode: {
+    sheet: {
       type: Object,
       required: true,
     },

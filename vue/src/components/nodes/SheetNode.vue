@@ -1,20 +1,20 @@
 <template>
   <text-marking
-    v-if="tiptapNode.marks"
-    :tiptapNode="tiptapNode"
+    v-if="sheet.marks.length > 0"
+    :marks="sheet.marks"
     :checkTrigger="checkTrigger"
     @grantPoints="(event) => $emit('grantPoints', event)"
   >
     <component
       :is="nodeType"
-      :tiptapNode="tiptapNode"
+      :sheet="sheet"
       :checkTrigger="checkTrigger"
       @grantPoints="(event) => $emit('grantPoints', event)"
     >
       <sheet-node
-        v-for="(c, index) in tiptapNode.content"
+        v-for="(c, index) in sheet.content"
         :key="index"
-        :tiptapNode="c"
+        :sheet="c"
         :checkTrigger="checkTrigger"
         @grantPoints="(event) => $emit('grantPoints', event)"
       ></sheet-node>
@@ -23,14 +23,14 @@
   <component
     v-else
     :is="nodeType"
-    :tiptapNode="tiptapNode"
+    :sheet="sheet"
     :checkTrigger="checkTrigger"
     @grantPoints="(event) => $emit('grantPoints', event)"
   >
     <sheet-node
-      v-for="(c, index) in tiptapNode.content"
+      v-for="(c, index) in sheet.content"
       :key="index"
-      :tiptapNode="c"
+      :sheet="c"
       :checkTrigger="checkTrigger"
       @grantPoints="(event) => $emit('grantPoints', event)"
     ></sheet-node>
@@ -76,7 +76,7 @@ export default defineComponent({
   },
 
   props: {
-    tiptapNode: {
+    sheet: {
       type: Object,
       required: true,
     },
@@ -97,7 +97,7 @@ export default defineComponent({
 
   computed: {
     nodeType(): string {
-      return this.tiptapNode.type.toLowerCase() + "-node";
+      return this.sheet.type.toLowerCase() + "-node";
     },
   },
 });

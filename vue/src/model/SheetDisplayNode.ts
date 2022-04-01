@@ -17,13 +17,59 @@ export class Node {
 
   public static fromTiptap(tiptapNode: JSONContent): Node {
     switch (tiptapNode.type) {
-      case "text":
-        return new Text(tiptapNode);
+      case "audio":
+        return new Audio(tiptapNode);
+      case "codeBlock":
+        return new Codeblock(tiptapNode);
+      case "heading":
+        return new Heading(tiptapNode);
       case "multipleChoiceAnswer":
         return new MultipleChoiceAnswer(tiptapNode);
+      case "text":
+        return new Text(tiptapNode);
       default:
         return new Node(tiptapNode);
     }
+  }
+}
+
+export class Audio extends Node {
+  source: string;
+  mimetype: string;
+
+  constructor(tiptapNode: JSONContent) {
+    super(tiptapNode);
+    this.source = tiptapNode.attrs?.source ?? "";
+    this.mimetype = tiptapNode.attrs?.mimetype ?? "";
+  }
+}
+
+export class Codeblock extends Node {
+  language: string;
+
+  constructor(tiptapNode: JSONContent) {
+    super(tiptapNode);
+    this.language = tiptapNode.attrs?.language ?? "";
+  }
+}
+
+export class Heading extends Node {
+  level: number;
+
+  constructor(tiptapNode: JSONContent) {
+    super(tiptapNode);
+    this.level = tiptapNode.attrs?.level ?? 1;
+  }
+}
+
+export class MultipleChoiceAnswer extends Node {
+  solution: boolean;
+  answer: boolean;
+
+  constructor(tiptapNode: JSONContent) {
+    super(tiptapNode);
+    this.solution = tiptapNode.attrs?.checked ?? false;
+    this.answer = false;
   }
 }
 
@@ -33,16 +79,5 @@ export class Text extends Node {
   constructor(tiptapNode: JSONContent) {
     super(tiptapNode);
     this.text = tiptapNode.text ?? "";
-  }
-}
-
-export class MultipleChoiceAnswer extends Node {
-  solution: boolean;
-  checked: boolean;
-
-  constructor(tiptapNode: JSONContent) {
-    super(tiptapNode);
-    this.solution = tiptapNode.attrs?.checked ?? false;
-    this.checked = false;
   }
 }

@@ -1,18 +1,19 @@
 <template>
-  <slot v-if="empty" />
   <component
-    v-else
     :is="markType"
-    :tiptapNode="tiptapNode"
+    :mark="marks[0]"
     :checkTrigger="checkTrigger"
     @grantPoints="(event) => $emit('grantPoints', event)"
   >
     <text-marking
-      :tiptapNode="{ ...tiptapNode, marks: marks.slice(1) }"
+      v-if="hasMoreMarks"
+      :marks="marks.slice(1)"
       :checkTrigger="checkTrigger"
       @grantPoints="(event) => $emit('grantPoints', event)"
-      ><slot
-    /></text-marking>
+    >
+      <slot />
+    </text-marking>
+    <slot v-else />
   </component>
 </template>
 
@@ -38,9 +39,12 @@ export default defineComponent({
   },
 
   props: {
-    tiptapNode: {
+    marks: {
       type: Object,
       required: true,
+      validator(value: any) {
+        return value.length > 0;
+      },
     },
     checkTrigger: {
       type: Boolean,
@@ -58,14 +62,11 @@ export default defineComponent({
   },
 
   computed: {
-    marks(): any[] {
-      return this.tiptapNode.marks;
-    },
-    empty(): boolean {
-      return this.marks.length == 0;
+    hasMoreMarks(): boolean {
+      return this.marks.length > 1;
     },
     markType(): string {
-      if (this.empty) {
+      if (this.marks.length === 0) {
         return "";
       } else {
         return this.marks[0].type.toLowerCase() + "-mark";

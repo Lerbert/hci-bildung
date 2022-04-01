@@ -3,20 +3,17 @@ import { defineComponent, h } from "vue";
 
 export default defineComponent({
   props: {
-    tiptapNode: {
+    sheet: {
       type: Object,
       required: true,
     },
   },
 
   render() {
-    if (this.tiptapNode.content) {
-      return h("h" + this.tiptapNode.attrs.level, {}, this.$slots.default());
+    if (this.sheet.content.length > 0) {
+      return h("h" + this.sheet.level, {}, this.$slots.default());
     } else {
-      return h("h" + this.tiptapNode.attrs.level, {}, [
-        this.$slots.default(),
-        h("br"),
-      ]);
+      return h("h" + this.sheet.level, {}, [this.$slots.default(), h("br")]);
     }
   },
 });

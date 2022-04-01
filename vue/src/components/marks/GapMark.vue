@@ -26,13 +26,14 @@
 import { computed, ref, toRefs } from "vue";
 
 import { useCheckable, withCheckableEmit } from "../../composables/Checkable";
+import { Gap } from "../../model/SheetDisplayMark";
 
 import CheckSymbol from "../feedback_symbols/CheckSymbol.vue";
 import CrossSymbol from "../feedback_symbols/CrossSymbol.vue";
 
 const propsDef = defineProps<{
   checkTrigger: boolean;
-  tiptapNode: Record<string, any>;
+  mark: Gap;
 }>();
 const props = toRefs(propsDef);
 
@@ -51,8 +52,8 @@ const { right, wrong } = useCheckable(
   totalPoints
 );
 
-const value = ref("");
-const solution = computed(() => props.tiptapNode.value.text);
+const value = ref(props.mark.value.answer);
+const solution = computed(() => props.mark.value.solution);
 // Lower resolution to multiples of 5 to not reveal the exact solution length
 const width = computed(() => Math.ceil(solution.value.length / 5) * 5);
 </script>

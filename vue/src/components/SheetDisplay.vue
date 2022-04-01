@@ -23,7 +23,7 @@
     </div>
     <sheet-node
       class="sheet__content"
-      :tiptapNode="editorJSON"
+      :sheet="sheet"
       :checkTrigger="checkTrigger"
       @grantPoints="grantPoints"
     ></sheet-node>
@@ -38,6 +38,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+
 import SheetNode from "./nodes/SheetNode.vue";
 import PointStatus from "./PointStatus.vue";
 
@@ -48,7 +49,7 @@ export default defineComponent({
   },
 
   props: {
-    editorJSON: {
+    sheet: {
       type: Object,
       required: true,
     },

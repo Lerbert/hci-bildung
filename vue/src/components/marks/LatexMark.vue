@@ -8,7 +8,7 @@ import Katex from "katex";
 
 export default defineComponent({
   props: {
-    tiptapNode: {
+    mark: {
       type: Object,
       required: true,
     },
@@ -20,7 +20,7 @@ export default defineComponent({
 
   computed: {
     latexSource(): string {
-      return this.tiptapNode.text;
+      return this.mark.source;
     },
   },
 
