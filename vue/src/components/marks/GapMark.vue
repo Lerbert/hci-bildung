@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRefs } from "vue";
+import { computed, ref, toRefs, watch } from "vue";
 
 import { useCheckable, withCheckableEmit } from "../../composables/Checkable";
 import { Gap } from "../../model/SheetDisplayMark";
@@ -34,6 +34,7 @@ import CrossSymbol from "../feedback_symbols/CrossSymbol.vue";
 const propsDef = defineProps<{
   checkTrigger: boolean;
   mark: Gap;
+  markExport: Gap;
 }>();
 const props = toRefs(propsDef);
 
@@ -56,6 +57,12 @@ const value = ref(props.mark.value.answer);
 const solution = computed(() => props.mark.value.solution);
 // Lower resolution to multiples of 5 to not reveal the exact solution length
 const width = computed(() => Math.ceil(solution.value.length / 5) * 5);
+
+function updateExport() {
+  props.markExport.value.answer = value.value;
+}
+watch(value, updateExport);
+watch(props.mark, updateExport);
 </script>
 
 <style lang="scss" scoped>

@@ -2,12 +2,14 @@
   <component
     :is="markType"
     :mark="marks[0]"
+    :markExport="marksExport[0]"
     :checkTrigger="checkTrigger"
     @grantPoints="(event) => $emit('grantPoints', event)"
   >
     <text-marking
       v-if="hasMoreMarks"
       :marks="marks.slice(1)"
+      :marksExport="marksExport.slice(1)"
       :checkTrigger="checkTrigger"
       @grantPoints="(event) => $emit('grantPoints', event)"
     >
@@ -40,6 +42,13 @@ export default defineComponent({
 
   props: {
     marks: {
+      type: Object,
+      required: true,
+      validator(value: any) {
+        return value.length > 0;
+      },
+    },
+    marksExport: {
       type: Object,
       required: true,
       validator(value: any) {

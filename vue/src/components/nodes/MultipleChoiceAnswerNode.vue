@@ -7,57 +7,41 @@
   </li>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { computed, ref, toRefs, watch } from "vue";
 
-export default defineComponent({
-  props: {
-    checkTrigger: {
-      type: Boolean,
-      required: true,
-    },
-    sheet: {
-      type: Object,
-      required: true,
-    },
-  },
+import { MultipleChoiceAnswer } from "../../model/SheetDisplayNode";
 
-  emits: {
-    answerCorrect(payload: { correct: boolean }) {
-      return true;
-    },
-  },
+const propsDef = defineProps<{
+  checkTrigger: boolean;
+  sheet: MultipleChoiceAnswer;
+  sheetExport: MultipleChoiceAnswer;
+}>();
+const props = toRefs(propsDef);
 
-  data() {
-    return {
-      ticked: this.sheet.answer,
-      checked: false,
-      correct: false,
-    };
-  },
+const emit = defineEmits<{
+  (e: "answerCorrect", correct: boolean): void;
+}>();
 
-  computed: {
-    solution(): boolean {
-      return this.sheet.solution;
-    },
-  },
+const ticked = ref(props.sheet.value.answer);
+const checked = ref(false);
+const correct = ref(false);
+const solution = computed(() => props.sheet.value.solution);
 
-  methods: {
-    check() {
-      this.checked = true;
-      this.correct = this.ticked === this.solution;
-      this.$emit("answerCorrect", {
-        correct: this.correct,
-      });
-    },
-  },
+function check() {
+  checked.value = true;
+  correct.value = ticked.value === solution.value;
+  emit("answerCorrect", correct.value);
+}
 
-  watch: {
-    checkTrigger() {
-      this.check();
-    },
-  },
-});
+watch(props.checkTrigger, check);
+
+function updateExport() {
+  props.sheetExport.value.answer = ticked.value;
+}
+
+watch(ticked, updateExport);
+watch(props.sheet, updateExport);
 </script>
 
 <style lang="scss" scoped>

@@ -2,12 +2,14 @@
   <text-marking
     v-if="sheet.marks.length > 0"
     :marks="sheet.marks"
+    :marksExport="sheetExport.marks"
     :checkTrigger="checkTrigger"
     @grantPoints="(event) => $emit('grantPoints', event)"
   >
     <component
       :is="nodeType"
       :sheet="sheet"
+      :sheetExport="sheetExport"
       :checkTrigger="checkTrigger"
       @grantPoints="(event) => $emit('grantPoints', event)"
     >
@@ -15,6 +17,7 @@
         v-for="(c, index) in sheet.content"
         :key="index"
         :sheet="c"
+        :sheetExport="sheetExport.content[index]"
         :checkTrigger="checkTrigger"
         @grantPoints="(event) => $emit('grantPoints', event)"
       ></sheet-node>
@@ -24,6 +27,7 @@
     v-else
     :is="nodeType"
     :sheet="sheet"
+    :sheetExport="sheetExport"
     :checkTrigger="checkTrigger"
     @grantPoints="(event) => $emit('grantPoints', event)"
   >
@@ -31,6 +35,7 @@
       v-for="(c, index) in sheet.content"
       :key="index"
       :sheet="c"
+      :sheetExport="sheetExport.content[index]"
       :checkTrigger="checkTrigger"
       @grantPoints="(event) => $emit('grantPoints', event)"
     ></sheet-node>
@@ -77,6 +82,10 @@ export default defineComponent({
 
   props: {
     sheet: {
+      type: Object,
+      required: true,
+    },
+    sheetExport: {
       type: Object,
       required: true,
     },

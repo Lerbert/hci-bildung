@@ -24,6 +24,7 @@
     <sheet-node
       class="sheet__content"
       :sheet="sheet"
+      :sheetExport="sheetExport"
       :checkTrigger="checkTrigger"
       @grantPoints="grantPoints"
     ></sheet-node>
@@ -38,6 +39,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import cloneDeep from "lodash/cloneDeep";
 
 import SheetNode from "./nodes/SheetNode.vue";
 import PointStatus from "./PointStatus.vue";
@@ -60,6 +62,7 @@ export default defineComponent({
       checkTrigger: false,
       achievedPoints: 0,
       totalPoints: 0,
+      sheetExport: cloneDeep(this.sheet),
     };
   },
 
@@ -72,6 +75,12 @@ export default defineComponent({
     grantPoints(event: { achievedPoints: number; totalPoints: number }) {
       this.achievedPoints += event.achievedPoints;
       this.totalPoints += event.totalPoints;
+    },
+  },
+
+  watch: {
+    sheet() {
+      this.sheetExport = cloneDeep(this.sheet);
     },
   },
 });

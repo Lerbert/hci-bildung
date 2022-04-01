@@ -7,17 +7,19 @@
   >
     <ul data-type="multipleChoice">
       <multiple-choice-answer-node
-        v-for="(c, index) in sheet.content"
-        :key="index"
+        v-for="(c, i) in sheet.content"
+        :key="i"
         :sheet="c"
+        :sheetExport="sheetExport.content[i]"
         :checkTrigger="checkAnswersTrigger"
         @grantPoints="(event) => $emit('grantPoints', event)"
         @answerCorrect="countAnswerCorrect"
       >
         <sheet-node
-          v-for="(c, index) in c.content"
-          :key="index"
+          v-for="(c, j) in c.content"
+          :key="j"
           :sheet="c"
+          :sheetExport="sheetExport.content[i].content[j]"
           :checkTrigger="checkTrigger"
           @grantPoints="(event) => $emit('grantPoints', event)"
         ></sheet-node>
@@ -52,6 +54,13 @@ const propsDef = defineProps({
       return value.content.every((c) => c.type === "multipleChoiceAnswer");
     },
   },
+  sheetExport: {
+    type: Object,
+    required: true,
+    validator(value: Record<string, any>) {
+      return value.content.every((c) => c.type === "multipleChoiceAnswer");
+    },
+  },
 });
 const props = toRefs(propsDef);
 
@@ -67,8 +76,8 @@ function resetCorrectAnswerCount() {
   correctAnswers.value = 0;
   totalAnswers.value = 0;
 }
-function countAnswerCorrect(event) {
-  if (event.correct) {
+function countAnswerCorrect(correct) {
+  if (correct) {
     correctAnswers.value++;
   }
   totalAnswers.value++;
