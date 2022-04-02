@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { Node } from "../../model/SheetDisplayNode";
 
-const props = defineProps<{
+defineProps<{
   checkTrigger: boolean;
   sheet: Node;
   sheetExport: Node;

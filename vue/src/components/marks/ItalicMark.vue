@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import { Mark } from "../../model/SheetDisplayMark";
 
-const props = defineProps<{
+defineProps<{
   checkTrigger: boolean;
   mark: Mark;
   markExport: Mark;
