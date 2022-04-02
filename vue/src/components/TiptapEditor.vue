@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, Ref, toRefs } from "vue";
+import { onBeforeUnmount, onMounted, ref, toRefs } from "vue";
 
 import { JSONContent } from "@tiptap/core";
 import { Editor, EditorContent } from "@tiptap/vue-3";
@@ -38,8 +38,8 @@ const emit = defineEmits<{
   (e: "update:content", content: JSONContent): void;
 }>();
 
-let editor: Ref<Editor | null> = ref(null);
-let content = ref(props.initialContent.value);
+const editor = ref<Editor | null>(null);
+const content = ref(props.initialContent.value);
 
 onMounted(
   () =>
@@ -54,12 +54,18 @@ onMounted(
         MultipleChoice,
       ],
       onUpdate: () => {
-        emit("update:content", editor.value.getJSON());
+        if (editor.value !== null) {
+          emit("update:content", editor.value.getJSON());
+        }
       },
     }))
 );
 
-onBeforeUnmount(() => editor.value.destroy());
+onBeforeUnmount(() => {
+  if (editor.value !== null) {
+    editor.value.destroy();
+  }
+});
 </script>
 
 <style lang="scss" scoped>

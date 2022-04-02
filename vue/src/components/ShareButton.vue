@@ -63,52 +63,35 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { computed, ref, toRefs } from "vue";
 
 import QRCode from "./QRCode.vue";
 
-export default defineComponent({
-  components: {
-    QRCode,
-  },
+const propsDef = defineProps<{
+  docId: string;
+}>();
+const props = toRefs(propsDef);
 
-  props: {
-    docId: {
-      type: String,
-      required: true,
-    },
-  },
+const copyText = ref("Link kopieren");
+const copyTimeout = ref<ReturnType<typeof setTimeout> | undefined>(undefined);
+const link = computed(
+  () => `${window.location.origin}/sheets/${props.docId.value}`
+);
 
-  data() {
-    return {
-      copyText: "Link kopieren",
-      copyTimeout: undefined,
-    };
-  },
+function copy() {
+  if (copyTimeout.value) {
+    clearTimeout(copyTimeout.value);
+  }
 
-  computed: {
-    link() {
-      return window.location.origin + "/sheets/" + this.docId;
-    },
-  },
+  navigator.clipboard.writeText(link.value);
 
-  methods: {
-    copy() {
-      if (this.copyTimeout) {
-        clearTimeout(this.copyTimeout);
-      }
-
-      navigator.clipboard.writeText(this.link);
-
-      this.copyText = "Link kopiert!";
-      this.copyTimeout = setTimeout(
-        () => (this.copyText = "Link kopieren"),
-        3000
-      );
-    },
-  },
-});
+  copyText.value = "Link kopiert!";
+  copyTimeout.value = setTimeout(
+    () => (copyText.value = "Link kopieren"),
+    3000
+  );
+}
 </script>
 
 <style lang="scss" scoped>

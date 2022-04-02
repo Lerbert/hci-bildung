@@ -7,21 +7,21 @@
   >
     <ul data-type="multipleChoice">
       <multiple-choice-answer-node
-        v-for="(c, i) in sheet.content"
+        v-for="(answer, i) in sheet.content"
         :key="i"
-        :sheet="c"
+        :sheet="answer"
         :sheetExport="sheetExport.content[i]"
         :checkTrigger="checkAnswersTrigger"
-        @grantPoints="(event) => $emit('grantPoints', event)"
+        @grantPoints="forwardGrantPoints"
         @answerCorrect="countAnswerCorrect"
       >
         <sheet-node
-          v-for="(c, j) in c.content"
+          v-for="(c, j) in answer.content"
           :key="j"
           :sheet="c"
           :sheetExport="sheetExport.content[i].content[j]"
           :checkTrigger="checkTrigger"
-          @grantPoints="(event) => $emit('grantPoints', event)"
+          @grantPoints="forwardGrantPoints"
         ></sheet-node>
       </multiple-choice-answer-node>
     </ul>
@@ -36,37 +36,30 @@
 import { computed, ref, toRefs, watch } from "vue";
 
 import { useCheckable, withCheckableEmit } from "../../composables/Checkable";
+import { MultipleChoice } from "../../model/SheetDisplayNode";
 
 import CheckSymbol from "../feedback_symbols/CheckSymbol.vue";
 import CrossSymbol from "../feedback_symbols/CrossSymbol.vue";
 import MultipleChoiceAnswerNode from "./MultipleChoiceAnswerNode.vue";
 import SheetNode from "./SheetNode.vue";
 
-const propsDef = defineProps({
-  checkTrigger: {
-    type: Boolean,
-    required: true,
-  },
-  sheet: {
-    type: Object,
-    required: true,
-    validator(value: Record<string, any>) {
-      return value.content.every((c) => c.type === "multipleChoiceAnswer");
-    },
-  },
-  sheetExport: {
-    type: Object,
-    required: true,
-    validator(value: Record<string, any>) {
-      return value.content.every((c) => c.type === "multipleChoiceAnswer");
-    },
-  },
-});
+const propsDef = defineProps<{
+  sheet: MultipleChoice;
+  sheetExport: MultipleChoice;
+  checkTrigger: boolean;
+}>();
 const props = toRefs(propsDef);
 
 const emit = defineEmits({
   ...withCheckableEmit(),
 });
+
+function forwardGrantPoints(event: {
+  achievedPoints: number;
+  totalPoints: number;
+}) {
+  return emit("grantPoints", event);
+}
 
 const checkAnswersTrigger = ref(false);
 const correctAnswers = ref(0);
@@ -76,7 +69,7 @@ function resetCorrectAnswerCount() {
   correctAnswers.value = 0;
   totalAnswers.value = 0;
 }
-function countAnswerCorrect(correct) {
+function countAnswerCorrect(correct: boolean) {
   if (correct) {
     correctAnswers.value++;
   }

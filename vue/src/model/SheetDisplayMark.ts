@@ -2,8 +2,8 @@ import { JSONContent } from "@tiptap/vue-3";
 
 type JSONContentMark = {
   type: string;
-  attrs?: Record<string, any>;
-  [key: string]: any;
+  attrs?: Record<string, unknown>;
+  [key: string]: unknown;
 };
 
 export class Mark {

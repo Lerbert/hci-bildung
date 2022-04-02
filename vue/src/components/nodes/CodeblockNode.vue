@@ -1,7 +1,7 @@
 <template>
   <pre>
     <code :class="language">
-      <slot/>
+      <slot></slot>
     </code>
   </pre>
 </template>

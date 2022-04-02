@@ -1,6 +1,6 @@
 <template>
   <p>
-    <slot />
+    <slot></slot>
     <br v-if="sheet.content.length === 0" />
   </p>
 </template>

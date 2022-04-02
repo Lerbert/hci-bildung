@@ -3,7 +3,7 @@ import { Node, mergeAttributes } from "@tiptap/core";
 // Based on https://github.com/ueberdosis/tiptap/blob/main/packages/extension-task-item/src/task-item.ts
 
 export interface MultipleChoiceAnswerOptions {
-  HTMLAttributes: Record<string, any>;
+  HTMLAttributes: Record<string, string>;
 }
 
 export default Node.create<MultipleChoiceAnswerOptions>({
@@ -88,7 +88,11 @@ export default Node.create<MultipleChoiceAnswerOptions>({
           return;
         }
 
-        const { checked } = event.target as any;
+        let checked = false;
+        if (event.target !== null) {
+          const target = event.target as HTMLInputElement;
+          checked = target.checked;
+        }
 
         if (editor.isEditable && typeof getPos === "function") {
           editor

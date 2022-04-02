@@ -1,17 +1,17 @@
 <template>
   <component :is="`h${sheet.level}`">
-    <slot />
+    <slot></slot>
     <br v-if="sheet.content.length === 0" />
   </component>
 </template>
 
 <script setup lang="ts">
-import { Node } from "../../model/SheetDisplayNode";
+import { Heading } from "../../model/SheetDisplayNode";
 
 defineProps<{
   checkTrigger: boolean;
-  sheet: Node;
-  sheetExport: Node;
+  sheet: Heading;
+  sheetExport: Heading;
 }>();
 </script>
 
