@@ -50,9 +50,11 @@ import { defineComponent } from "vue";
 export default defineComponent({
   props: {
     achievedPoints: {
+      type: Number,
       required: true,
     },
     totalPoints: {
+      type: Number,
       required: true,
     },
   },

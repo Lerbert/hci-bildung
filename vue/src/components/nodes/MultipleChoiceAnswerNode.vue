@@ -2,7 +2,7 @@
   <li>
     <label>
       <input type="checkbox" v-model="ticked" />
-      <div><slot /></div>
+      <div><slot></slot></div>
     </label>
   </li>
 </template>
