@@ -4,14 +4,14 @@
     :marks="sheet.marks"
     :marksExport="sheetExport.marks"
     :checkTrigger="checkTrigger"
-    @grantPoints="(event) => $emit('grantPoints', event)"
+    @grantPoints="forwardGrantPoints"
   >
     <component
       :is="nodeType"
       :sheet="sheet"
       :sheetExport="sheetExport"
       :checkTrigger="checkTrigger"
-      @grantPoints="(event) => $emit('grantPoints', event)"
+      @grantPoints="forwardGrantPoints"
     >
       <sheet-node
         v-for="(c, index) in sheet.content"
@@ -19,7 +19,7 @@
         :sheet="c"
         :sheetExport="sheetExport.content[index]"
         :checkTrigger="checkTrigger"
-        @grantPoints="(event) => $emit('grantPoints', event)"
+        @grantPoints="forwardGrantPoints"
       ></sheet-node>
     </component>
   </text-marking>
@@ -29,7 +29,7 @@
     :sheet="sheet"
     :sheetExport="sheetExport"
     :checkTrigger="checkTrigger"
-    @grantPoints="(event) => $emit('grantPoints', event)"
+    @grantPoints="forwardGrantPoints"
   >
     <sheet-node
       v-for="(c, index) in sheet.content"
@@ -37,15 +37,15 @@
       :sheet="c"
       :sheetExport="sheetExport.content[index]"
       :checkTrigger="checkTrigger"
-      @grantPoints="(event) => $emit('grantPoints', event)"
+      @grantPoints="forwardGrantPoints"
     ></sheet-node>
   </component>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { computed, defineAsyncComponent, toRefs } from "vue";
 
-import TextMarking from "../marks/TextMarking.vue";
+import { Node } from "../../model/SheetDisplayNode";
 
 import AudioNode from "./AudioNode.vue";
 import BulletListNode from "./BulletListNode.vue";
@@ -55,61 +55,55 @@ import HardbreakNode from "./HardbreakNode.vue";
 import HeadingNode from "./HeadingNode.vue";
 import ListItemNode from "./ListItemNode.vue";
 import MultipleChoiceAnswerNode from "./MultipleChoiceAnswerNode.vue";
-import MultipleChoiceNode from "./MultipleChoiceNode.vue";
 import OrderedListNode from "./OrderedListNode.vue";
 import ParagraphNode from "./ParagraphNode.vue";
+import TextMarking from "../marks/TextMarking.vue";
 import TextNode from "./TextNode.vue";
 
-export default defineComponent({
-  // For recursion
-  name: "SheetNode",
+const propsDef = defineProps<{
+  sheet: Node;
+  sheetExport: Node;
+  checkTrigger: boolean;
+}>();
+const props = toRefs(propsDef);
 
-  components: {
-    TextMarking,
-    AudioNode,
-    BulletlistNode: BulletListNode,
-    CodeblockNode,
-    DocNode,
-    HardbreakNode,
-    HeadingNode,
-    ListitemNode: ListItemNode,
-    MultiplechoiceanswerNode: MultipleChoiceAnswerNode,
-    MultiplechoiceNode: MultipleChoiceNode,
-    OrderedlistNode: OrderedListNode,
-    ParagraphNode,
-    TextNode,
-  },
-
-  props: {
-    sheet: {
-      type: Object,
-      required: true,
-    },
-    sheetExport: {
-      type: Object,
-      required: true,
-    },
-    checkTrigger: {
-      type: Boolean,
-      required: true,
-    },
-  },
-
-  emits: {
-    grantPoints(payload: { achievedPoints: number; totalPoints: number }) {
-      return (
-        payload.achievedPoints <= payload.totalPoints ||
-        (payload.totalPoints < 0 && payload.achievedPoints <= 0)
-      );
-    },
-  },
-
-  computed: {
-    nodeType(): string {
-      return this.sheet.type.toLowerCase() + "-node";
-    },
+const emit = defineEmits({
+  grantPoints(payload: { achievedPoints: number; totalPoints: number }) {
+    return (
+      payload.achievedPoints <= payload.totalPoints ||
+      (payload.totalPoints < 0 && payload.achievedPoints <= 0)
+    );
   },
 });
+
+function forwardGrantPoints(event: {
+  achievedPoints: number;
+  totalPoints: number;
+}) {
+  return emit("grantPoints", event);
+}
+
+const componentMap: { [key: string]: unknown } = {
+  audio: AudioNode,
+  bulletList: BulletListNode,
+  codeBlock: CodeblockNode,
+  doc: DocNode,
+  hardbreak: HardbreakNode,
+  heading: HeadingNode,
+  listItem: ListItemNode,
+  multipleChoiceAnswer: MultipleChoiceAnswerNode,
+  multipleChoice: defineAsyncComponent(
+    () => import("./MultipleChoiceNode.vue")
+  ),
+  orderedList: OrderedListNode,
+  paragraph: ParagraphNode,
+  textMarking: TextMarking,
+  text: TextNode,
+  fallback: "div",
+};
+const nodeType = computed(
+  () => componentMap[props.sheet.value?.type ?? "fallback"]
+);
 </script>
 
 <style></style>
