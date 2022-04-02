@@ -10,6 +10,7 @@
 <script setup lang="ts">
 import { computed, ref, toRefs, watch } from "vue";
 
+import { useExportable } from "../../composables/Exportable";
 import { MultipleChoiceAnswer } from "../../model/SheetDisplayNode";
 
 const propsDef = defineProps<{
@@ -40,8 +41,7 @@ function updateExport() {
   props.sheetExport.value.answer = ticked.value;
 }
 
-watch(ticked, updateExport);
-watch(props.sheet, updateExport);
+useExportable(props.sheet, updateExport, [ticked]);
 </script>
 
 <style lang="scss" scoped>

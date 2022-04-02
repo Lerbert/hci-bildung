@@ -26,6 +26,7 @@
 import { computed, ref, toRefs, watch } from "vue";
 
 import { useCheckable, withCheckableEmit } from "../../composables/Checkable";
+import { useExportable } from "../../composables/Exportable";
 import { Gap } from "../../model/SheetDisplayMark";
 
 import CheckSymbol from "../feedback_symbols/CheckSymbol.vue";
@@ -61,8 +62,8 @@ const width = computed(() => Math.ceil(solution.value.length / 5) * 5);
 function updateExport() {
   props.markExport.value.answer = value.value;
 }
-watch(value, updateExport);
-watch(props.mark, updateExport);
+
+useExportable(props.mark, updateExport, [value]);
 </script>
 
 <style lang="scss" scoped>
