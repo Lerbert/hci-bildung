@@ -70,6 +70,15 @@ function grantPoints(event: { achievedPoints: number; totalPoints: number }) {
   totalPoints.value += event.totalPoints;
 }
 
+// A note on sheetExport:
+// We use this as a prop for the child components which will mutate it to make their information (e.g. the answer to a gap) available to this component.
+// Aware that this is a bad practice, we chose this approach among the following alternatives:
+// - Use events to pass the information from the child to the parent: The problem here is making sure that the events are processed in the correct order and knowing which part of the state to mutate in the parent.
+// - Use a global store: Problematic, because each sheet we want to display needs its own store.
+// This solution can be considered as instantiating a "global store" for each instance of this component and passing the reference to the store to the child components.
+// Since those will muatate the store's content, we run into the bad practice mentioned above.
+// However, the mark and node components are intended to only be used inside of this component, thus making the problem less severe (see https://vuejs.org/guide/components/props.html#mutating-object-array-props).
+// See also https://forum.vuejs.org/t/data-sync-on-deeply-nested-structures/40099 for a similar approach
 const sheetExport = ref(cloneDeep(props.sheet.value));
 watch(props.sheet, () => (sheetExport.value = cloneDeep(props.sheet.value)));
 
