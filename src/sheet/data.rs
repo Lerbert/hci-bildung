@@ -97,6 +97,7 @@ pub async fn get_all_sheets(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>,
                 ))
                 .filter(sheets::owner_id.eq(user_id))
                 .filter(sheets::trashed.is_null())
+                .order(sheets::title.asc())
                 .load(c)
         })
         .await?;
@@ -121,6 +122,32 @@ pub async fn get_trash(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Erro
                 ))
                 .filter(sheets::owner_id.eq(user_id))
                 .filter(sheets::trashed.is_not_null())
+                .order(sheets::trashed.desc())
+                .load(c)
+        })
+        .await?;
+    Ok(sheets.into_iter().map(|s| s.into()).collect())
+}
+
+pub async fn get_recent(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Error> {
+    let sheets: Vec<(SheetMetadataDiesel, UserTransportDiesel)> = db
+        .run(move |c| {
+            sheets::table
+                .inner_join(users::table)
+                .select((
+                    (
+                        sheets::id,
+                        sheets::title,
+                        sheets::owner_id,
+                        sheets::created,
+                        sheets::changed,
+                        sheets::trashed,
+                    ),
+                    (users::id, users::username),
+                ))
+                .filter(sheets::owner_id.eq(user_id))
+                .filter(sheets::trashed.is_null())
+                .order(sheets::changed.desc())
                 .load(c)
         })
         .await?;

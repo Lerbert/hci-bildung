@@ -61,6 +61,10 @@ pub async fn get_trash(db: &Db, user: &User) -> Result<Vec<SheetMetadata>> {
     Ok(data::get_trash(db, user.id).await?)
 }
 
+pub async fn get_recent(db: &Db, user: &User) -> Result<Vec<SheetMetadata>> {
+    Ok(data::get_recent(db, user.id).await?)
+}
+
 pub async fn create_empty_sheet(db: &Db, user: &User, title: String) -> Result<Id> {
     let tiptap =
         serde_json::from_str("{\"type\": \"doc\", \"content\": [{\"type\": \"paragraph\"}]}")

@@ -146,6 +146,28 @@ pub fn trashed_sheets_login_req() -> FlashRedirect {
     redirect_to_login()
 }
 
+#[get("/recent")]
+pub async fn recent_sheets(db: Db, user: &User) -> Result<Template, Status> {
+    logic::get_recent(&db, user)
+        .await
+        .map_err(|e| e.to_status())
+        .map(|sheets| {
+            Template::render(
+                "sheet_management/recent_sheets",
+                &SheetManagementContext {
+                    flash: None,
+                    sheets: sheets.into_iter().map(|metadata| metadata.into()).collect(),
+                    user: user.into(),
+                },
+            )
+        })
+}
+
+#[get("/recent", rank = 4)]
+pub fn recent_sheets_login_req() -> FlashRedirect {
+    redirect_to_login()
+}
+
 #[post("/import", data = "<form>")]
 pub async fn import_sheet(
     db: Db,
