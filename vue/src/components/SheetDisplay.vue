@@ -37,53 +37,46 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { ref, toRefs, watch } from "vue";
 import cloneDeep from "lodash/cloneDeep";
+import debounce from "lodash/debounce";
 
 import SheetNode from "./nodes/SheetNode.vue";
 import PointStatus from "./PointStatus.vue";
+import { Node } from "../model/SheetDisplayNode";
 
-export default defineComponent({
-  components: {
-    SheetNode,
-    PointStatus,
-  },
+const propsDef = defineProps<{
+  sheet: Node;
+}>();
+const props = toRefs(propsDef);
 
-  props: {
-    sheet: {
-      type: Object,
-      required: true,
-    },
-  },
+const emit = defineEmits<{
+  (e: "update:export", sheet: Node): void;
+}>();
 
-  data() {
-    return {
-      checkTrigger: false,
-      achievedPoints: 0,
-      totalPoints: 0,
-      sheetExport: cloneDeep(this.sheet),
-    };
-  },
+const checkTrigger = ref(false);
+const achievedPoints = ref(0);
+const totalPoints = ref(0);
 
-  methods: {
-    checkAll() {
-      this.achievedPoints = 0;
-      this.totalPoints = 0;
-      this.checkTrigger = !this.checkTrigger;
-    },
-    grantPoints(event: { achievedPoints: number; totalPoints: number }) {
-      this.achievedPoints += event.achievedPoints;
-      this.totalPoints += event.totalPoints;
-    },
-  },
+function checkAll() {
+  achievedPoints.value = 0;
+  totalPoints.value = 0;
+  checkTrigger.value = !checkTrigger.value;
+}
 
-  watch: {
-    sheet() {
-      this.sheetExport = cloneDeep(this.sheet);
-    },
-  },
-});
+function grantPoints(event: { achievedPoints: number; totalPoints: number }) {
+  achievedPoints.value += event.achievedPoints;
+  totalPoints.value += event.totalPoints;
+}
+
+const sheetExport = ref(cloneDeep(props.sheet.value));
+watch(props.sheet, () => (sheetExport.value = cloneDeep(props.sheet.value)));
+
+const updateExport = debounce(() => {
+  emit("update:export", cloneDeep(sheetExport.value));
+}, 100);
+watch(sheetExport, updateExport, { deep: true });
 </script>
 
 <style lang="scss">

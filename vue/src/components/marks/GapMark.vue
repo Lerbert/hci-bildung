@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRefs, watch } from "vue";
+import { computed, ref, toRefs } from "vue";
 
 import { useCheckable, withCheckableEmit } from "../../composables/Checkable";
 import { useExportable } from "../../composables/Exportable";
