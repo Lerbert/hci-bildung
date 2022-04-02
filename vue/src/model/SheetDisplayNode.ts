@@ -23,6 +23,8 @@ export class Node {
         return new Codeblock(tiptapNode);
       case "heading":
         return new Heading(tiptapNode);
+      case "multipleChoice":
+        return new MultipleChoice(tiptapNode);
       case "multipleChoiceAnswer":
         return new MultipleChoiceAnswer(tiptapNode);
       case "text":
@@ -59,6 +61,20 @@ export class Heading extends Node {
   constructor(tiptapNode: JSONContent) {
     super(tiptapNode);
     this.level = tiptapNode.attrs?.level ?? 1;
+  }
+}
+
+export class MultipleChoice extends Node {
+  declare content: MultipleChoiceAnswer[];
+
+  constructor(tiptapNode: JSONContent) {
+    super(tiptapNode);
+    if (!this.content.every((node) => node instanceof MultipleChoiceAnswer)) {
+      throw new Error(
+        "MultipleChoice.content must only contain MultipleChoiceAnswer"
+      );
+    }
+    this.content = this.content.map((n) => n as MultipleChoiceAnswer);
   }
 }
 

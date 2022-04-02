@@ -6,7 +6,7 @@ import {
 } from "@tiptap/core";
 
 export interface LatexOptions {
-  HTMLAttributes: Record<string, any>;
+  HTMLAttributes: Record<string, unknown>;
 }
 
 declare module "@tiptap/core" {

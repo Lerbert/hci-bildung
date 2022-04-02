@@ -6,7 +6,7 @@ import App from "./App.vue";
 // The values are transformed by applying JSON.parse
 // in order to have correct types (Booleans, Numbers, Arrays, Objects, ...)
 const attributesToProps = (element: Element) => {
-  const props: any = {};
+  const props: Record<string, unknown> = {};
   for (let i = element.attributes.length - 1; i >= 0; i -= 1) {
     const attr = element.attributes[i];
     if (attr.name.startsWith("data-")) {
@@ -19,7 +19,7 @@ const attributesToProps = (element: Element) => {
 };
 
 const node = document.getElementById("app");
-if (node != null) {
-  const props = attributesToProps(node!);
-  createApp(App, props).mount(node!);
+if (node !== null) {
+  const props = attributesToProps(node);
+  createApp(App, props).mount(node);
 }
