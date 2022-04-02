@@ -5,7 +5,7 @@
     </p>
     <ul class="menu-list">
       <li><a href='{{ url_for(endpoint="sheets") }}' {% if active == "my_sheets" %} class="is-active" {% endif %}>Meine Dokumente</a></li>
-      <li><a {% if active == "?" and false %} class="is-active" {% endif %}>Zuletzt erstellt</a></li>
+      <li><a href='{{ url_for(endpoint="recent_sheets") }}' {% if active == "recent" %} class="is-active" {% endif %}>Zuletzt verwendet</a></li>
       <li><a {% if active == "?" and false %} class="is-active" {% endif %}>Von SuS bearbeitet</a></li>
       <li><a {% if active == "?" and false %} class="is-active" {% endif %}>Markiert</a></li>
       <li><a {% if active == "?" and false %} class="is-active" {% endif %}>Mit mir geteilt</a></li>

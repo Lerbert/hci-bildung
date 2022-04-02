@@ -1,0 +1,15 @@
+{% import "generic/symbols" as symbols %}
+{% import "sheet_management/sidebar" as sidebar %}
+
+{% extends "sheet_management/active_sheets_base" %}
+{% block title %}
+  Zuletzt verwendet — {{ super() }}
+{% endblock title %}
+
+{% block sidebar %}
+  {{ sidebar::sidebar(active="recent") }}
+{% endblock sidebar %}
+
+{% block heading %}
+  Meine Dokumente
+{% endblock heading %}
