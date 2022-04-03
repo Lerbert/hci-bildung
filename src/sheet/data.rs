@@ -8,7 +8,7 @@ use super::logic::{Sheet, SheetMetadata};
 use super::transport::Id;
 
 use self::diesel::prelude::*;
-use crate::schema::{sheets, users};
+use crate::db::schema::{sheets, users};
 
 pub type Error = diesel::result::Error;
 

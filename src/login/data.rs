@@ -6,7 +6,7 @@ use crate::Db;
 use super::logic::{Session, User};
 
 use self::diesel::prelude::*;
-use crate::schema::{sessions, users};
+use crate::db::schema::{sessions, users};
 
 pub type Error = diesel::result::Error;
 
