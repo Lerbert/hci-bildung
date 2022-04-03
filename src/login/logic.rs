@@ -33,11 +33,18 @@ impl From<data::Error> for Error {
 }
 
 #[derive(Debug)]
+pub enum Role {
+    Teacher,
+    Student,
+}
+
+#[derive(Debug)]
 pub struct User {
     pub id: i32,
     pub username: String,
     pub password_hash: String,
     pub session: Option<Session>,
+    pub roles: Vec<Role>,
 }
 
 impl User {

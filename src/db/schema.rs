@@ -1,4 +1,16 @@
 table! {
+    use diesel::sql_types::*;
+    use crate::db::sql_types::*;
+
+    roles (user_id, role) {
+        user_id -> Int4,
+        role -> Role,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+
     sessions (session_id) {
         session_id -> Varchar,
         user_id -> Int4,
@@ -7,6 +19,8 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+
     sheets (id) {
         id -> Uuid,
         title -> Varchar,
@@ -19,6 +33,8 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+
     users (id) {
         id -> Int4,
         username -> Varchar,
@@ -26,7 +42,8 @@ table! {
     }
 }
 
+joinable!(roles -> users (user_id));
 joinable!(sessions -> users (user_id));
 joinable!(sheets -> users (owner_id));
 
-allow_tables_to_appear_in_same_query!(sessions, sheets, users,);
+allow_tables_to_appear_in_same_query!(roles, sessions, sheets, users,);

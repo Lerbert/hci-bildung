@@ -3,21 +3,43 @@ use rocket_sync_db_pools::diesel;
 
 use crate::Db;
 
-use super::logic::{Session, User};
+use super::logic::{Role, Session, User};
 
 use self::diesel::prelude::*;
-use crate::db::schema::{sessions, users};
+use crate::db::schema::{roles, sessions, users};
+use crate::db::sql_types;
 
 pub type Error = diesel::result::Error;
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Identifiable, PartialEq, Queryable)]
+#[table_name = "users"]
 struct UserDiesel {
     id: i32,
     username: String,
     password_hash: String,
 }
 
-#[derive(Debug, Insertable, Queryable)]
+#[derive(Associations, Debug, Identifiable, PartialEq, Queryable)]
+#[belongs_to(UserDiesel, foreign_key = "user_id")]
+#[primary_key(user_id, role)]
+#[table_name = "roles"]
+struct RoleDiesel {
+    user_id: i32,
+    role: sql_types::RoleDb,
+}
+
+impl From<sql_types::RoleDb> for Role {
+    fn from(r: sql_types::RoleDb) -> Role {
+        match r {
+            sql_types::RoleDb::Teacher => Self::Teacher,
+            sql_types::RoleDb::Student => Self::Student,
+        }
+    }
+}
+
+#[derive(Associations, Debug, Identifiable, Insertable, PartialEq, Queryable)]
+#[belongs_to(UserDiesel, foreign_key = "user_id")]
+#[primary_key(session_id)]
 #[table_name = "sessions"]
 struct SessionDiesel {
     #[column_name = "session_id"]
@@ -35,39 +57,51 @@ impl From<SessionDiesel> for Session {
     }
 }
 
-impl From<(UserDiesel, Option<SessionDiesel>)> for User {
-    fn from(t: (UserDiesel, Option<SessionDiesel>)) -> User {
-        let (u, s) = t;
+impl From<(UserDiesel, Option<SessionDiesel>, Vec<RoleDiesel>)> for User {
+    fn from(t: (UserDiesel, Option<SessionDiesel>, Vec<RoleDiesel>)) -> User {
+        let (u, s, r) = t;
         User {
             id: u.id,
             username: u.username,
             password_hash: u.password_hash,
             session: s.map(|s| s.into()),
+            roles: r.into_iter().map(|r| r.role.into()).collect(),
         }
     }
 }
 
-impl From<(UserDiesel, SessionDiesel)> for User {
-    fn from(t: (UserDiesel, SessionDiesel)) -> User {
-        User::from((t.0, Some(t.1)))
+impl From<(UserDiesel, SessionDiesel, Vec<RoleDiesel>)> for User {
+    fn from(t: (UserDiesel, SessionDiesel, Vec<RoleDiesel>)) -> User {
+        User::from((t.0, Some(t.1), t.2))
     }
 }
 
 pub async fn get_user_by_name(db: &Db, name: String) -> Result<Option<User>, Error> {
-    let user: Option<(UserDiesel, Option<SessionDiesel>)> = db
+    let user: Option<UserDiesel> = db
         .run(move |c| {
             users::table
-                .left_join(sessions::table)
                 .filter(users::username.eq(name))
                 .first(c)
                 .optional()
         })
         .await?;
-    Ok(user.map(|u| u.into()))
+    match user {
+        Some(user) => Ok(Some(complete_user(db, user).await?)),
+        None => Ok(None),
+    }
+}
+
+async fn complete_user(db: &Db, user: UserDiesel) -> Result<User, Error> {
+    db.run(move |c| {
+        let session = SessionDiesel::belonging_to(&user).first(c).optional()?;
+        let roles = RoleDiesel::belonging_to(&user).load(c)?;
+        Ok(User::from((user, session, roles)))
+    })
+    .await
 }
 
 pub async fn get_user_by_session_id(db: &Db, session_id: String) -> Result<Option<User>, Error> {
-    let user: Option<(UserDiesel, SessionDiesel)> = db
+    let user_session: Option<(UserDiesel, SessionDiesel)> = db
         .run(move |c| {
             users::table
                 .inner_join(sessions::table)
@@ -76,7 +110,22 @@ pub async fn get_user_by_session_id(db: &Db, session_id: String) -> Result<Optio
                 .optional()
         })
         .await?;
-    Ok(user.map(|u| u.into()))
+    match user_session {
+        Some((user, session)) => Ok(Some(complete_user_session(db, user, session).await?)),
+        None => Ok(None),
+    }
+}
+
+async fn complete_user_session(
+    db: &Db,
+    user: UserDiesel,
+    session: SessionDiesel,
+) -> Result<User, Error> {
+    db.run(move |c| {
+        let roles = RoleDiesel::belonging_to(&user).load(c)?;
+        Ok(User::from((user, session, roles)))
+    })
+    .await
 }
 
 pub async fn create_session(
