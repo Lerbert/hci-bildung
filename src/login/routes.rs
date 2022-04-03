@@ -12,8 +12,8 @@ use crate::sheet;
 use crate::status::ToStatus;
 use crate::Db;
 
-use super::logic::{self, User};
-use super::transport::{LoginForm, UserTransport};
+use super::logic;
+use super::transport::{AuthenticatedUser, LoginForm, UserTransport};
 
 const SESSION_ID_COOKIE_NAME: &str = "session_id";
 
@@ -25,7 +25,7 @@ impl ToStatus for logic::Error {
 }
 
 #[rocket::async_trait]
-impl<'r> FromRequest<'r> for &'r User {
+impl<'r> FromRequest<'r> for &'r AuthenticatedUser {
     type Error = ();
 
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, ()> {
@@ -42,6 +42,7 @@ impl<'r> FromRequest<'r> for &'r User {
                         .map_err(|e| error!("{}", e))
                         .ok()
                         .flatten()
+                        .map(|user| user.into())
                 } else {
                     None
                 }
@@ -52,8 +53,8 @@ impl<'r> FromRequest<'r> for &'r User {
 }
 
 #[derive(Serialize)]
-struct LandingPageContext {
-    user: Option<UserTransport>,
+struct LandingPageContext<'a> {
+    user: Option<&'a UserTransport>,
 }
 
 #[derive(Serialize)]
@@ -62,11 +63,11 @@ struct LoginContext {
 }
 
 #[get("/")]
-pub fn landing_page(user: Option<&User>) -> Template {
+pub fn landing_page(user: Option<&AuthenticatedUser>) -> Template {
     Template::render(
         "landing_page",
         &LandingPageContext {
-            user: user.map(|u| u.into()),
+            user: user.map(|u| &u.user_info),
         },
     )
 }
@@ -111,9 +112,13 @@ pub async fn login(
 }
 
 #[get("/logout")]
-pub async fn logout(db: Db, user: &User, cookies: &CookieJar<'_>) -> Result<Redirect, Status> {
+pub async fn logout(
+    db: Db,
+    user: &AuthenticatedUser,
+    cookies: &CookieJar<'_>,
+) -> Result<Redirect, Status> {
     cookies.remove_private(Cookie::named(SESSION_ID_COOKIE_NAME));
-    logic::logout(&db, user)
+    logic::logout(&db, user.user_info.id)
         .await
         .map_err(|e| e.to_status())
         .map(|_| Redirect::to(uri!(login_form)))

@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use rocket_sync_db_pools::diesel;
 
-use crate::login::UserTransport;
+use crate::login::transport::UserTransport;
 use crate::Db;
 
 use super::logic::{Sheet, SheetMetadata};

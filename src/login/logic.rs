@@ -32,7 +32,7 @@ impl From<data::Error> for Error {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum Role {
     Teacher,
     Student,
@@ -92,8 +92,8 @@ pub async fn validate_session(db: &Db, session_id: String) -> Result<Option<User
     }
 }
 
-pub async fn logout(db: &Db, user: &User) -> Result<()> {
-    Ok(data::delete_session(db, user.id).await?)
+pub async fn logout(db: &Db, user_id: i32) -> Result<()> {
+    Ok(data::delete_session(db, user_id).await?)
 }
 
 async fn login_user(db: &Db, user: &User, provided_password: &str) -> Result<Option<String>> {

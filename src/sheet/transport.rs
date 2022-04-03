@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use rocket::serde::{Deserialize, Serialize};
 
-use crate::login::UserTransport;
+use crate::login::transport::UserTransport;
 
 pub use super::logic::Id;
 use super::logic::{Sheet, SheetMetadata};

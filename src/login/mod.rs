@@ -1,5 +1,4 @@
-pub use self::logic::User;
-pub use self::transport::UserTransport;
+pub use self::transport::AuthenticatedUser;
 
 pub mod routes;
 pub mod transport;
