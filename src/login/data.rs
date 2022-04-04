@@ -1,32 +1,16 @@
 use chrono::NaiveDateTime;
 use rocket_sync_db_pools::diesel;
 
+use crate::db::model::{RoleDiesel, SessionDiesel, UserDiesel};
+use crate::db::schema::{sessions, users};
+use crate::db::sql_types;
 use crate::Db;
 
 use super::logic::{Role, Session, User};
 
 use self::diesel::prelude::*;
-use crate::db::schema::{roles, sessions, users};
-use crate::db::sql_types;
 
 pub type Error = diesel::result::Error;
-
-#[derive(Debug, Identifiable, PartialEq, Queryable)]
-#[table_name = "users"]
-struct UserDiesel {
-    id: i32,
-    username: String,
-    password_hash: String,
-}
-
-#[derive(Associations, Debug, Identifiable, PartialEq, Queryable)]
-#[belongs_to(UserDiesel, foreign_key = "user_id")]
-#[primary_key(user_id, role)]
-#[table_name = "roles"]
-struct RoleDiesel {
-    user_id: i32,
-    role: sql_types::RoleDb,
-}
 
 impl From<sql_types::RoleDb> for Role {
     fn from(r: sql_types::RoleDb) -> Role {
@@ -35,17 +19,6 @@ impl From<sql_types::RoleDb> for Role {
             sql_types::RoleDb::Student => Self::Student,
         }
     }
-}
-
-#[derive(Associations, Debug, Identifiable, Insertable, PartialEq, Queryable)]
-#[belongs_to(UserDiesel, foreign_key = "user_id")]
-#[primary_key(session_id)]
-#[table_name = "sessions"]
-struct SessionDiesel {
-    #[column_name = "session_id"]
-    id: String,
-    user_id: i32,
-    expires: NaiveDateTime,
 }
 
 impl From<SessionDiesel> for Session {

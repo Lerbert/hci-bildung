@@ -79,7 +79,7 @@ pub async fn create_sheet(
     tiptap: serde_json::Value,
 ) -> Result<Id> {
     let now = chrono::Utc::now();
-    Ok(data::create_sheet(db, title, tiptap, user_id, now, now).await?)
+    Ok(data::create_sheet(db, title, tiptap, user_id, now, now, None).await?)
 }
 
 pub async fn get_sheet(db: &Db, id: Id) -> Result<Sheet> {

@@ -8,20 +8,10 @@ use super::logic::{Sheet, SheetMetadata};
 use super::transport::Id;
 
 use self::diesel::prelude::*;
+use crate::db::model::{SheetDiesel, SheetMetadataDiesel, UserTransportDiesel};
 use crate::db::schema::{sheets, users};
 
 pub type Error = diesel::result::Error;
-
-#[derive(Debug, Queryable)]
-struct SheetDiesel {
-    id: Id,
-    title: String,
-    _owner_id: i32,
-    created: DateTime<Utc>,
-    changed: DateTime<Utc>,
-    tiptap: serde_json::Value,
-    trashed: Option<DateTime<Utc>>,
-}
 
 impl From<(SheetDiesel, UserTransportDiesel)> for Sheet {
     fn from(t: (SheetDiesel, UserTransportDiesel)) -> Sheet {
@@ -40,12 +30,6 @@ impl From<(SheetDiesel, UserTransportDiesel)> for Sheet {
     }
 }
 
-#[derive(Debug, Queryable)]
-struct UserTransportDiesel {
-    id: i32,
-    username: String,
-}
-
 impl From<UserTransportDiesel> for UserTransport {
     fn from(u: UserTransportDiesel) -> UserTransport {
         UserTransport {
@@ -53,16 +37,6 @@ impl From<UserTransportDiesel> for UserTransport {
             username: u.username,
         }
     }
-}
-
-#[derive(Debug, Queryable)]
-struct SheetMetadataDiesel {
-    id: Id,
-    title: String,
-    _owner_id: i32,
-    created: DateTime<Utc>,
-    changed: DateTime<Utc>,
-    trashed: Option<DateTime<Utc>>,
 }
 
 impl From<(SheetMetadataDiesel, UserTransportDiesel)> for SheetMetadata {
@@ -85,15 +59,8 @@ pub async fn get_all_sheets(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>,
             sheets::table
                 .inner_join(users::table)
                 .select((
-                    (
-                        sheets::id,
-                        sheets::title,
-                        sheets::owner_id,
-                        sheets::created,
-                        sheets::changed,
-                        sheets::trashed,
-                    ),
-                    (users::id, users::username),
+                    SheetMetadataDiesel::columns(),
+                    UserTransportDiesel::columns(),
                 ))
                 .filter(sheets::owner_id.eq(user_id))
                 .filter(sheets::trashed.is_null())
@@ -110,15 +77,8 @@ pub async fn get_trash(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Erro
             sheets::table
                 .inner_join(users::table)
                 .select((
-                    (
-                        sheets::id,
-                        sheets::title,
-                        sheets::owner_id,
-                        sheets::created,
-                        sheets::changed,
-                        sheets::trashed,
-                    ),
-                    (users::id, users::username),
+                    SheetMetadataDiesel::columns(),
+                    UserTransportDiesel::columns(),
                 ))
                 .filter(sheets::owner_id.eq(user_id))
                 .filter(sheets::trashed.is_not_null())
@@ -135,15 +95,8 @@ pub async fn get_recent(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Err
             sheets::table
                 .inner_join(users::table)
                 .select((
-                    (
-                        sheets::id,
-                        sheets::title,
-                        sheets::owner_id,
-                        sheets::created,
-                        sheets::changed,
-                        sheets::trashed,
-                    ),
-                    (users::id, users::username),
+                    SheetMetadataDiesel::columns(),
+                    UserTransportDiesel::columns(),
                 ))
                 .filter(sheets::owner_id.eq(user_id))
                 .filter(sheets::trashed.is_null())
@@ -159,18 +112,7 @@ pub async fn get_sheet_by_id(db: &Db, id: Id) -> Result<Option<Sheet>, Error> {
         .run(move |c| {
             sheets::table
                 .inner_join(users::table)
-                .select((
-                    (
-                        sheets::id,
-                        sheets::title,
-                        sheets::owner_id,
-                        sheets::created,
-                        sheets::changed,
-                        sheets::tiptap,
-                        sheets::trashed,
-                    ),
-                    (users::id, users::username),
-                ))
+                .select((sheets::all_columns, UserTransportDiesel::columns()))
                 .filter(sheets::id.eq(id))
                 .first(c)
                 .optional()
@@ -186,6 +128,7 @@ pub async fn create_sheet(
     owner_id: i32,
     created: DateTime<Utc>,
     changed: DateTime<Utc>,
+    trashed: Option<DateTime<Utc>>,
 ) -> Result<Id, Error> {
     let sheet: SheetDiesel = db
         .run(move |c| {
@@ -196,7 +139,7 @@ pub async fn create_sheet(
                     sheets::created.eq(created),
                     sheets::changed.eq(changed),
                     sheets::tiptap.eq(tiptap),
-                    sheets::trashed.eq(None::<DateTime<Utc>>),
+                    sheets::trashed.eq(trashed),
                 ))
                 .get_result(c)
         })
