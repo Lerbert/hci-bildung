@@ -129,6 +129,7 @@ fn rocket() -> _ {
             sheet::routes::MOUNT,
             routes![
                 sheet::routes::sheets,
+                sheet::routes::sheets_stud,
                 sheet::routes::sheets_login_req,
                 sheet::routes::trashed_sheets,
                 sheet::routes::trashed_sheets_login_req,

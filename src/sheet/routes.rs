@@ -11,7 +11,7 @@ use rocket_dyn_templates::Template;
 
 use crate::flash::{FlashContext, FlashRedirect};
 use crate::login;
-use crate::login::guards::AuthenticatedUser;
+use crate::login::guards::{AuthenticatedUser, Student, Teacher};
 use crate::login::transport::UserTransport;
 use crate::status::ToStatus;
 use crate::validation::Validate;
@@ -94,9 +94,10 @@ pub const MOUNT: &str = "/sheets";
 #[get("/")]
 pub async fn sheets(
     db: Db,
-    user: &AuthenticatedUser,
+    teacher: Teacher<'_>,
     flash: Option<FlashMessage<'_>>,
 ) -> Result<Template, Status> {
+    let user = teacher.into_inner();
     logic::get_all_sheets(&db, user.user_info.id)
         .await
         .map_err(|e| e.to_status())
@@ -113,6 +114,22 @@ pub async fn sheets(
 }
 
 #[get("/", rank = 2)]
+pub async fn sheets_stud(
+    student: Student<'_>,
+    flash: Option<FlashMessage<'_>>,
+) -> Result<Template, Status> {
+    let user = student.into_inner();
+    Ok(Template::render(
+        "sheet_management/my_sheets",
+        &SheetManagementContext {
+            flash: flash.map(|f| f.into()),
+            sheets: vec![],
+            user: &user.user_info,
+        },
+    ))
+}
+
+#[get("/", rank = 3)]
 pub fn sheets_login_req() -> FlashRedirect {
     redirect_to_login()
 }
@@ -120,9 +137,10 @@ pub fn sheets_login_req() -> FlashRedirect {
 #[post("/", data = "<form>")]
 pub async fn new_sheet(
     db: Db,
-    user: &AuthenticatedUser,
+    teacher: Teacher<'_>,
     form: Form<NewSheetForm>,
 ) -> Result<Redirect, Status> {
+    let user = teacher.into_inner();
     let form = form.into_inner();
     logic::create_empty_sheet(&db, user.user_info.id, form.title)
         .await
@@ -131,7 +149,8 @@ pub async fn new_sheet(
 }
 
 #[get("/trash")]
-pub async fn trashed_sheets(db: Db, user: &AuthenticatedUser) -> Result<Template, Status> {
+pub async fn trashed_sheets(db: Db, teacher: Teacher<'_>) -> Result<Template, Status> {
+    let user = teacher.into_inner();
     logic::get_trash(&db, user.user_info.id)
         .await
         .map_err(|e| e.to_status())
@@ -153,7 +172,8 @@ pub fn trashed_sheets_login_req() -> FlashRedirect {
 }
 
 #[get("/recent")]
-pub async fn recent_sheets(db: Db, user: &AuthenticatedUser) -> Result<Template, Status> {
+pub async fn recent_sheets(db: Db, teacher: Teacher<'_>) -> Result<Template, Status> {
+    let user = teacher.into_inner();
     logic::get_recent(&db, user.user_info.id)
         .await
         .map_err(|e| e.to_status())
@@ -177,9 +197,10 @@ pub fn recent_sheets_login_req() -> FlashRedirect {
 #[post("/import", data = "<form>")]
 pub async fn import_sheet(
     db: Db,
-    user: &AuthenticatedUser,
+    teacher: Teacher<'_>,
     form: Form<ImportSheetForm>,
 ) -> Result<FlashRedirect, Status> {
+    let user = teacher.into_inner();
     let form = form.into_inner();
     match parse_sheet(&form.file) {
         Ok(sheet) => logic::create_sheet(&db, user.user_info.id, sheet.title, sheet.tiptap)
@@ -210,7 +231,8 @@ fn parse_sheet(sheet: &str) -> Result<SheetTransport, FlashRedirect> {
 }
 
 #[get("/<id>?edit")]
-pub async fn edit_sheet(db: Db, user: &AuthenticatedUser, id: Id) -> Result<Template, Status> {
+pub async fn edit_sheet(db: Db, teacher: Teacher<'_>, id: Id) -> Result<Template, Status> {
+    let user = teacher.into_inner();
     logic::get_sheet_for_edit(&db, user.user_info.id, id)
         .await
         .map_err(|e| e.to_status())
@@ -255,10 +277,11 @@ pub async fn view_sheet(
 #[put("/<id>", format = "json", data = "<sheet>")]
 pub async fn save_sheet(
     db: Db,
-    user: &AuthenticatedUser,
+    teacher: Teacher<'_>,
     id: Id,
     sheet: Json<SheetTransport>,
 ) -> Result<(), Status> {
+    let user = teacher.into_inner();
     let sheet = sheet.into_inner();
     if let Err(e) = sheet.validate() {
         Err(e.to_status())
@@ -270,7 +293,8 @@ pub async fn save_sheet(
 }
 
 #[delete("/<id>")]
-pub async fn delete_sheet(db: Db, user: &AuthenticatedUser, id: Id) -> Result<Redirect, Status> {
+pub async fn delete_sheet(db: Db, teacher: Teacher<'_>, id: Id) -> Result<Redirect, Status> {
+    let user = teacher.into_inner();
     logic::delete_sheet(&db, user.user_info.id, id)
         .await
         .map_err(|e| e.to_status())
@@ -283,7 +307,8 @@ pub async fn delete_sheet(db: Db, user: &AuthenticatedUser, id: Id) -> Result<Re
 }
 
 #[post("/<id>/restore")]
-pub async fn restore_sheet(db: Db, user: &AuthenticatedUser, id: Id) -> Result<Redirect, Status> {
+pub async fn restore_sheet(db: Db, teacher: Teacher<'_>, id: Id) -> Result<Redirect, Status> {
+    let user = teacher.into_inner();
     logic::restore_sheet(&db, user.user_info.id, id)
         .await
         .map_err(|e| e.to_status())
