@@ -43,6 +43,15 @@ pub fn landing_page(user: Option<&AuthenticatedUser>) -> Template {
 }
 
 #[get("/login")]
+pub fn already_logged_in(_user: &AuthenticatedUser) -> Redirect {
+    Redirect::to(format!(
+        "{}{}",
+        sheet::routes::MOUNT,
+        uri!(sheet::routes::sheets)
+    ))
+}
+
+#[get("/login", rank = 2)]
 pub fn login_form(flash: Option<FlashMessage>) -> Template {
     Template::render(
         "login",

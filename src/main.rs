@@ -149,6 +149,7 @@ fn rocket() -> _ {
             routes![
                 login::routes::landing_page,
                 login::routes::login_form,
+                login::routes::already_logged_in,
                 login::routes::login,
                 login::routes::logout
             ],
