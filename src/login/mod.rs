@@ -1,5 +1,4 @@
-pub use self::transport::AuthenticatedUser;
-
+pub mod guards;
 pub mod routes;
 pub mod transport;
 

@@ -1,8 +1,7 @@
 use log::error;
 use rocket::form::Form;
 use rocket::http::{Cookie, CookieJar, Status};
-use rocket::outcome::IntoOutcome;
-use rocket::request::{FlashMessage, FromRequest, Outcome, Request};
+use rocket::request::FlashMessage;
 use rocket::response::Redirect;
 use rocket::serde::Serialize;
 use rocket_dyn_templates::Template;
@@ -12,43 +11,14 @@ use crate::sheet;
 use crate::status::ToStatus;
 use crate::Db;
 
+use super::guards::{self, AuthenticatedUser};
 use super::logic;
-use super::transport::{AuthenticatedUser, LoginForm, UserTransport};
-
-const SESSION_ID_COOKIE_NAME: &str = "session_id";
+use super::transport::{LoginForm, UserTransport};
 
 impl ToStatus for logic::Error {
     fn to_status(self) -> Status {
         error!("{}", self);
         Status::InternalServerError
-    }
-}
-
-#[rocket::async_trait]
-impl<'r> FromRequest<'r> for &'r AuthenticatedUser {
-    type Error = ();
-
-    async fn from_request(request: &'r Request<'_>) -> Outcome<Self, ()> {
-        let user = request
-            .local_cache_async(async {
-                let db = request.guard::<Db>().await.succeeded()?;
-                if let Some(session_id) = request
-                    .cookies()
-                    .get_private(SESSION_ID_COOKIE_NAME)
-                    .map(|cookie| cookie.value().to_owned())
-                {
-                    logic::validate_session(&db, session_id)
-                        .await
-                        .map_err(|e| error!("{}", e))
-                        .ok()
-                        .flatten()
-                        .map(|user| user.into())
-                } else {
-                    None
-                }
-            })
-            .await;
-        user.as_ref().or_forward(())
     }
 }
 
@@ -94,7 +64,7 @@ pub async fn login(
         .map_err(|e| e.to_status())
         .and_then(|s| {
             s.map(|session_id| {
-                cookies.add_private(Cookie::new(SESSION_ID_COOKIE_NAME, session_id));
+                cookies.add_private(Cookie::new(guards::SESSION_ID_COOKIE_NAME, session_id));
                 Ok(FlashRedirect::no_flash(format!(
                     "{}{}",
                     sheet::routes::MOUNT,
@@ -117,7 +87,7 @@ pub async fn logout(
     user: &AuthenticatedUser,
     cookies: &CookieJar<'_>,
 ) -> Result<Redirect, Status> {
-    cookies.remove_private(Cookie::named(SESSION_ID_COOKIE_NAME));
+    cookies.remove_private(Cookie::named(guards::SESSION_ID_COOKIE_NAME));
     logic::logout(&db, user.user_info.id)
         .await
         .map_err(|e| e.to_status())

@@ -10,8 +10,9 @@ use rocket::serde::Serialize;
 use rocket_dyn_templates::Template;
 
 use crate::flash::{FlashContext, FlashRedirect};
+use crate::login;
+use crate::login::guards::AuthenticatedUser;
 use crate::login::transport::UserTransport;
-use crate::login::{self, AuthenticatedUser};
 use crate::status::ToStatus;
 use crate::validation::Validate;
 use crate::Db;

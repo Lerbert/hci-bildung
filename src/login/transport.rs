@@ -26,34 +26,7 @@ impl From<&User> for UserTransport {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct AuthenticatedUser {
-    pub user_info: UserTransport,
-    pub roles: Vec<RoleTransport>,
-}
-
-impl From<User> for AuthenticatedUser {
-    fn from(user: User) -> Self {
-        AuthenticatedUser {
-            user_info: UserTransport {
-                id: user.id,
-                username: user.username.clone(),
-            },
-            roles: user.roles.into_iter().map(|r| r.into()).collect(),
-        }
-    }
-}
-
-impl From<&User> for AuthenticatedUser {
-    fn from(user: &User) -> Self {
-        AuthenticatedUser {
-            user_info: user.into(),
-            roles: user.roles.iter().map(|&r| r.into()).collect(),
-        }
-    }
-}
-
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum RoleTransport {
     Teacher,
     Student,
