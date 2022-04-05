@@ -44,11 +44,9 @@ pub fn landing_page(user: Option<&AuthenticatedUser>) -> Template {
 
 #[get("/login")]
 pub fn already_logged_in(_user: &AuthenticatedUser) -> Redirect {
-    Redirect::to(format!(
-        "{}{}",
-        sheets::routes::MOUNT,
-        uri!(sheets::routes::sheet::sheet_overview)
-    ))
+    Redirect::to(sheets::routes::sheets_uri(uri!(
+        sheets::routes::sheet::sheet_overview
+    )))
 }
 
 #[get("/login", rank = 2)]
@@ -74,11 +72,9 @@ pub async fn login(
         .and_then(|s| {
             s.map(|session_id| {
                 cookies.add_private(Cookie::new(guards::SESSION_ID_COOKIE_NAME, session_id));
-                Ok(FlashRedirect::no_flash(format!(
-                    "{}{}",
-                    sheets::routes::MOUNT,
-                    uri!(sheets::routes::sheet::sheet_overview)
-                )))
+                Ok(FlashRedirect::no_flash(sheets::routes::sheets_uri(uri!(
+                    sheets::routes::sheet::sheet_overview
+                ))))
             })
             .unwrap_or_else(|| {
                 Ok(FlashRedirect::with_flash(

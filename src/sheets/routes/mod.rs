@@ -39,6 +39,10 @@ impl ToStatus for transport::SheetTransportValidationError {
     }
 }
 
+pub fn sheets_uri(uri: rocket::http::uri::Origin) -> String {
+    format!("{}{}", MOUNT, uri)
+}
+
 fn redirect_to_login() -> FlashRedirect {
     FlashRedirect::with_flash(
         uri!(login::routes::login),

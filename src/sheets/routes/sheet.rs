@@ -12,10 +12,9 @@ use crate::status::ToStatus;
 use crate::validation::Validate;
 use crate::Db;
 
-use super::logic;
 use super::logic::{Id, Sheet};
-use super::sheet_tree;
 use super::transport::{ImportSheetForm, NewSheetForm, SheetTransport};
+use super::{logic, redirect_to_login, sheet_tree, sheets_uri};
 
 #[derive(Serialize)]
 struct SheetContext<'a> {
@@ -38,7 +37,7 @@ pub async fn new_sheet(
     logic::create_empty_sheet(&db, user.user_info.id, form.title)
         .await
         .map_err(|e| e.to_status())
-        .map(|id| Redirect::to(format!("{}{}", super::MOUNT, uri!(edit_sheet(id)))))
+        .map(|id| Redirect::to(sheets_uri(uri!(edit_sheet(id)))))
 }
 
 #[post("/import", data = "<form>")]
@@ -53,7 +52,7 @@ pub async fn import_sheet(
         Ok(sheet) => logic::create_sheet(&db, user.user_info.id, sheet.title, sheet.tiptap)
             .await
             .map_err(|e| e.to_status())
-            .map(|id| FlashRedirect::no_flash(format!("{}{}", super::MOUNT, uri!(edit_sheet(id))))),
+            .map(|id| FlashRedirect::no_flash(sheets_uri(uri!(edit_sheet(id))))),
         Err(redirect) => Ok(redirect),
     }
 }
@@ -61,7 +60,7 @@ pub async fn import_sheet(
 fn parse_sheet(sheet: &str) -> Result<SheetTransport, FlashRedirect> {
     let get_error_redirect = || {
         FlashRedirect::with_flash(
-            format!("{}{}", super::MOUNT, uri!(sheet_tree::assignment_overview)),
+            sheets_uri(uri!(sheet_tree::assignment_overview)),
             "danger",
             "Invalides Dateiformat",
         )
@@ -118,7 +117,7 @@ pub async fn edit_sheet(db: Db, teacher: Teacher<'_>, id: Id) -> Result<Template
 
 #[get("/<_id>/edit", rank = 2)]
 pub fn login_edit_sheet(_id: Id) -> FlashRedirect {
-    super::redirect_to_login()
+    redirect_to_login()
 }
 
 #[put("/<id>", format = "json", data = "<sheet>")]
@@ -146,16 +145,12 @@ pub async fn delete_sheet(db: Db, teacher: Teacher<'_>, id: Id) -> Result<Redire
         .await
         .map_err(|e| e.to_status())
         .map(|outcome| match outcome {
-            logic::DeleteOutcome::Trashed => Redirect::to(format!(
-                "{}{}",
-                super::MOUNT,
-                uri!(sheet_tree::assignment_overview)
-            )),
-            logic::DeleteOutcome::Deleted => Redirect::to(format!(
-                "{}{}",
-                super::MOUNT,
-                uri!(sheet_tree::trashed_sheets)
-            )),
+            logic::DeleteOutcome::Trashed => {
+                Redirect::to(sheets_uri(uri!(sheet_tree::assignment_overview)))
+            }
+            logic::DeleteOutcome::Deleted => {
+                Redirect::to(sheets_uri(uri!(sheet_tree::trashed_sheets)))
+            }
         })
 }
 
@@ -165,11 +160,5 @@ pub async fn restore_sheet(db: Db, teacher: Teacher<'_>, id: Id) -> Result<Redir
     logic::restore_sheet(&db, user.user_info.id, id)
         .await
         .map_err(|e| e.to_status())
-        .map(|_| {
-            Redirect::to(format!(
-                "{}{}",
-                super::MOUNT,
-                uri!(sheet_tree::assignment_overview)
-            ))
-        })
+        .map(|_| Redirect::to(sheets_uri(uri!(sheet_tree::assignment_overview))))
 }
