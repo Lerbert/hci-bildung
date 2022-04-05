@@ -4,8 +4,7 @@ use rocket_sync_db_pools::diesel;
 use crate::login::transport::UserTransport;
 use crate::Db;
 
-use super::logic::{Sheet, SheetMetadata};
-use super::transport::Id;
+use super::logic::{Id, Sheet, SheetMetadata};
 
 use self::diesel::prelude::*;
 use crate::db::model::{SheetDiesel, SheetMetadataDiesel, UserTransportDiesel};

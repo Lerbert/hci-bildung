@@ -21,7 +21,7 @@
     <td colspan="{{ num_actions + 4 }}">
       <div class="columns is-1 is-variable">
         <div class="column">
-          <form action='{{ url_for(endpoint="sheets") }}' method="POST">
+          <form action='{{ url_for(endpoint="new_sheet") }}' method="POST">
             <div class="field has-addons">
               <div class="control is-expanded">
                 <input class="input js-validation" name="title" type="text" placeholder="Neues Dokument" required>

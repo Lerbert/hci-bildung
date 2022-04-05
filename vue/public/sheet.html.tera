@@ -7,7 +7,7 @@
   Editor — {{ super() }}
 {% endblock title %}
 {% block content %}
-  <div id="app" data-edit="{{ edit }}" data-docid='"{{ sheet.id }}"' data-doctitle='"{{ sheet.title }}"' data-docjson='{{ sheet | get(key="tiptap") | json_encode() | safe }}'></div>
+  <div id="app" data-edit="{{ edit }}" data-docid='"{{ sheet.metadata.id }}"' data-doctitle='"{{ sheet.metadata.title }}"' data-docjson='{{ sheet | get(key="tiptap") | json_encode() | safe }}'></div>
 {% endblock content %}
 {% block scripts %}
   {{ super() }}

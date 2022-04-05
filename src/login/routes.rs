@@ -7,7 +7,7 @@ use rocket::serde::Serialize;
 use rocket_dyn_templates::Template;
 
 use crate::flash::{FlashContext, FlashRedirect};
-use crate::sheet;
+use crate::sheets;
 use crate::status::ToStatus;
 use crate::Db;
 
@@ -46,8 +46,8 @@ pub fn landing_page(user: Option<&AuthenticatedUser>) -> Template {
 pub fn already_logged_in(_user: &AuthenticatedUser) -> Redirect {
     Redirect::to(format!(
         "{}{}",
-        sheet::routes::MOUNT,
-        uri!(sheet::routes::sheets)
+        sheets::routes::MOUNT,
+        uri!(sheets::routes::sheet::sheet_overview)
     ))
 }
 
@@ -76,8 +76,8 @@ pub async fn login(
                 cookies.add_private(Cookie::new(guards::SESSION_ID_COOKIE_NAME, session_id));
                 Ok(FlashRedirect::no_flash(format!(
                     "{}{}",
-                    sheet::routes::MOUNT,
-                    uri!(sheet::routes::sheets)
+                    sheets::routes::MOUNT,
+                    uri!(sheets::routes::sheet::sheet_overview)
                 )))
             })
             .unwrap_or_else(|| {

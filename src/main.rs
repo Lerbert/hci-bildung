@@ -16,7 +16,8 @@ use tera::{self, from_value, to_value, Function};
 mod db;
 mod flash;
 mod login;
-mod sheet;
+// mod sheet;
+mod sheets;
 mod status;
 mod validation;
 
@@ -126,23 +127,28 @@ fn rocket() -> _ {
     }
     let r = rocket::build()
         .mount(
-            sheet::routes::MOUNT,
+            sheets::routes::MOUNT,
             routes![
-                sheet::routes::sheets,
-                sheet::routes::sheets_stud,
-                sheet::routes::sheets_login_req,
-                sheet::routes::trashed_sheets,
-                sheet::routes::trashed_sheets_login_req,
-                sheet::routes::recent_sheets,
-                sheet::routes::recent_sheets_login_req,
-                sheet::routes::new_sheet,
-                sheet::routes::import_sheet,
-                sheet::routes::view_sheet,
-                sheet::routes::edit_sheet,
-                sheet::routes::edit_login_req,
-                sheet::routes::save_sheet,
-                sheet::routes::delete_sheet,
-                sheet::routes::restore_sheet
+                sheets::routes::sheet::sheet_overview,
+                sheets::routes::sheet::new_sheet,
+                sheets::routes::sheet::import_sheet,
+                sheets::routes::sheet::view_sheet,
+                sheets::routes::sheet::edit_sheet,
+                sheets::routes::sheet::save_sheet,
+                sheets::routes::sheet::delete_sheet,
+                sheets::routes::sheet::restore_sheet,
+                sheets::routes::sheet_tree::assignment_overview,
+                sheets::routes::sheet_tree::trashed_sheets,
+                sheets::routes::sheet_tree::recent_sheets,
+                sheets::routes::solutions::solution_overview,
+                sheets::routes::solutions::sheet_solutions,
+                sheets::routes::solutions::start_solve,
+                sheets::routes::solutions::my_solution,
+                sheets::routes::solutions::student_solution,
+                sheets::routes::sheet::login_edit_sheet,
+                sheets::routes::sheet_tree::login_assignment_overview,
+                sheets::routes::sheet_tree::login_trashed_sheets,
+                sheets::routes::sheet_tree::login_recent_sheets
             ],
         )
         .mount(

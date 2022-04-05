@@ -130,7 +130,7 @@ export default defineComponent({
       let delay = new Promise((r) => setTimeout(r, 500)); // Delay to show user that we are indeed saving
       let saveOk = false;
       try {
-        let response = await fetch(this.docId, {
+        let response = await fetch(".", {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",

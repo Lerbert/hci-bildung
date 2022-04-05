@@ -18,7 +18,7 @@
         Startseite
       </a>
 
-      <a class="navbar-item" href='{{ url_for(endpoint="sheets") }}'>
+      <a class="navbar-item" href='{{ url_for(endpoint="sheet_overview") }}'>
         Dokumente
       </a>
 

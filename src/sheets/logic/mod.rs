@@ -1,6 +1,7 @@
 use std::fmt::{self, Display};
 
 use chrono::{DateTime, Utc};
+use rocket::serde::Serialize;
 
 use crate::login::transport::UserTransport;
 use crate::Db;
@@ -34,11 +35,13 @@ impl From<data::Error> for Error {
     }
 }
 
+#[derive(Debug, Serialize)]
 pub struct Sheet {
     pub metadata: SheetMetadata,
     pub tiptap: serde_json::Value,
 }
 
+#[derive(Debug, Serialize)]
 pub struct SheetMetadata {
     pub id: Id,
     pub title: String,
