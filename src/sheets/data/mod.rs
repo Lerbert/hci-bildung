@@ -151,10 +151,11 @@ pub async fn update_sheet(
     id: Id,
     title: String,
     tiptap: serde_json::Value,
+    changed: DateTime<Utc>,
 ) -> Result<(), Error> {
     db.run(move |c| {
         diesel::update(sheets::table.find(id))
-            .set((sheets::title.eq(title), sheets::tiptap.eq(tiptap)))
+            .set((sheets::title.eq(title), sheets::tiptap.eq(tiptap), sheets::changed.eq(changed)))
             .execute(c)
     })
     .await?;

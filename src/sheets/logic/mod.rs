@@ -115,7 +115,8 @@ pub async fn update_sheet(
     tiptap: serde_json::Value,
 ) -> Result<()> {
     get_sheet_owned_by_user(db, user_id, id).await?; // We don't care about the sheet here, we just need to check ownership
-    Ok(data::update_sheet(db, id, title, tiptap).await?)
+    let now = chrono::Utc::now();
+    Ok(data::update_sheet(db, id, title, tiptap, now).await?)
 }
 
 pub async fn delete_sheet(db: &Db, user_id: i32, id: Id) -> Result<DeleteOutcome> {
