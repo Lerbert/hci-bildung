@@ -3,6 +3,7 @@ use std::fmt::{self, Display};
 use super::data;
 
 pub mod sheet;
+pub mod solution;
 
 pub type Id = rocket::serde::uuid::Uuid;
 

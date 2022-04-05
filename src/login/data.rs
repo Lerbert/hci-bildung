@@ -1,12 +1,13 @@
 use chrono::NaiveDateTime;
 use rocket_sync_db_pools::diesel;
 
-use crate::db::model::{RoleDiesel, SessionDiesel, UserDiesel};
+use crate::db::model::{RoleDiesel, SessionDiesel, UserDiesel, UserTransportDiesel};
 use crate::db::schema::{sessions, users};
 use crate::db::sql_types;
 use crate::Db;
 
 use super::logic::{Role, Session, User};
+use super::transport::UserTransport;
 
 use self::diesel::prelude::*;
 
@@ -46,6 +47,15 @@ impl From<(UserDiesel, Option<SessionDiesel>, Vec<RoleDiesel>)> for User {
 impl From<(UserDiesel, SessionDiesel, Vec<RoleDiesel>)> for User {
     fn from(t: (UserDiesel, SessionDiesel, Vec<RoleDiesel>)) -> User {
         User::from((t.0, Some(t.1), t.2))
+    }
+}
+
+impl From<UserTransportDiesel> for UserTransport {
+    fn from(u: UserTransportDiesel) -> UserTransport {
+        UserTransport {
+            id: u.id,
+            username: u.username,
+        }
     }
 }
 

@@ -1,7 +1,7 @@
 use chrono::{DateTime, NaiveDateTime, Utc};
 use rocket::serde::uuid::Uuid;
 
-use super::schema::{roles, sessions, sheets, users};
+use super::schema::{roles, sessions, sheets, solutions, users};
 use super::sql_types::RoleDb;
 
 #[derive(Debug, Identifiable, PartialEq, Queryable)]
@@ -83,6 +83,58 @@ impl SheetMetadataDiesel {
             sheets::created,
             sheets::changed,
             sheets::trashed,
+        )
+    }
+}
+
+#[derive(Associations, Debug, Identifiable, Insertable, PartialEq, Queryable)]
+#[belongs_to(UserDiesel, foreign_key = "owner_id")]
+#[belongs_to(SheetDiesel, foreign_key = "sheet_id")]
+#[table_name = "solutions"]
+pub struct SolutionDiesel {
+    pub id: i32,
+    pub title: String,
+    pub sheet_id: Option<Uuid>,
+    pub sheet_version: DateTime<Utc>,
+    pub owner_id: i32,
+    pub created: DateTime<Utc>,
+    pub changed: DateTime<Utc>,
+    pub trashed: Option<DateTime<Utc>>,
+    pub solution: serde_json::Value,
+}
+
+#[derive(Debug, PartialEq, Queryable)]
+pub struct SolutionMetadataDiesel {
+    pub id: i32,
+    pub title: String,
+    pub sheet_id: Option<Uuid>,
+    pub sheet_version: DateTime<Utc>,
+    pub owner_id: i32,
+    pub created: DateTime<Utc>,
+    pub changed: DateTime<Utc>,
+    pub trashed: Option<DateTime<Utc>>,
+}
+
+impl SolutionMetadataDiesel {
+    pub fn columns() -> (
+        solutions::id,
+        solutions::title,
+        solutions::sheet_id,
+        solutions::sheet_version,
+        solutions::owner_id,
+        solutions::created,
+        solutions::changed,
+        solutions::trashed,
+    ) {
+        (
+            solutions::id,
+            solutions::title,
+            solutions::sheet_id,
+            solutions::sheet_version,
+            solutions::owner_id,
+            solutions::created,
+            solutions::changed,
+            solutions::trashed,
         )
     }
 }

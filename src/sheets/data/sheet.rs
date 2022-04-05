@@ -4,11 +4,10 @@ use rocket_sync_db_pools::diesel;
 use crate::db::model::{SheetDiesel, SheetMetadataDiesel, UserTransportDiesel};
 use crate::db::schema::{sheets, users};
 use crate::Db;
-use crate::login::transport::UserTransport;
 
-use super::Error;
-use super::logic::Id;
 use super::logic::sheet::{Sheet, SheetMetadata};
+use super::logic::Id;
+use super::Error;
 
 use self::diesel::prelude::*;
 
@@ -25,15 +24,6 @@ impl From<(SheetDiesel, UserTransportDiesel)> for Sheet {
                 trashed: s.trashed,
             },
             tiptap: s.tiptap,
-        }
-    }
-}
-
-impl From<UserTransportDiesel> for UserTransport {
-    fn from(u: UserTransportDiesel) -> UserTransport {
-        UserTransport {
-            id: u.id,
-            username: u.username,
         }
     }
 }
@@ -155,7 +145,11 @@ pub async fn update_sheet(
 ) -> Result<(), Error> {
     db.run(move |c| {
         diesel::update(sheets::table.find(id))
-            .set((sheets::title.eq(title), sheets::tiptap.eq(tiptap), sheets::changed.eq(changed)))
+            .set((
+                sheets::title.eq(title),
+                sheets::tiptap.eq(tiptap),
+                sheets::changed.eq(changed),
+            ))
             .execute(c)
     })
     .await?;
