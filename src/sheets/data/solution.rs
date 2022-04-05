@@ -5,7 +5,7 @@ use crate::db::model::{SolutionDiesel, SolutionMetadataDiesel, UserTransportDies
 use crate::db::schema::{solutions, users};
 use crate::Db;
 
-use super::logic::solution::{Solution, SolutionMetadata};
+use super::logic::solution::{FreshSolution, Solution, SolutionMetadata};
 use super::logic::Id;
 use super::Error;
 
@@ -44,4 +44,24 @@ impl From<(SolutionMetadataDiesel, UserTransportDiesel)> for SolutionMetadata {
             trashed: s.trashed,
         }
     }
+}
+
+pub async fn create_solution(db: &Db, fresh_solution: FreshSolution) -> Result<i32, Error> {
+    let solution: SolutionDiesel = db
+        .run(move |c| {
+            diesel::insert_into(solutions::table)
+                .values(&(
+                    solutions::title.eq(fresh_solution.title),
+                    solutions::owner_id.eq(fresh_solution.owner_id),
+                    solutions::sheet_id.eq(fresh_solution.sheet_id),
+                    solutions::sheet_version.eq(fresh_solution.sheet_version),
+                    solutions::created.eq(fresh_solution.created),
+                    solutions::changed.eq(fresh_solution.changed),
+                    solutions::trashed.eq(fresh_solution.trashed),
+                    solutions::solution.eq(fresh_solution.solution),
+                ))
+                .get_result(c)
+        })
+        .await?;
+    Ok(solution.id)
 }

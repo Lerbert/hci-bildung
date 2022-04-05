@@ -4,7 +4,9 @@ use rocket::serde::Serialize;
 use crate::login::transport::UserTransport;
 use crate::Db;
 
-use super::{data, Error, Id, Result};
+use super::sheet::{Sheet, SheetMetadata};
+use super::{data, sheet};
+use super::{Id, Result};
 
 #[derive(Debug, Serialize)]
 pub struct Solution {
@@ -22,4 +24,37 @@ pub struct SolutionMetadata {
     pub created: DateTime<Utc>,
     pub changed: DateTime<Utc>,
     pub trashed: Option<DateTime<Utc>>,
+}
+
+pub struct FreshSolution {
+    pub title: String,
+    pub sheet_id: Id,
+    pub sheet_version: DateTime<Utc>,
+    pub owner_id: i32,
+    pub created: DateTime<Utc>,
+    pub changed: DateTime<Utc>,
+    pub trashed: Option<DateTime<Utc>>,
+    pub solution: serde_json::Value,
+}
+
+impl FreshSolution {
+    fn from(sheet: Sheet, user_id: i32) -> FreshSolution {
+        let now = Utc::now();
+        FreshSolution {
+            title: sheet.metadata.title,
+            sheet_id: sheet.metadata.id,
+            sheet_version: sheet.metadata.changed,
+            owner_id: user_id,
+            created: now,
+            changed: now,
+            trashed: None,
+            solution: sheet.tiptap,
+        }
+    }
+}
+
+pub async fn start_solve(db: &Db, sheet_id: Id, user_id: i32) -> Result<()> {
+    let sheet = sheet::get_sheet(db, sheet_id).await?;
+    data::solution::create_solution(db, FreshSolution::from(sheet, user_id)).await?;
+    Ok(())
 }
