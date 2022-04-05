@@ -9,7 +9,7 @@ use crate::login::transport::UserTransport;
 use crate::status::ToStatus;
 use crate::Db;
 
-use super::logic::SheetMetadata;
+use super::logic::sheet::SheetMetadata;
 use super::{logic, redirect_to_login};
 
 #[derive(Serialize)]
@@ -26,7 +26,7 @@ pub async fn assignment_overview(
     flash: Option<FlashMessage<'_>>,
 ) -> Result<Template, Status> {
     let user = teacher.into_inner();
-    logic::get_all_sheets(&db, user.user_info.id)
+    logic::sheet::get_all_sheets(&db, user.user_info.id)
         .await
         .map_err(|e| e.to_status())
         .map(|sheets| {
@@ -49,7 +49,7 @@ pub fn login_assignment_overview() -> FlashRedirect {
 #[get("/assignments/trash")]
 pub async fn trashed_sheets(db: Db, teacher: Teacher<'_>) -> Result<Template, Status> {
     let user = teacher.into_inner();
-    logic::get_trash(&db, user.user_info.id)
+    logic::sheet::get_trash(&db, user.user_info.id)
         .await
         .map_err(|e| e.to_status())
         .map(|sheets| {
@@ -72,7 +72,7 @@ pub fn login_trashed_sheets() -> FlashRedirect {
 #[get("/assignments/recent")]
 pub async fn recent_sheets(db: Db, teacher: Teacher<'_>) -> Result<Template, Status> {
     let user = teacher.into_inner();
-    logic::get_recent(&db, user.user_info.id)
+    logic::sheet::get_recent(&db, user.user_info.id)
         .await
         .map_err(|e| e.to_status())
         .map(|sheets| {

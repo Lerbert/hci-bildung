@@ -12,7 +12,8 @@ use crate::status::ToStatus;
 use crate::validation::Validate;
 use crate::Db;
 
-use super::logic::{Id, Sheet};
+use super::logic::Id;
+use super::logic::sheet::Sheet;
 use super::transport::{ImportSheetForm, NewSheetForm, SheetTransport};
 use super::{logic, redirect_to_login, sheet_tree, sheets_uri};
 
@@ -33,7 +34,7 @@ pub async fn new_sheet(
 ) -> Result<Redirect, Status> {
     let user = teacher.into_inner();
     let form = form.into_inner();
-    logic::create_empty_sheet(&db, user.user_info.id, form.title)
+    logic::sheet::create_empty_sheet(&db, user.user_info.id, form.title)
         .await
         .map_err(|e| e.to_status())
         .map(|id| Redirect::to(sheets_uri(uri!(edit_sheet(id)))))
@@ -48,7 +49,7 @@ pub async fn import_sheet(
     let user = teacher.into_inner();
     let form = form.into_inner();
     match parse_sheet(&form.file) {
-        Ok(sheet) => logic::create_sheet(&db, user.user_info.id, sheet.title, sheet.tiptap)
+        Ok(sheet) => logic::sheet::create_sheet(&db, user.user_info.id, sheet.title, sheet.tiptap)
             .await
             .map_err(|e| e.to_status())
             .map(|id| FlashRedirect::no_flash(sheets_uri(uri!(edit_sheet(id))))),
@@ -81,7 +82,7 @@ pub async fn view_sheet(
     user: Option<&AuthenticatedUser>,
     id: Id,
 ) -> Result<Template, Status> {
-    logic::get_sheet(&db, id)
+    logic::sheet::get_sheet(&db, id)
         .await
         .map_err(|e| e.to_status())
         .map(|sheet| {
@@ -98,7 +99,7 @@ pub async fn view_sheet(
 #[get("/<id>/edit")]
 pub async fn edit_sheet(db: Db, teacher: Teacher<'_>, id: Id) -> Result<Template, Status> {
     let user = teacher.into_inner();
-    logic::get_sheet_for_edit(&db, user.user_info.id, id)
+    logic::sheet::get_sheet_for_edit(&db, user.user_info.id, id)
         .await
         .map_err(|e| e.to_status())
         .map(|sheet| {
@@ -129,7 +130,7 @@ pub async fn save_sheet(
     if let Err(e) = sheet.validate() {
         Err(e.to_status())
     } else {
-        logic::update_sheet(&db, user.user_info.id, id, sheet.title, sheet.tiptap)
+        logic::sheet::update_sheet(&db, user.user_info.id, id, sheet.title, sheet.tiptap)
             .await
             .map_err(|e| e.to_status())
     }
@@ -138,14 +139,14 @@ pub async fn save_sheet(
 #[delete("/<id>")]
 pub async fn delete_sheet(db: Db, teacher: Teacher<'_>, id: Id) -> Result<Redirect, Status> {
     let user = teacher.into_inner();
-    logic::delete_sheet(&db, user.user_info.id, id)
+    logic::sheet::delete_sheet(&db, user.user_info.id, id)
         .await
         .map_err(|e| e.to_status())
         .map(|outcome| match outcome {
-            logic::DeleteOutcome::Trashed => {
+            logic::sheet::DeleteOutcome::Trashed => {
                 Redirect::to(sheets_uri(uri!(sheet_tree::assignment_overview)))
             }
-            logic::DeleteOutcome::Deleted => {
+            logic::sheet::DeleteOutcome::Deleted => {
                 Redirect::to(sheets_uri(uri!(sheet_tree::trashed_sheets)))
             }
         })
@@ -154,7 +155,7 @@ pub async fn delete_sheet(db: Db, teacher: Teacher<'_>, id: Id) -> Result<Redire
 #[post("/<id>/restore")]
 pub async fn restore_sheet(db: Db, teacher: Teacher<'_>, id: Id) -> Result<Redirect, Status> {
     let user = teacher.into_inner();
-    logic::restore_sheet(&db, user.user_info.id, id)
+    logic::sheet::restore_sheet(&db, user.user_info.id, id)
         .await
         .map_err(|e| e.to_status())
         .map(|_| Redirect::to(sheets_uri(uri!(sheet_tree::assignment_overview))))
