@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve --mode dev-standalone",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build && mv ../vue_dist/vue_macros.html.tera ../templates/sheet",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {

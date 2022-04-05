@@ -1,0 +1,7 @@
+{% import "sheet/vue_macros" as vue_macros %}
+
+{% extends "sheet/base" %}
+
+{% block content %}
+    {{ vue_macros::vue_app(edit=true, doc_id=sheet.metadata.id, doc_title=sheet.metadata.title, doc_json=sheet.tiptap) }}
+{% endblock content %}

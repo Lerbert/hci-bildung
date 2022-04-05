@@ -18,7 +18,6 @@ use super::{logic, redirect_to_login, sheet_tree, sheets_uri};
 
 #[derive(Serialize)]
 struct SheetContext<'a> {
-    edit: bool,
     sheet: Sheet,
     user: Option<&'a UserTransport>,
 }
@@ -87,9 +86,8 @@ pub async fn view_sheet(
         .map_err(|e| e.to_status())
         .map(|sheet| {
             Template::render(
-                "sheet.html",
+                "sheet/view_sheet",
                 &SheetContext {
-                    edit: false,
                     sheet,
                     user: user.map(|u| &u.user_info),
                 },
@@ -105,9 +103,8 @@ pub async fn edit_sheet(db: Db, teacher: Teacher<'_>, id: Id) -> Result<Template
         .map_err(|e| e.to_status())
         .map(|sheet| {
             Template::render(
-                "sheet.html",
+                "sheet/edit_sheet",
                 &SheetContext {
-                    edit: true,
                     sheet,
                     user: Some(&user.user_info),
                 },

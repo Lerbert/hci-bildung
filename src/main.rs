@@ -16,7 +16,6 @@ use tera::{self, from_value, to_value, Function};
 mod db;
 mod flash;
 mod login;
-// mod sheet;
 mod sheets;
 mod status;
 mod validation;
@@ -168,10 +167,6 @@ fn rocket() -> _ {
         .map(|route| (route.name.clone().unwrap().into(), route.uri.clone()))
         .collect();
     r.attach(Template::custom(move |engines| {
-        engines
-            .tera
-            .add_template_file("vue_dist/sheet.html.tera", Some("sheet.html"))
-            .ok();
         engines
             .tera
             .register_function("url_for", make_url_for(map.clone()));

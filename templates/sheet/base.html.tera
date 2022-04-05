@@ -1,0 +1,13 @@
+{% import "sheet/vue_macros" as vue_macros %}
+
+{% extends "generic/base" %}
+
+{% block head %}
+  {{ super() }}
+  {{ vue_macros::vue_head() }}
+{% endblock head %}
+
+{% block scripts %}
+  {{ super() }}
+  {{ vue_macros::vue_scripts() }} 
+{% endblock scripts %}
