@@ -74,6 +74,11 @@ async fn get_sheet_owned_by_user(db: &Db, user_id: i32, id: Id) -> Result<Sheet>
     }
 }
 
+pub async fn check_sheet_ownership(db: &Db, user_id: i32, id: Id) -> Result<()> {
+    get_sheet_owned_by_user(db, user_id, id).await?; // We don't care about the sheet here, we just need to check ownership
+    Ok(())
+}
+
 pub async fn get_sheet_for_edit(db: &Db, user_id: i32, id: Id) -> Result<Sheet> {
     get_sheet_owned_by_user(db, user_id, id).await
 }
@@ -85,7 +90,7 @@ pub async fn update_sheet(
     title: String,
     tiptap: serde_json::Value,
 ) -> Result<()> {
-    get_sheet_owned_by_user(db, user_id, id).await?; // We don't care about the sheet here, we just need to check ownership
+    check_sheet_ownership(db, user_id, id).await?;
     let now = chrono::Utc::now();
     Ok(data::sheet::update_sheet(db, id, title, tiptap, now).await?)
 }
@@ -102,7 +107,7 @@ pub async fn delete_sheet(db: &Db, user_id: i32, id: Id) -> Result<DeleteOutcome
 }
 
 pub async fn restore_sheet(db: &Db, user_id: i32, id: Id) -> Result<()> {
-    get_sheet_owned_by_user(db, user_id, id).await?; // We don't care about the sheet here, we just need to check ownership
+    check_sheet_ownership(db, user_id, id).await?;
     data::sheet::restore_sheet(db, id).await?;
     Ok(())
 }

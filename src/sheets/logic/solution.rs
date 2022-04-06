@@ -69,3 +69,13 @@ pub async fn get_solution(db: &Db, sheet_id: Id, user_id: i32) -> Result<Solutio
             ))
         })
 }
+
+pub async fn get_solution_for_teacher(
+    db: &Db,
+    sheet_id: Id,
+    teacher_id: i32,
+    student_id: i32,
+) -> Result<Solution> {
+    sheet::check_sheet_ownership(db, teacher_id, sheet_id).await?;
+    get_solution(db, sheet_id, student_id).await
+}

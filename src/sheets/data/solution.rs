@@ -66,7 +66,11 @@ pub async fn create_solution(db: &Db, fresh_solution: FreshSolution) -> Result<i
     Ok(solution.id)
 }
 
-pub async fn get_solution_by_sheet_and_user_id(db: &Db, sheet_id: Id, user_id: i32) -> Result<Option<Solution>, Error> {
+pub async fn get_solution_by_sheet_and_user_id(
+    db: &Db,
+    sheet_id: Id,
+    user_id: i32,
+) -> Result<Option<Solution>, Error> {
     let solution: Option<(SolutionDiesel, UserTransportDiesel)> = db
         .run(move |c| {
             solutions::table
