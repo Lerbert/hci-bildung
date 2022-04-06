@@ -41,7 +41,7 @@ pub async fn get_recent(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>> {
 
 pub async fn create_empty_sheet(db: &Db, user_id: i32, title: String) -> Result<Id> {
     let tiptap =
-        serde_json::from_str("{\"type\": \"doc\", \"content\": [{\"type\": \"paragraph\"}]}")
+        serde_json::from_str("{\"type\": \"doc\", \"content\": [{\"type\": \"paragraph\", \"content\": [], \"marks\": []}], \"marks\": []}")
             .expect("malformed JSON");
     create_sheet(db, user_id, title, tiptap).await
 }
