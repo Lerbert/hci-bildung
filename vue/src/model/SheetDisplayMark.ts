@@ -6,11 +6,19 @@ type JSONContentMark = {
   [key: string]: unknown;
 };
 
-export class Mark {
-  type?: string;
+export interface MarkJSON {
+  type: string;
+  solution?: string;
+  answer?: string;
+  source?: string;
+  [key: string]: unknown;
+}
 
-  constructor(tiptapMark: JSONContentMark) {
-    this.type = tiptapMark.type;
+export class Mark {
+  type: string;
+
+  constructor(type: string) {
+    this.type = type;
   }
 
   public static fromTiptap(
@@ -19,12 +27,29 @@ export class Mark {
   ): Mark {
     switch (tiptapMark.type) {
       case "gap":
-        return new Gap(tiptapMark, parentNode);
+        return Gap.fromTiptap(parentNode);
       case "latex":
-        return new Latex(tiptapMark, parentNode);
+        return Latex.fromTiptap(parentNode);
       default:
-        return new Mark(tiptapMark);
+        return new Mark(tiptapMark.type);
     }
+  }
+
+  public static fromJSON(json: MarkJSON) {
+    switch (json.type) {
+      case "gap":
+        return Gap.fromJSON(json);
+      case "latex":
+        return Latex.fromJSON(json);
+      default:
+        return new Mark(json.type);
+    }
+  }
+
+  public toTiptap(): JSONContentMark {
+    return {
+      type: this.type,
+    };
   }
 }
 
@@ -32,18 +57,34 @@ export class Gap extends Mark {
   solution: string;
   answer: string;
 
-  constructor(tiptapMark: JSONContentMark, parentNode: JSONContent) {
-    super(tiptapMark);
-    this.solution = parentNode.text ?? "";
-    this.answer = "";
+  constructor(solution: string, answer: string) {
+    super("gap");
+    this.solution = solution;
+    this.answer = answer;
+  }
+
+  public static fromTiptap(parentNode: JSONContent): Gap {
+    return new Gap(parentNode.text ?? "", "");
+  }
+
+  public static fromJSON(json: MarkJSON): Gap {
+    return new Gap(json.solution ?? "", json.answer ?? "");
   }
 }
 
 export class Latex extends Mark {
   source: string;
 
-  constructor(tiptapMark: JSONContentMark, parentNode: JSONContent) {
-    super(tiptapMark);
-    this.source = parentNode.text ?? "";
+  constructor(source: string) {
+    super("latex");
+    this.source = source;
+  }
+
+  public static fromTiptap(parentNode: JSONContent): Latex {
+    return new Latex(parentNode.text ?? "");
+  }
+
+  public static fromJSON(json: MarkJSON): Latex {
+    return new Latex(json.source ?? "");
   }
 }

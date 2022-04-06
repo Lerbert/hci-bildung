@@ -80,9 +80,9 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    docJSON: {
+    initialSheet: {
       type: Object,
-      default: () => ({ type: "doc", content: [{ type: "paragraph" }] }),
+      default: () => Node.emptyDocument(),
     },
     docTitle: {
       type: String,
@@ -92,7 +92,7 @@ export default defineComponent({
 
   data() {
     return {
-      editorContent: this.docJSON,
+      editorContent: this.initialSheet.toTiptap(),
       title: this.docTitle,
       saveStatus: SaveStatus.SAVED,
       updatePreview: debounce((event) => {
@@ -107,7 +107,7 @@ export default defineComponent({
     doc() {
       return {
         title: this.title,
-        tiptap: this.editorContent,
+        tiptap: this.sheet,
       };
     },
     sheet() {

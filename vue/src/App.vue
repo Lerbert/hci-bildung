@@ -3,50 +3,45 @@
     <edit-view
       v-if="edit"
       :docId="docid"
-      :docJSON="docjson"
+      :initialSheet="sheet"
       :docTitle="doctitle"
     ></edit-view>
     <student-view
       v-else
       :docId="docid"
-      :docJSON="docjson"
+      :sheet="sheet"
       :docTitle="doctitle"
     ></student-view>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { computed, toRefs } from "vue";
+
+import { Node, NodeJSON } from "./model/SheetDisplayNode";
 
 import EditView from "./components/EditView.vue";
 import StudentView from "./components/StudentView.vue";
 
-export default defineComponent({
-  name: "App",
-  components: {
-    EditView,
-    StudentView,
-  },
+const propsDef = withDefaults(
+  defineProps<{
+    docid: string;
+    docjson?: NodeJSON;
+    doctitle?: string;
+    edit: boolean;
+  }>(),
+  {
+    docjson: () => ({
+      type: "doc",
+      content: [{ type: "paragraph", content: [], marks: [] }],
+      marks: [],
+    }),
+    doctitle: "",
+  }
+);
+const props = toRefs(propsDef);
 
-  props: {
-    docid: {
-      type: String,
-      required: true,
-    },
-    docjson: {
-      type: Object,
-      default: () => ({ type: "doc", content: [{ type: "paragraph" }] }),
-    },
-    doctitle: {
-      type: String,
-      default: "",
-    },
-    edit: {
-      type: Boolean,
-      required: true,
-    },
-  },
-});
+const sheet = computed(() => Node.fromJSON(props.docjson.value));
 </script>
 
 <style lang="scss" scoped>

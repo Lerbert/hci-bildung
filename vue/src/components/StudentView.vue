@@ -23,19 +23,13 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    docJSON: {
-      type: Object,
+    sheet: {
+      type: Node,
       required: true,
     },
     docTitle: {
       type: String,
       required: true,
-    },
-  },
-
-  computed: {
-    sheet() {
-      return Node.fromTiptap(this.docJSON);
     },
   },
 });
