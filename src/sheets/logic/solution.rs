@@ -6,7 +6,7 @@ use crate::Db;
 
 use super::sheet::{Sheet, SheetMetadata};
 use super::{data, sheet};
-use super::{Id, Result};
+use super::{Error, Id, Result};
 
 #[derive(Debug, Serialize)]
 pub struct Solution {
@@ -57,4 +57,15 @@ pub async fn start_solve(db: &Db, sheet_id: Id, user_id: i32) -> Result<()> {
     let sheet = sheet::get_sheet(db, sheet_id).await?;
     data::solution::create_solution(db, FreshSolution::from(sheet, user_id)).await?;
     Ok(())
+}
+
+pub async fn get_solution(db: &Db, sheet_id: Id, user_id: i32) -> Result<Solution> {
+    data::solution::get_solution_by_sheet_and_user_id(db, sheet_id, user_id)
+        .await?
+        .ok_or_else(|| {
+            Error::NotFound(format!(
+                "solution for sheet {} by user {}",
+                sheet_id, user_id
+            ))
+        })
 }

@@ -65,3 +65,19 @@ pub async fn create_solution(db: &Db, fresh_solution: FreshSolution) -> Result<i
         .await?;
     Ok(solution.id)
 }
+
+pub async fn get_solution_by_sheet_and_user_id(db: &Db, sheet_id: Id, user_id: i32) -> Result<Option<Solution>, Error> {
+    let solution: Option<(SolutionDiesel, UserTransportDiesel)> = db
+        .run(move |c| {
+            solutions::table
+                .inner_join(users::table)
+                .select((solutions::all_columns, UserTransportDiesel::columns()))
+                .filter(solutions::sheet_id.eq(sheet_id))
+                .filter(solutions::owner_id.eq(user_id))
+                .order(solutions::sheet_version.desc())
+                .first(c)
+                .optional()
+        })
+        .await?;
+    Ok(solution.map(|s| s.into()))
+}

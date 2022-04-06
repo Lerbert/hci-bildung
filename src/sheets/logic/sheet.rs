@@ -57,9 +57,9 @@ pub async fn create_sheet(
 }
 
 pub async fn get_sheet(db: &Db, id: Id) -> Result<Sheet> {
-    Ok(data::sheet::get_sheet_by_id(db, id)
+    data::sheet::get_sheet_by_id(db, id)
         .await?
-        .ok_or_else(|| Error::NotFound(format!("sheet {}", id)))?)
+        .ok_or_else(|| Error::NotFound(format!("sheet {}", id)))
 }
 
 async fn get_sheet_owned_by_user(db: &Db, user_id: i32, id: Id) -> Result<Sheet> {
