@@ -2,7 +2,7 @@
   <div>
     <div class="is-flex is-justify-content-space-between">
       <h1>{{ sheetTitle }}</h1>
-      <form action="solve" method="POST">
+      <form :action="`${sheetId}/solve`" method="POST">
         <button class="button is-link" type="submit">
           <svg
             xmlns="http://www.w3.org/2000/svg"

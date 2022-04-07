@@ -11,6 +11,7 @@ use crate::Db;
 use super::logic;
 use super::logic::solution::Solution;
 use super::logic::Id;
+use super::{redirect_to_login, sheets_uri};
 
 #[derive(Serialize)]
 struct SolutionContext<'a> {
@@ -30,7 +31,7 @@ pub async fn start_solve(db: Db, student: Student<'_>, sheet_id: Id) -> Result<R
     logic::solution::start_solve(&db, sheet_id, user.user_info.id)
         .await
         .map_err(|e| e.to_status())
-        .map(|_| Redirect::to(uri!(my_solution(sheet_id))))
+        .map(|_| Redirect::to(sheets_uri(uri!(my_solution(sheet_id)))))
 }
 
 #[get("/<sheet_id>/solutions/my")]

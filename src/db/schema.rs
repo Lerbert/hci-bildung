@@ -64,10 +64,4 @@ joinable!(sheets -> users (owner_id));
 joinable!(solutions -> sheets (sheet_id));
 joinable!(solutions -> users (owner_id));
 
-allow_tables_to_appear_in_same_query!(
-    roles,
-    sessions,
-    sheets,
-    solutions,
-    users,
-);
+allow_tables_to_appear_in_same_query!(roles, sessions, sheets, solutions, users,);
