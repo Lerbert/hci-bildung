@@ -9,12 +9,12 @@
   </noscript>  
 {%- endmacro %}
 
-{% macro vue_app(edit, doc_id, doc_title, doc_json) -%}
+{% macro vue_app(mode, sheet_id, sheet_title, content) -%}
   {# using {{ "" }} here to prevent webpack from converting the outer single quotes to double quotes as this would break the JSON inserted by Tera #}
   <div id="app"
-    data-edit="{{ edit }}"
-    data-docid='"{{ doc_id }}"'
-    data-doctitle='"{{ doc_title }}"'
-    data-docjson='{{ "" }}{{ doc_json | json_encode() | safe }}'>
+    data-mode='"{{ mode }}"'
+    data-sheetid='"{{ sheet_id }}"'
+    data-sheettitle='"{{ sheet_title }}"'
+    data-content='{{ "" }}{{ content | json_encode() | safe }}'>
   </div>
 {%- endmacro %}

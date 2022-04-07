@@ -23,7 +23,7 @@
         <div class="is-flex is-justify-content-space-between">
           <h1 class="title">Vorschau</h1>
           <div class="is-flex is-justify-content-right buttons">
-            <share-button :docId="docId"></share-button>
+            <share-button :sheetId="sheetId"></share-button>
             <more-button class="is-right">
               <a class="dropdown-item icon-text" @click="exportDocument">
                 <span class="icon">
@@ -76,7 +76,7 @@ export default defineComponent({
   },
 
   props: {
-    docId: {
+    sheetId: {
       type: String,
       required: true,
     },
@@ -84,7 +84,7 @@ export default defineComponent({
       type: Object,
       default: () => Node.emptyDocument(),
     },
-    docTitle: {
+    sheetTitle: {
       type: String,
       default: "",
     },
@@ -93,7 +93,7 @@ export default defineComponent({
   data() {
     return {
       editorContent: this.initialSheet.toTiptap(),
-      title: this.docTitle,
+      title: this.sheetTitle,
       saveStatus: SaveStatus.SAVED,
       updatePreview: debounce((event) => {
         this.editorContent = event;

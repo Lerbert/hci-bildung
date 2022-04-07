@@ -69,14 +69,14 @@ import { computed, ref, toRefs } from "vue";
 import QRCode from "./QRCode.vue";
 
 const propsDef = defineProps<{
-  docId: string;
+  sheetId: string;
 }>();
 const props = toRefs(propsDef);
 
 const copyText = ref("Link kopieren");
 const copyTimeout = ref<ReturnType<typeof setTimeout> | undefined>(undefined);
 const link = computed(
-  () => `${window.location.origin}/sheets/${props.docId.value}`
+  () => `${window.location.origin}/sheets/${props.sheetId.value}`
 );
 
 function copy() {

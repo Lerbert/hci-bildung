@@ -1,16 +1,16 @@
 <template>
   <div class="container is-fluid content" id="app">
     <edit-view
-      v-if="edit"
-      :docId="docid"
+      v-if="mode === AppMode.EDIT_SHEET"
+      :sheetId="sheetid"
       :initialSheet="sheet"
-      :docTitle="doctitle"
+      :sheetTitle="sheettitle"
     ></edit-view>
     <student-view
-      v-else
-      :docId="docid"
+      v-else-if="mode === AppMode.VIEW_SHEET"
+      :sheetId="sheetid"
       :sheet="sheet"
-      :docTitle="doctitle"
+      :sheetTitle="sheettitle"
     ></student-view>
   </div>
 </template>
@@ -18,6 +18,7 @@
 <script setup lang="ts">
 import { computed, toRefs } from "vue";
 
+import { AppMode } from "./enums";
 import { Node, NodeJSON } from "./model/SheetDisplayNode";
 
 import EditView from "./components/EditView.vue";
@@ -25,23 +26,23 @@ import StudentView from "./components/StudentView.vue";
 
 const propsDef = withDefaults(
   defineProps<{
-    docid: string;
-    docjson?: NodeJSON;
-    doctitle?: string;
-    edit: boolean;
+    sheetid: string;
+    content?: NodeJSON;
+    sheettitle?: string;
+    mode: AppMode;
   }>(),
   {
-    docjson: () => ({
+    content: () => ({
       type: "doc",
       content: [{ type: "paragraph", content: [], marks: [] }],
       marks: [],
     }),
-    doctitle: "",
+    sheettitle: "",
   }
 );
 const props = toRefs(propsDef);
 
-const sheet = computed(() => Node.fromJSON(props.docjson.value));
+const sheet = computed(() => Node.fromJSON(props.content.value));
 </script>
 
 <style lang="scss" scoped>
