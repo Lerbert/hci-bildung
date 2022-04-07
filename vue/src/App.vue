@@ -13,6 +13,12 @@
       :sheet="sheet"
       :sheetTitle="sheettitle"
     ></sheet-view>
+    <edit-solution-view
+      v-else-if="mode === AppMode.EDIT_SOLUTION"
+      :sheetId="sheetid"
+      :sheet="sheet"
+      :sheetTitle="sheettitle"
+    ></edit-solution-view>
   </div>
 </template>
 
@@ -23,6 +29,7 @@ import { AppMode } from "./enums";
 import { Node, NodeJSON } from "./model/SheetDisplayNode";
 
 import EditSheetView from "./components/EditSheetView.vue";
+import EditSolutionView from "./components/EditSolutionView.vue";
 import SheetView from "./components/SheetView.vue";
 
 const propsDef = withDefaults(
