@@ -1,8 +1,11 @@
+{% import "management/sidebar" as sidebar %}
+
 {% extends "generic/base" %}
 {% block content %} 
   <div class="mt-3 columns">
     <div class="column is-one-fifth">
       {% block sidebar %}
+        {{ sidebar::sidebar() }}
       {% endblock sidebar %}
     </div>
     <div class="column">

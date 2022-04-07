@@ -47,7 +47,7 @@ pub async fn sheet_solutions_teacher(
         .map_err(|e| e.to_status())
         .map(|solutions| {
             Template::render(
-                "solution_management/sheet_solutions",
+                "management/solution/sheet_solutions",
                 &SolutionManagementContext {
                     flash: flash.map(|f| f.into()),
                     sheet_title: "TODO".to_owned(), // TODO: get from DB

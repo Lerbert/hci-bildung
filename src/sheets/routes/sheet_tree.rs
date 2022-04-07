@@ -31,7 +31,7 @@ pub async fn assignment_overview(
         .map_err(|e| e.to_status())
         .map(|sheets| {
             Template::render(
-                "sheet_management/my_sheets",
+                "management/sheet/my_sheets",
                 &SheetManagementContext {
                     flash: flash.map(|f| f.into()),
                     sheets,
@@ -54,7 +54,7 @@ pub async fn trashed_sheets(db: Db, teacher: Teacher<'_>) -> Result<Template, St
         .map_err(|e| e.to_status())
         .map(|sheets| {
             Template::render(
-                "sheet_management/trash",
+                "management/sheet/trash",
                 &SheetManagementContext {
                     flash: None,
                     sheets,
@@ -77,7 +77,7 @@ pub async fn recent_sheets(db: Db, teacher: Teacher<'_>) -> Result<Template, Sta
         .map_err(|e| e.to_status())
         .map(|sheets| {
             Template::render(
-                "sheet_management/recent_sheets",
+                "management/sheet/recent_sheets",
                 &SheetManagementContext {
                     flash: None,
                     sheets,

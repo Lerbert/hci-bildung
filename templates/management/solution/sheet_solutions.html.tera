@@ -1,6 +1,6 @@
 {% import "generic/symbols" as symbols %}
 
-{% extends "solution_management/base" %}
+{% extends "management/solution/base" %}
 {% block title %}
   Lösungen — {{ sheet_title }} — {{ super() }}
 {% endblock title %}

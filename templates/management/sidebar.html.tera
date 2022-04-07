@@ -1,4 +1,4 @@
-{% macro sidebar(active) -%}
+{% macro sidebar(active="none") -%}
   <aside class="box menu">
     <p class="menu-label">
       Dokumente

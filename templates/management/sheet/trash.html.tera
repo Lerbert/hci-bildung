@@ -1,7 +1,7 @@
 {% import "generic/symbols" as symbols %}
-{% import "sheet_management/sidebar" as sidebar %}
+{% import "management/sidebar" as sidebar %}
 
-{% extends "sheet_management/base" %}
+{% extends "management/sheet/base" %}
 {% block title %}
   Papierkorb — {{ super() }}
 {% endblock title %}

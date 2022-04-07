@@ -1,7 +1,7 @@
 {% import "generic/symbols" as symbols %}
-{% import "sheet_management/sidebar" as sidebar %}
+{% import "management/sidebar" as sidebar %}
 
-{% extends "sheet_management/active_sheets_base" %}
+{% extends "management/sheet/active_sheets_base" %}
 {% block title %}
   Zuletzt verwendet — {{ super() }}
 {% endblock title %}
