@@ -1,5 +1,5 @@
 <template>
-  <div class="spinner_container">
+  <div class="spinner_container" :class="{ hidden: hidden }">
     <div v-if="saveStatus === SaveStatus.SAVING" class="spinner"></div>
     <svg
       v-if="saveStatus === SaveStatus.SAVED"
@@ -46,6 +46,10 @@ import { SaveStatus } from "../enums";
 
 export default defineComponent({
   props: {
+    hideWhenDisabled: {
+      type: Boolean,
+      default: false,
+    },
     saveStatus: {
       required: true,
     },
@@ -58,6 +62,9 @@ export default defineComponent({
   },
 
   computed: {
+    hidden(): boolean {
+      return this.hideWhenDisabled && this.saveStatus === SaveStatus.DISABLED;
+    },
     text(): string {
       switch (this.saveStatus) {
         case SaveStatus.WAITING:
@@ -84,6 +91,9 @@ export default defineComponent({
   align-items: space-between;
   flex: 0 0 auto;
   flex-wrap: wrap;
+  &.hidden {
+    visibility: hidden;
+  }
 }
 
 // Taken from bulma code

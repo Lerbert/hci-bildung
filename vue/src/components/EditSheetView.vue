@@ -14,7 +14,7 @@
         <h1 class="title">Editor</h1>
         <tiptap-editor
           :initialContent="editorContent"
-          @update:content="handleContentUpdate($event)"
+          @update:content="updatePreview($event)"
           :saveStatus="saveStatus"
         ></tiptap-editor>
         <input type="file" id="file-input" accept=".mp3, .ogg, .m4a" />
@@ -47,20 +47,24 @@
             </more-button>
           </div>
         </div>
-        <sheet-display :edit="true" :sheet="sheet"></sheet-display>
+        <sheet-display
+          :autosave="false"
+          :edit="true"
+          :sheet="sheet"
+        ></sheet-display>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRefs, watch } from "vue";
+import { computed, ref, toRefs } from "vue";
 import { JSONContent } from "@tiptap/core";
 import debounce from "lodash/debounce";
 import download from "downloadjs";
 
 import { Node } from "../model/SheetDisplayNode";
-import { SaveStatus } from "../enums";
+import { useSaveable } from "../composables/Saveable";
 
 import MoreButton from "./MoreButton.vue";
 import ShareButton from "./ShareButton.vue";
@@ -89,67 +93,16 @@ const doc = computed(() => ({
   content: sheet.value,
 }));
 
-const saveStatus = ref(
-  props.autosave.value ? SaveStatus.SAVED : SaveStatus.DISABLED
+const { saveStatus } = useSaveable(
+  ".",
+  props.autosave,
+  doc,
+  (doc) => doc.title !== ""
 );
-const saveBackoff = ref(0);
-const save = debounce(() => {
-  if (props.autosave.value) {
-    saveHelper();
-  }
-}, 1000);
-async function saveHelper() {
-  if (title.value === "") {
-    saveStatus.value = SaveStatus.FAILED;
-    return;
-  }
-  saveStatus.value = SaveStatus.SAVING;
-  let delay = new Promise((r) => setTimeout(r, 500)); // Delay to show user that we are indeed saving
-  let saveOk = false;
-  try {
-    let response = await fetch(".", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(doc.value),
-    });
-    await delay;
-    saveOk = response.status === 200;
-  } catch (e) {
-    console.log("Error while saving:", e);
-    saveOk = false;
-  }
-  if (saveStatus.value === SaveStatus.SAVING) {
-    if (saveOk) {
-      saveStatus.value = SaveStatus.SAVED;
-      saveBackoff.value = 0;
-    } else if (saveBackoff.value >= 5000) {
-      saveStatus.value = SaveStatus.FAILED;
-      console.log("Saving failed. No further automatic retries");
-    } else {
-      saveBackoff.value += 1000;
-      console.log(
-        "Saving failed. Retrying automatically in",
-        saveBackoff.value / 1000,
-        "s"
-      );
-      setTimeout(save, saveBackoff.value);
-    }
-  }
-}
-watch(title, () => save());
 
 const updatePreview = debounce((event: JSONContent) => {
   editorContent.value = event;
 }, 100);
-function handleContentUpdate(event: JSONContent) {
-  if (props.autosave.value) {
-    saveStatus.value = SaveStatus.WAITING;
-  }
-  updatePreview(event);
-  save();
-}
 
 function exportDocument() {
   download(

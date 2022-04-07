@@ -37,20 +37,28 @@
         :achievedPoints="achievedPoints"
         :totalPoints="totalPoints"
       ></point-status>
+      <save-status
+        :saveStatus="status"
+        :hide-when-disabled="true"
+      ></save-status>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { provide, ref, toRefs, watch } from "vue";
+import { computed, provide, ref, toRefs, watch } from "vue";
 import cloneDeep from "lodash/cloneDeep";
 import debounce from "lodash/debounce";
 
+import { Node } from "../model/SheetDisplayNode";
+import { useSaveable } from "../composables/Saveable";
+
+import SaveStatus from "./SaveStatus.vue";
 import SheetNode from "./nodes/SheetNode.vue";
 import PointStatus from "./PointStatus.vue";
-import { Node } from "../model/SheetDisplayNode";
 
 const propsDef = defineProps<{
+  autosave: boolean;
   edit: boolean;
   sheet: Node;
 }>();
@@ -93,6 +101,16 @@ const updateExport = debounce(() => {
   emit("update:export", cloneDeep(sheetExport.value));
 }, 100);
 watch(sheetExport, updateExport, { deep: true });
+
+const solution = computed(() => ({
+  content: sheetExport.value,
+}));
+const { saveStatus: status } = useSaveable(
+  "./my",
+  props.autosave,
+  solution,
+  () => true
+);
 </script>
 
 <style lang="scss">
@@ -139,7 +157,7 @@ watch(sheetExport, updateExport, { deep: true });
     display: flex;
     flex: 0 0 auto;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
     flex-wrap: wrap;
     white-space: nowrap;
     border-top: 3px solid #0d0d0d;

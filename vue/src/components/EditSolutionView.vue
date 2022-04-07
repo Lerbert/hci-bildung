@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>{{ sheetTitle }}</h1>
-    <sheet-display :edit="true" :sheet="sheet"></sheet-display>
+    <sheet-display :autosave="true" :edit="true" :sheet="sheet"></sheet-display>
   </div>
 </template>
 
