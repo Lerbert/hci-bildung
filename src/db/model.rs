@@ -53,7 +53,7 @@ pub struct SheetDiesel {
     pub owner_id: i32,
     pub created: DateTime<Utc>,
     pub changed: DateTime<Utc>,
-    pub tiptap: serde_json::Value,
+    pub content: serde_json::Value,
     pub trashed: Option<DateTime<Utc>>,
 }
 
@@ -100,7 +100,7 @@ pub struct SolutionDiesel {
     pub created: DateTime<Utc>,
     pub changed: DateTime<Utc>,
     pub trashed: Option<DateTime<Utc>>,
-    pub solution: serde_json::Value,
+    pub content: serde_json::Value,
 }
 
 #[derive(Debug, PartialEq, Queryable)]

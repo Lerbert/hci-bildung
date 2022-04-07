@@ -3,5 +3,5 @@
 {% extends "sheet/base" %}
 
 {% block content %}
-    {{ vue_macros::vue_app(edit=false, doc_id=sheet.metadata.id, doc_title=sheet.metadata.title, doc_json=sheet.tiptap) }}
+    {{ vue_macros::vue_app(edit=false, doc_id=sheet.metadata.id, doc_title=sheet.metadata.title, doc_json=sheet.content) }}
 {% endblock content %}

@@ -25,7 +25,7 @@ impl From<(SolutionDiesel, UserTransportDiesel)> for Solution {
                 changed: s.changed,
                 trashed: s.trashed,
             },
-            solution: s.solution,
+            content: s.content,
         }
     }
 }
@@ -58,7 +58,7 @@ pub async fn create_solution(db: &Db, fresh_solution: FreshSolution) -> Result<i
                     solutions::created.eq(fresh_solution.created),
                     solutions::changed.eq(fresh_solution.changed),
                     solutions::trashed.eq(fresh_solution.trashed),
-                    solutions::solution.eq(fresh_solution.solution),
+                    solutions::content.eq(fresh_solution.content),
                 ))
                 .get_result(c)
         })

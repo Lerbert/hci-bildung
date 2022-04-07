@@ -7,7 +7,7 @@ use crate::validation::Validate;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct SheetTransport {
     pub title: String,
-    pub tiptap: serde_json::Value,
+    pub content: serde_json::Value,
 }
 
 #[derive(Debug)]

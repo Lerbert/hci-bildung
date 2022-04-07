@@ -23,7 +23,7 @@ impl From<(SheetDiesel, UserTransportDiesel)> for Sheet {
                 changed: s.changed,
                 trashed: s.trashed,
             },
-            tiptap: s.tiptap,
+            content: s.content,
         }
     }
 }
@@ -113,7 +113,7 @@ pub async fn get_sheet_by_id(db: &Db, id: Id) -> Result<Option<Sheet>, Error> {
 pub async fn create_sheet(
     db: &Db,
     title: String,
-    tiptap: serde_json::Value,
+    content: serde_json::Value,
     owner_id: i32,
     created: DateTime<Utc>,
     changed: DateTime<Utc>,
@@ -127,7 +127,7 @@ pub async fn create_sheet(
                     sheets::owner_id.eq(owner_id),
                     sheets::created.eq(created),
                     sheets::changed.eq(changed),
-                    sheets::tiptap.eq(tiptap),
+                    sheets::content.eq(content),
                     sheets::trashed.eq(trashed),
                 ))
                 .get_result(c)
@@ -140,14 +140,14 @@ pub async fn update_sheet(
     db: &Db,
     id: Id,
     title: String,
-    tiptap: serde_json::Value,
+    content: serde_json::Value,
     changed: DateTime<Utc>,
 ) -> Result<(), Error> {
     db.run(move |c| {
         diesel::update(sheets::table.find(id))
             .set((
                 sheets::title.eq(title),
-                sheets::tiptap.eq(tiptap),
+                sheets::content.eq(content),
                 sheets::changed.eq(changed),
             ))
             .execute(c)

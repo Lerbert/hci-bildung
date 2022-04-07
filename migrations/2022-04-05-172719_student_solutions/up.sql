@@ -11,7 +11,7 @@ CREATE TABLE solutions (
     created TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     changed TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     trashed TIMESTAMPTZ NULL,
-    solution JSONB NOT NULL,
+    content JSONB NOT NULL,
     UNIQUE (sheet_id, sheet_version, owner_id)
 );
 
@@ -64,6 +64,7 @@ AS $$
 $$;
 
 UPDATE sheets SET tiptap = convert_tiptap_node_to_custom(tiptap);
+ALTER TABLE sheets RENAME COLUMN tiptap TO content;
 
 DROP FUNCTION convert_tiptap_node_to_custom(JSONB);
 DROP FUNCTION convert_tiptap_mark_to_custom(JSONB, JSONB);

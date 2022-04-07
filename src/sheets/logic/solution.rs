@@ -11,7 +11,7 @@ use super::{Error, Id, Result};
 #[derive(Debug, Serialize)]
 pub struct Solution {
     pub metadata: SolutionMetadata,
-    pub solution: serde_json::Value,
+    pub content: serde_json::Value,
 }
 
 #[derive(Debug, Serialize)]
@@ -34,7 +34,7 @@ pub struct FreshSolution {
     pub created: DateTime<Utc>,
     pub changed: DateTime<Utc>,
     pub trashed: Option<DateTime<Utc>>,
-    pub solution: serde_json::Value,
+    pub content: serde_json::Value,
 }
 
 impl FreshSolution {
@@ -48,7 +48,7 @@ impl FreshSolution {
             created: now,
             changed: now,
             trashed: None,
-            solution: sheet.tiptap,
+            content: sheet.content,
         }
     }
 }

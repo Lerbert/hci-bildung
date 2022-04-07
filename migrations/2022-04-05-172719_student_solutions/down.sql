@@ -31,7 +31,8 @@ AS $$
         END
 $$;
 
-UPDATE sheets SET tiptap = convert_custom_node_to_tiptap(tiptap);
+UPDATE sheets SET content = convert_custom_node_to_tiptap(content);
+ALTER TABLE sheets RENAME COLUMN content TO tiptap;
 
 DROP FUNCTION convert_custom_node_to_tiptap(JSONB);
 DROP FUNCTION convert_custom_mark_to_tiptap(JSONB);

@@ -49,7 +49,7 @@ pub async fn import_sheet(
     let user = teacher.into_inner();
     let form = form.into_inner();
     match parse_sheet(&form.file) {
-        Ok(sheet) => logic::sheet::create_sheet(&db, user.user_info.id, sheet.title, sheet.tiptap)
+        Ok(sheet) => logic::sheet::create_sheet(&db, user.user_info.id, sheet.title, sheet.content)
             .await
             .map_err(|e| e.to_status())
             .map(|id| FlashRedirect::no_flash(sheets_uri(uri!(edit_sheet(id))))),
@@ -130,7 +130,7 @@ pub async fn save_sheet(
     if let Err(e) = sheet.validate() {
         Err(e.to_status())
     } else {
-        logic::sheet::update_sheet(&db, user.user_info.id, id, sheet.title, sheet.tiptap)
+        logic::sheet::update_sheet(&db, user.user_info.id, id, sheet.title, sheet.content)
             .await
             .map_err(|e| e.to_status())
     }

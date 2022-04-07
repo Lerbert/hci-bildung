@@ -9,7 +9,7 @@ use super::{data, Error, Id, Result};
 #[derive(Debug, Serialize)]
 pub struct Sheet {
     pub metadata: SheetMetadata,
-    pub tiptap: serde_json::Value,
+    pub content: serde_json::Value,
 }
 
 #[derive(Debug, Serialize)]
@@ -40,20 +40,20 @@ pub async fn get_recent(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>> {
 }
 
 pub async fn create_empty_sheet(db: &Db, user_id: i32, title: String) -> Result<Id> {
-    let tiptap =
+    let content =
         serde_json::from_str("{\"type\": \"doc\", \"content\": [{\"type\": \"paragraph\", \"content\": [], \"marks\": []}], \"marks\": []}")
             .expect("malformed JSON");
-    create_sheet(db, user_id, title, tiptap).await
+    create_sheet(db, user_id, title, content).await
 }
 
 pub async fn create_sheet(
     db: &Db,
     user_id: i32,
     title: String,
-    tiptap: serde_json::Value,
+    content: serde_json::Value,
 ) -> Result<Id> {
     let now = chrono::Utc::now();
-    Ok(data::sheet::create_sheet(db, title, tiptap, user_id, now, now, None).await?)
+    Ok(data::sheet::create_sheet(db, title, content, user_id, now, now, None).await?)
 }
 
 pub async fn get_sheet(db: &Db, id: Id) -> Result<Sheet> {
@@ -88,11 +88,11 @@ pub async fn update_sheet(
     user_id: i32,
     id: Id,
     title: String,
-    tiptap: serde_json::Value,
+    content: serde_json::Value,
 ) -> Result<()> {
     check_sheet_ownership(db, user_id, id).await?;
     let now = chrono::Utc::now();
-    Ok(data::sheet::update_sheet(db, id, title, tiptap, now).await?)
+    Ok(data::sheet::update_sheet(db, id, title, content, now).await?)
 }
 
 pub async fn delete_sheet(db: &Db, user_id: i32, id: Id) -> Result<DeleteOutcome> {

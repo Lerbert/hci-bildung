@@ -27,7 +27,7 @@ table! {
         owner_id -> Int4,
         created -> Timestamptz,
         changed -> Timestamptz,
-        tiptap -> Jsonb,
+        content -> Jsonb,
         trashed -> Nullable<Timestamptz>,
     }
 }
@@ -44,7 +44,7 @@ table! {
         created -> Timestamptz,
         changed -> Timestamptz,
         trashed -> Nullable<Timestamptz>,
-        solution -> Jsonb,
+        content -> Jsonb,
     }
 }
 
@@ -64,4 +64,10 @@ joinable!(sheets -> users (owner_id));
 joinable!(solutions -> sheets (sheet_id));
 joinable!(solutions -> users (owner_id));
 
-allow_tables_to_appear_in_same_query!(roles, sessions, sheets, solutions, users,);
+allow_tables_to_appear_in_same_query!(
+    roles,
+    sessions,
+    sheets,
+    solutions,
+    users,
+);
