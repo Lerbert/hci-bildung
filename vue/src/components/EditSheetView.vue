@@ -49,6 +49,7 @@
         </div>
         <sheet-display
           :autosave="false"
+          :check="true"
           :edit="true"
           :sheet="sheet"
         ></sheet-display>

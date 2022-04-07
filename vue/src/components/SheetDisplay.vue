@@ -4,7 +4,7 @@
       <button
         class="button is-success is-small"
         v-on:click="checkAll"
-        :disabled="!edit"
+        :disabled="!check"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -59,6 +59,7 @@ import PointStatus from "./PointStatus.vue";
 
 const propsDef = defineProps<{
   autosave: boolean;
+  check: boolean;
   edit: boolean;
   sheet: Node;
 }>();

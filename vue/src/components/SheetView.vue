@@ -24,7 +24,12 @@
         </button>
       </form>
     </div>
-    <sheet-display :edit="false" :sheet="sheet"></sheet-display>
+    <sheet-display
+      :autosave="false"
+      :check="false"
+      :edit="false"
+      :sheet="sheet"
+    ></sheet-display>
   </div>
 </template>
 

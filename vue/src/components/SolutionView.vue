@@ -2,9 +2,9 @@
   <div>
     <h1>{{ sheetTitle }}</h1>
     <sheet-display
-      :autosave="true"
+      :autosave="false"
       :check="true"
-      :edit="true"
+      :edit="false"
       :sheet="sheet"
     ></sheet-display>
   </div>
