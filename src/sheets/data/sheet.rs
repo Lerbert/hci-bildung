@@ -96,6 +96,18 @@ pub async fn get_recent(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Err
     Ok(sheets.into_iter().map(|s| s.into()).collect())
 }
 
+pub async fn get_sheet_title(db: &Db, id: Id) -> Result<String, Error> {
+    let title: String = db
+        .run(move |c| {
+            sheets::table
+                .select(sheets::title)
+                .filter(sheets::id.eq(id))
+                .first(c)
+        })
+        .await?;
+    Ok(title)
+}
+
 pub async fn get_sheet_by_id(db: &Db, id: Id) -> Result<Option<Sheet>, Error> {
     let sheet: Option<(SheetDiesel, UserTransportDiesel)> = db
         .run(move |c| {

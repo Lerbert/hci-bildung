@@ -56,6 +56,10 @@ pub async fn create_sheet(
     Ok(data::sheet::create_sheet(db, title, content, user_id, now, now, None).await?)
 }
 
+pub async fn get_sheet_title(db: &Db, sheet_id: Id) -> Result<String> {
+    Ok(data::sheet::get_sheet_title(db, sheet_id).await?)
+}
+
 pub async fn get_sheet(db: &Db, id: Id) -> Result<Sheet> {
     data::sheet::get_sheet_by_id(db, id)
         .await?

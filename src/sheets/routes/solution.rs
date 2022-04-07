@@ -42,15 +42,16 @@ pub async fn sheet_solutions_teacher(
     sheet_id: Id,
 ) -> Result<Template, Status> {
     let user = teacher.into_inner();
+    let sheet_title = logic::sheet::get_sheet_title(&db, sheet_id).await.map_err(|e| e.to_status())?;
     logic::solution::get_sheet_solutions_teacher(&db, user.user_info.id, sheet_id)
         .await
         .map_err(|e| e.to_status())
         .map(|solutions| {
             Template::render(
-                "management/solution/sheet_solutions",
+                "management/solution/sheet_solutions_teacher",
                 &SolutionManagementContext {
                     flash: flash.map(|f| f.into()),
-                    sheet_title: "TODO".to_owned(), // TODO: get from DB
+                    sheet_title,
                     solutions,
                     user: &user.user_info,
                 },
@@ -59,7 +60,24 @@ pub async fn sheet_solutions_teacher(
 }
 
 #[get("/<sheet_id>/solutions", rank = 2)]
-pub async fn sheet_solutions_student(db: Db, student: Student<'_>, sheet_id: Id) {}
+pub async fn sheet_solutions_student(db: Db, student: Student<'_>, sheet_id: Id) -> Result<Template, Status> {
+    let user = student.into_inner();
+    let sheet_title = logic::sheet::get_sheet_title(&db, sheet_id).await.map_err(|e| e.to_status())?;
+    logic::solution::get_sheet_solutions_student(&db, user.user_info.id, sheet_id)
+        .await
+        .map_err(|e| e.to_status())
+        .map(|solutions| {
+            Template::render(
+                "management/solution/sheet_solutions_student",
+                &SolutionManagementContext {
+                    flash: None,
+                    sheet_title,
+                    solutions,
+                    user: &user.user_info,
+                },
+            )
+        })
+}
 
 #[post("/<sheet_id>/solve")]
 pub async fn start_solve(db: Db, student: Student<'_>, sheet_id: Id) -> Result<Redirect, Status> {
@@ -73,7 +91,7 @@ pub async fn start_solve(db: Db, student: Student<'_>, sheet_id: Id) -> Result<R
 #[get("/<sheet_id>/solutions/my")]
 pub async fn my_solution(db: Db, student: Student<'_>, sheet_id: Id) -> Result<Template, Status> {
     let user = student.into_inner();
-    logic::solution::get_solution(&db, sheet_id, user.user_info.id)
+    logic::solution::get_latest_solution(&db, sheet_id, user.user_info.id)
         .await
         .map_err(|e| e.to_status())
         .map(|solution| {

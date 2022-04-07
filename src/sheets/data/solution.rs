@@ -67,6 +67,29 @@ pub async fn get_all_sheet_solutions(
     Ok(solutions.into_iter().map(|s| s.into()).collect())
 }
 
+pub async fn get_sheet_solutions_by_sheet_and_user_id(
+    db: &Db,
+    sheet_id: Id,
+    user_id: i32,
+) -> Result<Vec<SolutionMetadata>, Error> {
+    let solutions: Vec<(SolutionMetadataDiesel, UserTransportDiesel)> = db
+        .run(move |c| {
+            solutions::table
+                .inner_join(users::table)
+                .select((
+                    SolutionMetadataDiesel::columns(),
+                    UserTransportDiesel::columns(),
+                ))
+                .filter(solutions::sheet_id.eq(sheet_id))
+                .filter(solutions::owner_id.eq(user_id))
+                .filter(solutions::trashed.is_null())
+                .order(solutions::sheet_version.desc())
+                .load(c)
+        })
+        .await?;
+    Ok(solutions.into_iter().map(|s| s.into()).collect())
+}
+
 pub async fn create_solution(db: &Db, fresh_solution: FreshSolution) -> Result<i32, Error> {
     let solution: SolutionDiesel = db
         .run(move |c| {
@@ -87,7 +110,7 @@ pub async fn create_solution(db: &Db, fresh_solution: FreshSolution) -> Result<i
     Ok(solution.id)
 }
 
-pub async fn get_solution_by_sheet_and_user_id(
+pub async fn get_latest_solution_by_sheet_and_user_id(
     db: &Db,
     sheet_id: Id,
     user_id: i32,
@@ -114,7 +137,7 @@ pub async fn update_solution(
     content: serde_json::Value,
     changed: DateTime<Utc>,
 ) -> Result<(), Error> {
-    if let Some(latest_solution) = get_solution_by_sheet_and_user_id(db, sheet_id, user_id).await? {
+    if let Some(latest_solution) = get_latest_solution_by_sheet_and_user_id(db, sheet_id, user_id).await? {
         db.run(move |c| {
             diesel::update(solutions::table.find(latest_solution.metadata.id))
                 .set((

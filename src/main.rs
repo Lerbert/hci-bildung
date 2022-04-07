@@ -140,6 +140,7 @@ fn rocket() -> _ {
                 sheets::routes::sheet_tree::recent_sheets,
                 sheets::routes::solution::solution_overview,
                 sheets::routes::solution::sheet_solutions_teacher,
+                sheets::routes::solution::sheet_solutions_student,
                 sheets::routes::solution::start_solve,
                 sheets::routes::solution::my_solution,
                 sheets::routes::solution::save_solution,

@@ -4,7 +4,7 @@ use rocket::serde::Serialize;
 use crate::login::transport::UserTransport;
 use crate::Db;
 
-use super::sheet::{Sheet, SheetMetadata};
+use super::sheet::Sheet;
 use super::{data, sheet};
 use super::{Error, Id, Result};
 
@@ -62,9 +62,17 @@ pub async fn get_sheet_solutions_teacher(
     Ok(data::solution::get_all_sheet_solutions(db, sheet_id).await?)
 }
 
+pub async fn get_sheet_solutions_student(
+    db: &Db,
+    user_id: i32,
+    sheet_id: Id,
+) -> Result<Vec<SolutionMetadata>> {
+    Ok(data::solution::get_sheet_solutions_by_sheet_and_user_id(db, sheet_id, user_id).await?)
+}
+
 pub async fn start_solve(db: &Db, sheet_id: Id, user_id: i32) -> Result<()> {
     let sheet = sheet::get_sheet(db, sheet_id).await?;
-    let solution = get_solution(db, sheet_id, user_id).await;
+    let solution = get_latest_solution(db, sheet_id, user_id).await;
     match solution {
         Err(Error::NotFound(_)) => {
             let fresh_solution = FreshSolution::from(sheet, user_id);
@@ -77,8 +85,8 @@ pub async fn start_solve(db: &Db, sheet_id: Id, user_id: i32) -> Result<()> {
     Ok(())
 }
 
-pub async fn get_solution(db: &Db, sheet_id: Id, user_id: i32) -> Result<Solution> {
-    data::solution::get_solution_by_sheet_and_user_id(db, sheet_id, user_id)
+pub async fn get_latest_solution(db: &Db, sheet_id: Id, user_id: i32) -> Result<Solution> {
+    data::solution::get_latest_solution_by_sheet_and_user_id(db, sheet_id, user_id)
         .await?
         .ok_or_else(|| {
             Error::NotFound(format!(
@@ -105,5 +113,5 @@ pub async fn get_solution_for_teacher(
     student_id: i32,
 ) -> Result<Solution> {
     sheet::check_sheet_ownership(db, teacher_id, sheet_id).await?;
-    get_solution(db, sheet_id, student_id).await
+    get_latest_solution(db, sheet_id, student_id).await
 }
