@@ -44,3 +44,8 @@ pub struct NewSheetForm {
 pub struct ImportSheetForm {
     pub file: String,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct SolutionTransport {
+    pub content: serde_json::Value,
+}

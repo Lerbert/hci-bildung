@@ -79,6 +79,23 @@ pub async fn get_solution(db: &Db, sheet_id: Id, user_id: i32) -> Result<Solutio
         })
 }
 
+pub async fn update_solution(
+    db: &Db,
+    sheet_id: Id,
+    user_id: i32,
+    content: serde_json::Value,
+) -> Result<()> {
+    let now = Utc::now();
+    Ok(data::solution::update_solution(
+        db,
+        sheet_id,
+        user_id,
+        content,
+        now,
+    )
+    .await?)
+}
+
 pub async fn get_solution_for_teacher(
     db: &Db,
     sheet_id: Id,

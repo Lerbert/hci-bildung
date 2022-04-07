@@ -1,5 +1,6 @@
 use rocket::http::Status;
 use rocket::response::Redirect;
+use rocket::serde::json::Json;
 use rocket::serde::Serialize;
 use rocket_dyn_templates::Template;
 
@@ -11,6 +12,7 @@ use crate::Db;
 use super::logic;
 use super::logic::solution::Solution;
 use super::logic::Id;
+use super::transport::SolutionTransport;
 use super::{redirect_to_login, sheets_uri};
 
 #[derive(Serialize)]
@@ -49,6 +51,20 @@ pub async fn my_solution(db: Db, student: Student<'_>, sheet_id: Id) -> Result<T
                 },
             )
         })
+}
+
+#[put("/<sheet_id>/solutions/my", format = "json", data = "<solution>")]
+pub async fn save_solution(
+    db: Db,
+    student: Student<'_>,
+    sheet_id: Id,
+    solution: Json<SolutionTransport>,
+) -> Result<(), Status> {
+    let user = student.into_inner();
+    let solution = solution.into_inner();
+    logic::solution::update_solution(&db, sheet_id, user.user_info.id, solution.content)
+        .await
+        .map_err(|e| e.to_status())
 }
 
 #[get("/<sheet_id>/solutions/<student_id>", rank = 2)]

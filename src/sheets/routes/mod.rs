@@ -9,7 +9,7 @@ use super::transport;
 
 pub mod sheet;
 pub mod sheet_tree;
-pub mod solutions;
+pub mod solution;
 
 pub const MOUNT: &str = "/sheets";
 
