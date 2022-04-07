@@ -23,7 +23,6 @@ mod validation;
 use db::Db;
 
 fn make_url_for(urls: HashMap<String, RouteUri<'static>>) -> impl Function {
-    println!("{:?}", urls.keys());
     move |args: &HashMap<String, tera::Value>| -> tera::Result<tera::Value> {
         match args.get("endpoint") {
             Some(val) => match from_value::<String>(val.clone()) {
@@ -140,7 +139,7 @@ fn rocket() -> _ {
                 sheets::routes::sheet_tree::trashed_sheets,
                 sheets::routes::sheet_tree::recent_sheets,
                 sheets::routes::solution::solution_overview,
-                sheets::routes::solution::sheet_solutions,
+                sheets::routes::solution::sheet_solutions_teacher,
                 sheets::routes::solution::start_solve,
                 sheets::routes::solution::my_solution,
                 sheets::routes::solution::save_solution,

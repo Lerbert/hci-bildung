@@ -46,6 +46,27 @@ impl From<(SolutionMetadataDiesel, UserTransportDiesel)> for SolutionMetadata {
     }
 }
 
+pub async fn get_all_sheet_solutions(
+    db: &Db,
+    sheet_id: Id,
+) -> Result<Vec<SolutionMetadata>, Error> {
+    let solutions: Vec<(SolutionMetadataDiesel, UserTransportDiesel)> = db
+        .run(move |c| {
+            solutions::table
+                .inner_join(users::table)
+                .select((
+                    SolutionMetadataDiesel::columns(),
+                    UserTransportDiesel::columns(),
+                ))
+                .filter(solutions::sheet_id.eq(sheet_id))
+                .filter(solutions::trashed.is_null())
+                .order((users::username.asc(), solutions::sheet_version.desc()))
+                .load(c)
+        })
+        .await?;
+    Ok(solutions.into_iter().map(|s| s.into()).collect())
+}
+
 pub async fn create_solution(db: &Db, fresh_solution: FreshSolution) -> Result<i32, Error> {
     let solution: SolutionDiesel = db
         .run(move |c| {

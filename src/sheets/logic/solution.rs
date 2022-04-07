@@ -53,6 +53,15 @@ impl FreshSolution {
     }
 }
 
+pub async fn get_sheet_solutions_teacher(
+    db: &Db,
+    user_id: i32,
+    sheet_id: Id,
+) -> Result<Vec<SolutionMetadata>> {
+    sheet::check_sheet_ownership(db, user_id, sheet_id).await?;
+    Ok(data::solution::get_all_sheet_solutions(db, sheet_id).await?)
+}
+
 pub async fn start_solve(db: &Db, sheet_id: Id, user_id: i32) -> Result<()> {
     let sheet = sheet::get_sheet(db, sheet_id).await?;
     let solution = get_solution(db, sheet_id, user_id).await;
@@ -86,14 +95,7 @@ pub async fn update_solution(
     content: serde_json::Value,
 ) -> Result<()> {
     let now = Utc::now();
-    Ok(data::solution::update_solution(
-        db,
-        sheet_id,
-        user_id,
-        content,
-        now,
-    )
-    .await?)
+    Ok(data::solution::update_solution(db, sheet_id, user_id, content, now).await?)
 }
 
 pub async fn get_solution_for_teacher(

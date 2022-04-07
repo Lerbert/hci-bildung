@@ -54,7 +54,6 @@
       </div>
     </div>
   {% endfor %}
-  </div>
 {% endblock content %}
 
 {% block scripts %}
