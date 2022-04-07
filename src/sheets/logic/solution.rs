@@ -55,7 +55,16 @@ impl FreshSolution {
 
 pub async fn start_solve(db: &Db, sheet_id: Id, user_id: i32) -> Result<()> {
     let sheet = sheet::get_sheet(db, sheet_id).await?;
-    data::solution::create_solution(db, FreshSolution::from(sheet, user_id)).await?;
+    let solution = get_solution(db, sheet_id, user_id).await;
+    match solution {
+        Err(Error::NotFound(_)) => {
+            let fresh_solution = FreshSolution::from(sheet, user_id);
+            data::solution::create_solution(db, fresh_solution).await?;
+        }
+        sol => {
+            sol?;
+        }
+    };
     Ok(())
 }
 
