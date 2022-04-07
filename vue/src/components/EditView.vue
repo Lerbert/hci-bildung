@@ -53,8 +53,9 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { computed, ref, toRefs, watch } from "vue";
+import { JSONContent } from "@tiptap/core";
 import debounce from "lodash/debounce";
 import download from "downloadjs";
 
@@ -66,116 +67,88 @@ import ShareButton from "./ShareButton.vue";
 import SheetDisplay from "./SheetDisplay.vue";
 import TiptapEditor from "./TiptapEditor.vue";
 
-export default defineComponent({
-  name: "EditView",
-  components: {
-    MoreButton,
-    ShareButton,
-    SheetDisplay,
-    TiptapEditor,
-  },
+const propsDef = withDefaults(
+  defineProps<{
+    sheetId: string;
+    initialSheet?: Node;
+    sheetTitle?: string;
+  }>(),
+  {
+    initialSheet: () => Node.emptyDocument(),
+    sheetTitle: "",
+  }
+);
+const props = toRefs(propsDef);
 
-  props: {
-    sheetId: {
-      type: String,
-      required: true,
-    },
-    initialSheet: {
-      type: Object,
-      default: () => Node.emptyDocument(),
-    },
-    sheetTitle: {
-      type: String,
-      default: "",
-    },
-  },
+const editorContent = ref(props.initialSheet.value.toTiptap());
+const title = ref(props.sheetTitle.value);
+const sheet = computed(() => Node.fromTiptap(editorContent.value));
+const doc = computed(() => ({
+  title: title.value,
+  content: sheet.value,
+}));
 
-  data() {
-    return {
-      editorContent: this.initialSheet.toTiptap(),
-      title: this.sheetTitle,
-      saveStatus: SaveStatus.SAVED,
-      updatePreview: debounce((event) => {
-        this.editorContent = event;
-      }, 100),
-      save: debounce(this.saveHelper, 1000),
-      saveBackoff: 0,
-    };
-  },
-
-  computed: {
-    doc() {
-      return {
-        title: this.title,
-        tiptap: this.sheet,
-      };
-    },
-    sheet() {
-      return Node.fromTiptap(this.editorContent);
-    },
-  },
-
-  methods: {
-    handleContentUpdate(event) {
-      this.saveStatus = SaveStatus.WAITING;
-      this.updatePreview(event);
-      this.save();
-    },
-    async saveHelper() {
-      if (this.title === "") {
-        this.saveStatus = SaveStatus.FAILED;
-        return;
-      }
-      this.saveStatus = SaveStatus.SAVING;
-      let delay = new Promise((r) => setTimeout(r, 500)); // Delay to show user that we are indeed saving
-      let saveOk = false;
-      try {
-        let response = await fetch(".", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(this.doc),
-        });
-        await delay;
-        saveOk = response.status === 200;
-      } catch (e) {
-        console.log("Error while saving:", e);
-        saveOk = false;
-      }
-      if (this.saveStatus === SaveStatus.SAVING) {
-        if (saveOk) {
-          this.saveStatus = SaveStatus.SAVED;
-          this.saveBackoff = 0;
-        } else if (this.saveBackoff >= 5000) {
-          this.saveStatus = SaveStatus.FAILED;
-          console.log("Saving failed. No further automatic retries");
-        } else {
-          this.saveBackoff += 1000;
-          console.log(
-            "Saving failed. Retrying automatically in",
-            this.saveBackoff / 1000,
-            "s"
-          );
-          setTimeout(this.save, this.saveBackoff);
-        }
-      }
-    },
-    exportDocument() {
-      download(
-        new Blob([JSON.stringify(this.doc)]),
-        this.title + ".json",
-        "application/json"
+const saveStatus = ref(SaveStatus.SAVED);
+const saveBackoff = ref(0);
+const save = debounce(saveHelper, 1000);
+async function saveHelper() {
+  if (title.value === "") {
+    saveStatus.value = SaveStatus.FAILED;
+    return;
+  }
+  saveStatus.value = SaveStatus.SAVING;
+  let delay = new Promise((r) => setTimeout(r, 500)); // Delay to show user that we are indeed saving
+  let saveOk = false;
+  try {
+    let response = await fetch(".", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(doc.value),
+    });
+    await delay;
+    saveOk = response.status === 200;
+  } catch (e) {
+    console.log("Error while saving:", e);
+    saveOk = false;
+  }
+  if (saveStatus.value === SaveStatus.SAVING) {
+    if (saveOk) {
+      saveStatus.value = SaveStatus.SAVED;
+      saveBackoff.value = 0;
+    } else if (saveBackoff.value >= 5000) {
+      saveStatus.value = SaveStatus.FAILED;
+      console.log("Saving failed. No further automatic retries");
+    } else {
+      saveBackoff.value += 1000;
+      console.log(
+        "Saving failed. Retrying automatically in",
+        saveBackoff.value / 1000,
+        "s"
       );
-    },
-  },
+      setTimeout(save, saveBackoff.value);
+    }
+  }
+}
+watch(title, () => save());
 
-  watch: {
-    title: function () {
-      this.save();
-    },
-  },
-});
+const updatePreview = debounce((event: JSONContent) => {
+  editorContent.value = event;
+}, 100);
+function handleContentUpdate(event: JSONContent) {
+  saveStatus.value = SaveStatus.WAITING;
+  updatePreview(event);
+  save();
+}
+
+function exportDocument() {
+  download(
+    new Blob([JSON.stringify(doc.value)]),
+    title.value + ".json",
+    "application/json"
+  );
+}
 </script>
 
 <style lang="scss" scoped>
