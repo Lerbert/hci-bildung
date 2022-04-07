@@ -1,14 +1,14 @@
 <template>
   <li>
     <label>
-      <input type="checkbox" v-model="ticked" />
+      <input type="checkbox" v-model="ticked" :disabled="!edit" />
       <div><slot></slot></div>
     </label>
   </li>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRefs, watch } from "vue";
+import { computed, inject, ref, toRefs, watch } from "vue";
 
 import { useExportable } from "../../composables/Exportable";
 import { MultipleChoiceAnswer } from "../../model/SheetDisplayNode";
@@ -23,6 +23,8 @@ const props = toRefs(propsDef);
 const emit = defineEmits<{
   (e: "answerCorrect", correct: boolean): void;
 }>();
+
+const edit = inject<boolean>("edit", true);
 
 const ticked = ref(props.sheet.value.answer);
 const checked = ref(false);

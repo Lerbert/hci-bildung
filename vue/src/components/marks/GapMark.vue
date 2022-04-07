@@ -10,6 +10,7 @@
             incorrect: wrong,
           }"
           :style="{ width: `${width}rem` }"
+          :disabled="!edit"
         />
         <span v-if="right" class="icon is-small is-right">
           <check-symbol></check-symbol>
@@ -23,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRefs } from "vue";
+import { computed, inject, ref, toRefs } from "vue";
 
 import { useCheckable, withCheckableEmit } from "../../composables/Checkable";
 import { useExportable } from "../../composables/Exportable";
@@ -42,6 +43,8 @@ const props = toRefs(propsDef);
 const emit = defineEmits({
   ...withCheckableEmit(),
 });
+
+const edit = inject<boolean>("edit", true);
 
 const totalPoints = 1;
 function check() {

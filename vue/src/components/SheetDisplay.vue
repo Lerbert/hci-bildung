@@ -1,7 +1,11 @@
 <template>
   <div class="sheet">
     <div class="sheet__header">
-      <button class="button is-success is-small" v-on:click="checkAll">
+      <button
+        class="button is-success is-small"
+        v-on:click="checkAll"
+        :disabled="!edit"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="h-6 w-6"
@@ -38,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRefs, watch } from "vue";
+import { provide, ref, toRefs, watch } from "vue";
 import cloneDeep from "lodash/cloneDeep";
 import debounce from "lodash/debounce";
 
@@ -47,6 +51,7 @@ import PointStatus from "./PointStatus.vue";
 import { Node } from "../model/SheetDisplayNode";
 
 const propsDef = defineProps<{
+  edit: boolean;
   sheet: Node;
 }>();
 const props = toRefs(propsDef);
@@ -54,6 +59,8 @@ const props = toRefs(propsDef);
 const emit = defineEmits<{
   (e: "update:export", sheet: Node): void;
 }>();
+
+provide("edit", props.edit);
 
 const checkTrigger = ref(false);
 const achievedPoints = ref(0);

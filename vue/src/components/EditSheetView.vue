@@ -47,7 +47,7 @@
             </more-button>
           </div>
         </div>
-        <sheet-display :sheet="sheet"></sheet-display>
+        <sheet-display :edit="true" :sheet="sheet"></sheet-display>
       </div>
     </div>
   </div>
