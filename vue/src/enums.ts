@@ -3,6 +3,7 @@ export enum SaveStatus {
   SAVING,
   SAVED,
   FAILED,
+  DISABLED,
 }
 
 export enum AppMode {

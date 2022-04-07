@@ -68,6 +68,8 @@ export default defineComponent({
           return "Dokument gespeichert";
         case SaveStatus.FAILED:
           return "Speichern fehlgeschlagen";
+        case SaveStatus.DISABLED:
+          return "Speichern deaktiviert";
         default:
           return "";
       }

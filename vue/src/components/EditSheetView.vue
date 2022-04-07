@@ -69,6 +69,7 @@ import TiptapEditor from "./TiptapEditor.vue";
 
 const propsDef = withDefaults(
   defineProps<{
+    autosave: boolean;
     sheetId: string;
     initialSheet?: Node;
     sheetTitle?: string;
@@ -88,9 +89,15 @@ const doc = computed(() => ({
   content: sheet.value,
 }));
 
-const saveStatus = ref(SaveStatus.SAVED);
+const saveStatus = ref(
+  props.autosave.value ? SaveStatus.SAVED : SaveStatus.DISABLED
+);
 const saveBackoff = ref(0);
-const save = debounce(saveHelper, 1000);
+const save = debounce(() => {
+  if (props.autosave.value) {
+    saveHelper();
+  }
+}, 1000);
 async function saveHelper() {
   if (title.value === "") {
     saveStatus.value = SaveStatus.FAILED;
@@ -137,7 +144,9 @@ const updatePreview = debounce((event: JSONContent) => {
   editorContent.value = event;
 }, 100);
 function handleContentUpdate(event: JSONContent) {
-  saveStatus.value = SaveStatus.WAITING;
+  if (props.autosave.value) {
+    saveStatus.value = SaveStatus.WAITING;
+  }
   updatePreview(event);
   save();
 }

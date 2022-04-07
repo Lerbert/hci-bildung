@@ -1,17 +1,18 @@
 <template>
   <div class="container is-fluid content" id="app">
-    <edit-view
+    <edit-sheet-view
       v-if="mode === AppMode.EDIT_SHEET"
+      :autosave="true"
       :sheetId="sheetid"
       :initialSheet="sheet"
       :sheetTitle="sheettitle"
-    ></edit-view>
-    <student-view
+    ></edit-sheet-view>
+    <sheet-view
       v-else-if="mode === AppMode.VIEW_SHEET"
       :sheetId="sheetid"
       :sheet="sheet"
       :sheetTitle="sheettitle"
-    ></student-view>
+    ></sheet-view>
   </div>
 </template>
 
@@ -21,8 +22,8 @@ import { computed, toRefs } from "vue";
 import { AppMode } from "./enums";
 import { Node, NodeJSON } from "./model/SheetDisplayNode";
 
-import EditView from "./components/EditView.vue";
-import StudentView from "./components/StudentView.vue";
+import EditSheetView from "./components/EditSheetView.vue";
+import SheetView from "./components/SheetView.vue";
 
 const propsDef = withDefaults(
   defineProps<{
