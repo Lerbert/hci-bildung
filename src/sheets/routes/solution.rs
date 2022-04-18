@@ -5,7 +5,7 @@ use rocket::serde::json::Json;
 use rocket::serde::Serialize;
 use rocket_dyn_templates::Template;
 
-use crate::flash::FlashContext;
+use crate::flash::{FlashContext, FlashRedirect};
 use crate::login::guards::{Student, Teacher};
 use crate::login::transport::UserTransport;
 use crate::status::ToStatus;
@@ -33,6 +33,12 @@ struct SolutionManagementContext<'a> {
 
 #[get("/solutions")]
 pub fn solution_overview() {}
+
+
+#[get("/solutions", rank = 2)]
+pub fn login_solution_overview() -> FlashRedirect {
+    redirect_to_login()
+}
 
 #[get("/<sheet_id>/solutions")]
 pub async fn sheet_solutions_teacher(
@@ -79,6 +85,11 @@ pub async fn sheet_solutions_student(db: Db, student: Student<'_>, sheet_id: Id)
         })
 }
 
+#[get("/<_id>/solutions", rank = 3)]
+pub fn login_sheet_solutions(_id: Id) -> FlashRedirect {
+    redirect_to_login()
+}
+
 #[post("/<sheet_id>/solve")]
 pub async fn start_solve(db: Db, student: Student<'_>, sheet_id: Id) -> Result<Redirect, Status> {
     let user = student.into_inner();
@@ -103,6 +114,11 @@ pub async fn my_solution(db: Db, student: Student<'_>, sheet_id: Id) -> Result<T
                 },
             )
         })
+}
+
+#[get("/<_id>/solutions/my", rank = 3)]
+pub fn login_my_solution(_id: Id) -> FlashRedirect {
+    redirect_to_login()
 }
 
 #[put("/<sheet_id>/solutions/my", format = "json", data = "<solution>")]
@@ -139,4 +155,9 @@ pub async fn student_solution(
                 },
             )
         })
+}
+
+#[get("/<_sheet_id>/solutions/<_student_id>", rank = 4)]
+pub fn login_student_solution(_sheet_id: Id, _student_id: i32) -> FlashRedirect {
+    redirect_to_login()
 }

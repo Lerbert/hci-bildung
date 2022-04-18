@@ -145,10 +145,15 @@ fn rocket() -> _ {
                 sheets::routes::solution::my_solution,
                 sheets::routes::solution::save_solution,
                 sheets::routes::solution::student_solution,
+                sheets::routes::sheet::login_sheet_overview,
                 sheets::routes::sheet::login_edit_sheet,
                 sheets::routes::sheet_tree::login_assignment_overview,
                 sheets::routes::sheet_tree::login_trashed_sheets,
-                sheets::routes::sheet_tree::login_recent_sheets
+                sheets::routes::sheet_tree::login_recent_sheets,
+                sheets::routes::solution::login_solution_overview,
+                sheets::routes::solution::login_sheet_solutions,
+                sheets::routes::solution::login_my_solution,
+                sheets::routes::solution::login_student_solution
             ],
         )
         .mount(

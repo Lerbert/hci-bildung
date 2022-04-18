@@ -28,6 +28,11 @@ struct SheetContext<'a> {
 #[get("/")]
 pub fn sheet_overview() {}
 
+#[get("/", rank = 2)]
+pub fn login_sheet_overview() -> FlashRedirect {
+    redirect_to_login()
+}
+
 #[post("/", data = "<form>")]
 pub async fn new_sheet(
     db: Db,
