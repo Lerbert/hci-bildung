@@ -4,13 +4,13 @@ use rocket::serde::Serialize;
 use rocket_dyn_templates::Template;
 
 use crate::flash::{FlashContext, FlashRedirect};
-use crate::login::guards::Teacher;
+use crate::login::guards::{AuthenticatedUser, Teacher};
 use crate::login::transport::UserTransport;
 use crate::status::ToStatus;
 use crate::Db;
 
 use super::logic::sheet::SheetMetadata;
-use super::{logic, redirect_to_login};
+use super::{logic, handle_insufficient_permissions};
 
 #[derive(Serialize)]
 struct SheetManagementContext<'a> {
@@ -42,8 +42,8 @@ pub async fn assignment_overview(
 }
 
 #[get("/assignments", rank = 2)]
-pub fn login_assignment_overview() -> FlashRedirect {
-    redirect_to_login()
+pub fn login_assignment_overview(user: Option<&AuthenticatedUser>) -> Result<FlashRedirect, Status> {
+    handle_insufficient_permissions(user)
 }
 
 #[get("/assignments/trash")]
@@ -65,8 +65,8 @@ pub async fn trashed_sheets(db: Db, teacher: Teacher<'_>) -> Result<Template, St
 }
 
 #[get("/assignments/trash", rank = 2)]
-pub fn login_trashed_sheets() -> FlashRedirect {
-    redirect_to_login()
+pub fn login_trashed_sheets(user: Option<&AuthenticatedUser>) -> Result<FlashRedirect, Status> {
+    handle_insufficient_permissions(user)
 }
 
 #[get("/assignments/recent")]
@@ -88,6 +88,6 @@ pub async fn recent_sheets(db: Db, teacher: Teacher<'_>) -> Result<Template, Sta
 }
 
 #[get("/assignments/recent", rank = 2)]
-pub fn login_recent_sheets() -> FlashRedirect {
-    redirect_to_login()
+pub fn login_recent_sheets(user: Option<&AuthenticatedUser>) -> Result<FlashRedirect, Status> {
+    handle_insufficient_permissions(user)
 }

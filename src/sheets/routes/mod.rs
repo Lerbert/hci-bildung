@@ -2,6 +2,7 @@ use rocket::http::Status;
 
 use crate::flash::FlashRedirect;
 use crate::login;
+use crate::login::guards::AuthenticatedUser;
 use crate::status::ToStatus;
 
 use super::logic;
@@ -43,10 +44,16 @@ pub fn sheets_uri(uri: rocket::http::uri::Origin) -> String {
     format!("{}{}", MOUNT, uri)
 }
 
-fn redirect_to_login() -> FlashRedirect {
-    FlashRedirect::with_flash(
-        uri!(login::routes::login),
-        "danger",
-        "Anmeldung erforderlich",
-    )
+fn handle_insufficient_permissions(user: Option<&AuthenticatedUser>) -> Result<FlashRedirect, Status> {
+    match user {
+        Some(user) => {
+            info!("forbidden access by user {}", user.user_info.id);
+            Err(Status::Forbidden)
+        }
+        None => Ok(FlashRedirect::with_flash(
+            uri!(login::routes::login),
+            "danger",
+            "Anmeldung erforderlich",
+        )),
+    }
 }

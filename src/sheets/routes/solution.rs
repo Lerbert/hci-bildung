@@ -6,7 +6,7 @@ use rocket::serde::Serialize;
 use rocket_dyn_templates::Template;
 
 use crate::flash::{FlashContext, FlashRedirect};
-use crate::login::guards::{Student, Teacher};
+use crate::login::guards::{AuthenticatedUser, Student, Teacher};
 use crate::login::transport::UserTransport;
 use crate::status::ToStatus;
 use crate::Db;
@@ -15,7 +15,7 @@ use super::logic;
 use super::logic::solution::{Solution, SolutionMetadata};
 use super::logic::Id;
 use super::transport::SolutionTransport;
-use super::{redirect_to_login, sheets_uri};
+use super::{handle_insufficient_permissions, sheets_uri};
 
 #[derive(Serialize)]
 struct SolutionContext<'a> {
@@ -32,11 +32,13 @@ struct SolutionManagementContext<'a> {
 }
 
 #[get("/solutions")]
-pub fn solution_overview() {}
+pub fn solution_overview() {
+    todo!()
+}
 
 #[get("/solutions", rank = 2)]
-pub fn login_solution_overview() -> FlashRedirect {
-    redirect_to_login()
+pub fn login_solution_overview(user: Option<&AuthenticatedUser>) -> Result<FlashRedirect, Status> {
+    handle_insufficient_permissions(user)
 }
 
 #[get("/solutions/trash")]
@@ -59,8 +61,8 @@ pub async fn trashed_solutions(db: Db, student: Student<'_>) -> Result<Template,
 }
 
 #[get("/solutions/trash", rank = 2)]
-pub fn login_trashed_solutions() -> FlashRedirect {
-    redirect_to_login()
+pub fn login_trashed_solutions(user: Option<&AuthenticatedUser>) -> Result<FlashRedirect, Status> {
+    handle_insufficient_permissions(user)
 }
 
 #[get("/solutions/recent")]
@@ -83,8 +85,8 @@ pub async fn recent_solutions(db: Db, student: Student<'_>) -> Result<Template, 
 }
 
 #[get("/solutions/recent", rank = 2)]
-pub fn login_recent_solutions() -> FlashRedirect {
-    redirect_to_login()
+pub fn login_recent_solutions(user: Option<&AuthenticatedUser>) -> Result<FlashRedirect, Status> {
+    handle_insufficient_permissions(user)
 }
 
 #[get("/<sheet_id>/solutions")]
@@ -141,8 +143,8 @@ pub async fn sheet_solutions_student(
 }
 
 #[get("/<_id>/solutions", rank = 3)]
-pub fn login_sheet_solutions(_id: Id) -> FlashRedirect {
-    redirect_to_login()
+pub fn login_sheet_solutions(user: Option<&AuthenticatedUser>, _id: Id) -> Result<FlashRedirect, Status> {
+    handle_insufficient_permissions(user)
 }
 
 #[post("/<sheet_id>/solve")]
@@ -172,8 +174,8 @@ pub async fn my_solution(db: Db, student: Student<'_>, sheet_id: Id) -> Result<T
 }
 
 #[get("/<_id>/solutions/my", rank = 3)]
-pub fn login_my_solution(_id: Id) -> FlashRedirect {
-    redirect_to_login()
+pub fn login_my_solution(user: Option<&AuthenticatedUser>, _id: Id) -> Result<FlashRedirect, Status> {
+    handle_insufficient_permissions(user)
 }
 
 #[put("/<sheet_id>/solutions/my", format = "json", data = "<solution>")]
@@ -213,8 +215,8 @@ pub async fn student_solution(
 }
 
 #[get("/<_sheet_id>/solutions/<_student_id>", rank = 4)]
-pub fn login_student_solution(_sheet_id: Id, _student_id: i32) -> FlashRedirect {
-    redirect_to_login()
+pub fn login_student_solution(user: Option<&AuthenticatedUser>, _sheet_id: Id, _student_id: i32) -> Result<FlashRedirect, Status> {
+    handle_insufficient_permissions(user)
 }
 
 #[delete("/<sheet_id>/solutions/<student_id>/<solution_id>")]

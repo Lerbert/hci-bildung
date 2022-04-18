@@ -17,7 +17,7 @@ use super::logic::sheet::Sheet;
 use super::logic::Id;
 use super::sheet_tree;
 use super::transport::{ImportSheetForm, NewSheetForm, SheetTransport};
-use super::{redirect_to_login, sheets_uri};
+use super::{handle_insufficient_permissions, sheets_uri};
 
 #[derive(Serialize)]
 struct SheetContext<'a> {
@@ -26,11 +26,13 @@ struct SheetContext<'a> {
 }
 
 #[get("/")]
-pub fn sheet_overview() {}
+pub fn sheet_overview() {
+    todo!()
+}
 
 #[get("/", rank = 2)]
-pub fn login_sheet_overview() -> FlashRedirect {
-    redirect_to_login()
+pub fn login_sheet_overview(user: Option<&AuthenticatedUser>) -> Result<FlashRedirect, Status> {
+    handle_insufficient_permissions(user)
 }
 
 #[post("/", data = "<form>")]
@@ -121,8 +123,8 @@ pub async fn edit_sheet(db: Db, teacher: Teacher<'_>, id: Id) -> Result<Template
 }
 
 #[get("/<_id>/edit", rank = 2)]
-pub fn login_edit_sheet(_id: Id) -> FlashRedirect {
-    redirect_to_login()
+pub fn login_edit_sheet(user: Option<&AuthenticatedUser>, _id: Id) -> Result<FlashRedirect, Status> {
+    handle_insufficient_permissions(user)
 }
 
 #[put("/<id>", format = "json", data = "<sheet>")]
