@@ -139,6 +139,8 @@ fn rocket() -> _ {
                 sheets::routes::sheet_tree::trashed_sheets,
                 sheets::routes::sheet_tree::recent_sheets,
                 sheets::routes::solution::solution_overview,
+                sheets::routes::solution::trashed_solutions,
+                sheets::routes::solution::recent_solutions,
                 sheets::routes::solution::sheet_solutions_teacher,
                 sheets::routes::solution::sheet_solutions_student,
                 sheets::routes::solution::start_solve,
@@ -151,6 +153,8 @@ fn rocket() -> _ {
                 sheets::routes::sheet_tree::login_trashed_sheets,
                 sheets::routes::sheet_tree::login_recent_sheets,
                 sheets::routes::solution::login_solution_overview,
+                sheets::routes::solution::login_trashed_solutions,
+                sheets::routes::solution::login_recent_solutions,
                 sheets::routes::solution::login_sheet_solutions,
                 sheets::routes::solution::login_my_solution,
                 sheets::routes::solution::login_student_solution

@@ -1,13 +1,6 @@
 {% import "generic/symbols" as symbols %}
 
 {% extends "management/solution/base" %}
-{% block title %}
-  Lösungen — {{ sheet_title }} — {{ super() }}
-{% endblock title %}
-
-{% block heading %}
-  Lösungen für {{ sheet_title }}
-{% endblock heading %}
 
 {% block header %}
   <th class="is-narrow"></th>

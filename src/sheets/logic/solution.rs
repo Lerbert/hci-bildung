@@ -53,6 +53,14 @@ impl FreshSolution {
     }
 }
 
+pub async fn get_trash(db: &Db, user_id: i32) -> Result<Vec<SolutionMetadata>> {
+    Ok(data::solution::get_trash(db, user_id).await?)
+}
+
+pub async fn get_recent(db: &Db, user_id: i32) -> Result<Vec<SolutionMetadata>> {
+    Ok(data::solution::get_recent(db, user_id).await?)
+}
+
 pub async fn get_sheet_solutions_teacher(
     db: &Db,
     user_id: i32,

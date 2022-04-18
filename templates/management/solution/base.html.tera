@@ -1,1 +1,17 @@
 {% extends "management/base" %}
+
+{% block title %}
+  {% if sheet_title %}
+    {{ sheet_title }} — Lösungen — {{ super() }}
+  {% else %}
+    Lösungen — {{ super() }}
+  {% endif %}
+{% endblock title %}
+
+{% block heading %}
+  {% if sheet_title %}  
+    Lösungen für {{ sheet_title }}
+  {% else %}
+    {{ super() }}
+  {% endif %}
+{% endblock heading %}

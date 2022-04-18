@@ -7,7 +7,7 @@
 {% endblock title %}
 
 {% block sidebar %}
-  {{ sidebar::sidebar(active="trash") }}
+  {{ sidebar::sidebar(active="trashed_sheets") }}
 {% endblock sidebar %}
 
 {% block heading %}

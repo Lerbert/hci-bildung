@@ -26,7 +26,7 @@ struct SolutionContext<'a> {
 #[derive(Serialize)]
 struct SolutionManagementContext<'a> {
     flash: Option<FlashContext>,
-    sheet_title: String,
+    sheet_title: Option<String>,
     solutions: Vec<SolutionMetadata>,
     user: &'a UserTransport,
 }
@@ -37,6 +37,54 @@ pub fn solution_overview() {}
 
 #[get("/solutions", rank = 2)]
 pub fn login_solution_overview() -> FlashRedirect {
+    redirect_to_login()
+}
+
+#[get("/solutions/trash")]
+pub async fn trashed_solutions(db: Db, student: Student<'_>) -> Result<Template, Status> {
+    let user = student.into_inner();
+    logic::solution::get_trash(&db, user.user_info.id)
+        .await
+        .map_err(|e| e.to_status())
+        .map(|solutions| {
+            Template::render(
+                "management/solution/trash",
+                &SolutionManagementContext {
+                    flash: None,
+                    sheet_title: None,
+                    solutions,
+                    user: &user.user_info,
+                },
+            )
+        })
+}
+
+#[get("/solutions/trash", rank = 2)]
+pub fn login_trashed_solutions() -> FlashRedirect {
+    redirect_to_login()
+}
+
+#[get("/solutions/recent")]
+pub async fn recent_solutions(db: Db, student: Student<'_>) -> Result<Template, Status> {
+    let user = student.into_inner();
+    logic::solution::get_recent(&db, user.user_info.id)
+        .await
+        .map_err(|e| e.to_status())
+        .map(|solutions| {
+            Template::render(
+                "management/solution/recent_solutions",
+                &SolutionManagementContext {
+                    flash: None,
+                    sheet_title: None,
+                    solutions,
+                    user: &user.user_info,
+                },
+            )
+        })
+}
+
+#[get("/solutions/recent", rank = 2)]
+pub fn login_recent_solutions() -> FlashRedirect {
     redirect_to_login()
 }
 
@@ -57,7 +105,7 @@ pub async fn sheet_solutions_teacher(
                 "management/solution/sheet_solutions_teacher",
                 &SolutionManagementContext {
                     flash: flash.map(|f| f.into()),
-                    sheet_title,
+                    sheet_title: Some(sheet_title),
                     solutions,
                     user: &user.user_info,
                 },
@@ -77,7 +125,7 @@ pub async fn sheet_solutions_student(db: Db, student: Student<'_>, sheet_id: Id)
                 "management/solution/sheet_solutions_student",
                 &SolutionManagementContext {
                     flash: None,
-                    sheet_title,
+                    sheet_title: Some(sheet_title),
                     solutions,
                     user: &user.user_info,
                 },

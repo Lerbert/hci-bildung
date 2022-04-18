@@ -7,7 +7,7 @@
 {% endblock title %}
 
 {% block sidebar %}
-  {{ sidebar::sidebar(active="recent") }}
+  {{ sidebar::sidebar(active="recent_sheets") }}
 {% endblock sidebar %}
 
 {% block heading %}
