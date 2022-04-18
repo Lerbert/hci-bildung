@@ -1,0 +1,15 @@
+{% import "generic/symbols" as symbols %}
+{% import "management/sidebar" as sidebar %}
+
+{% extends "management/solution/active_solutions_base" %}
+{% block title %}
+  Zuletzt verwendet — {{ super() }}
+{% endblock title %}
+
+{% block sidebar %}
+  {{ sidebar::sidebar(active="recent_solutions") }}
+{% endblock sidebar %}
+
+{% block heading %}
+  Meine Lösungen
+{% endblock heading %}
