@@ -147,6 +147,8 @@ fn rocket() -> _ {
                 sheets::routes::solution::my_solution,
                 sheets::routes::solution::save_solution,
                 sheets::routes::solution::student_solution,
+                sheets::routes::solution::delete_solution,
+                sheets::routes::solution::restore_solution,
                 sheets::routes::sheet::login_sheet_overview,
                 sheets::routes::sheet::login_edit_sheet,
                 sheets::routes::sheet_tree::login_assignment_overview,

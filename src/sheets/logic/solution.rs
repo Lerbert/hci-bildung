@@ -5,7 +5,7 @@ use crate::login::transport::UserTransport;
 use crate::Db;
 
 use super::sheet::Sheet;
-use super::{data, sheet};
+use super::{data, sheet, DeleteOutcome};
 use super::{Error, Id, Result};
 
 #[derive(Debug, Serialize)]
@@ -122,4 +122,64 @@ pub async fn get_solution_for_teacher(
 ) -> Result<Solution> {
     sheet::check_sheet_ownership(db, teacher_id, sheet_id).await?;
     get_latest_solution(db, sheet_id, student_id).await
+}
+
+async fn get_solution(db: &Db, solution_id: i32) -> Result<Solution> {
+    data::solution::get_solution_by_id(db, solution_id)
+        .await?
+        .ok_or_else(|| Error::NotFound(format!("solution {}", solution_id)))
+}
+
+async fn get_solution_owned_by_user(db: &Db, user_id: i32, solution_id: i32) -> Result<Solution> {
+    let solution = get_solution(db, solution_id).await?;
+    if solution.metadata.owner.id == user_id {
+        Ok(solution)
+    } else {
+        Err(Error::Forbidden(format!(
+            "user {} is not the owner of solution {}",
+            user_id, solution_id
+        )))
+    }
+}
+
+fn check_coherence(solution: &Solution, sheet_id: Id, student_id: i32) -> Result<()> {
+    if solution.metadata.sheet_id != Some(sheet_id) || solution.metadata.owner.id != student_id {
+        Err(Error::NotFound(format!(
+            "solution {} does not match sheet {} or user {}",
+            solution.metadata.id, sheet_id, student_id
+        )))
+    } else {
+        Ok(())
+    }
+}
+
+pub async fn delete_solution(
+    db: &Db,
+    user_id: i32,
+    sheet_id: Id,
+    student_id: i32,
+    solution_id: i32,
+) -> Result<DeleteOutcome> {
+    let solution = get_solution_owned_by_user(db, user_id, solution_id).await?;
+    check_coherence(&solution, sheet_id, student_id)?;
+    if solution.metadata.trashed.is_some() {
+        data::solution::delete_solution(db, solution_id).await?;
+        Ok(DeleteOutcome::Deleted)
+    } else {
+        data::solution::move_solution_to_trash(db, solution_id).await?;
+        Ok(DeleteOutcome::Trashed)
+    }
+}
+
+pub async fn restore_solution(
+    db: &Db,
+    user_id: i32,
+    sheet_id: Id,
+    student_id: i32,
+    solution_id: i32,
+) -> Result<()> {
+    let solution = get_solution_owned_by_user(db, user_id, solution_id).await?;
+    check_coherence(&solution, sheet_id, student_id)?;
+    data::solution::restore_solution(db, solution_id).await?;
+    Ok(())
 }

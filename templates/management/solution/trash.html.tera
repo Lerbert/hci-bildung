@@ -25,7 +25,7 @@
 
 {% block rows %}
   {% for solution in solutions %} 
-    {% set restore_url = "#" %}
+    {% set restore_url = url_for(endpoint="restore_solution", sheet_id=solution.sheet_id, student_id=solution.owner.id | as_str, solution_id=solution.id | as_str) %}
     <tr>
       <td class="is-narrow">{{ symbols::file() }}</td>
       <td>{{ solution.title }}</td>
@@ -46,7 +46,7 @@
   {% set num_actions = 2 %}
   {{ super() }}
   {% for solution in solutions %}
-    {% set delete_url = "#" %}
+    {% set delete_url = url_for(endpoint="delete_solution", sheet_id=solution.sheet_id, student_id=solution.owner.id | as_str, solution_id=solution.id | as_str) %}
     <div id="delete-modal-{{ solution.id }}" class="modal">
       <div class="modal-background"></div>
       <div class="modal-card">

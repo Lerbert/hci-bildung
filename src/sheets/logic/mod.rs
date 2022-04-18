@@ -31,3 +31,8 @@ impl From<data::Error> for Error {
         Self::Db(e)
     }
 }
+
+pub enum DeleteOutcome {
+    Deleted,
+    Trashed,
+}

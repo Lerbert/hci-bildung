@@ -30,7 +30,7 @@
   {% set num_actions = 2 %}
   {{ super() }}
   {% for solution in solutions %}
-    {% set delete_url = "#" %}
+    {% set delete_url = url_for(endpoint="delete_solution", sheet_id=solution.sheet_id, student_id=solution.owner.id | as_str, solution_id=solution.id | as_str) %}
     <div id="delete-modal-{{ solution.id }}" class="modal">
       <div class="modal-background"></div>
       <div class="modal-card">

@@ -146,6 +146,20 @@ pub async fn create_solution(db: &Db, fresh_solution: FreshSolution) -> Result<i
     Ok(solution.id)
 }
 
+pub async fn get_solution_by_id(db: &Db, id: i32) -> Result<Option<Solution>, Error> {
+    let solution: Option<(SolutionDiesel, UserTransportDiesel)> = db
+        .run(move |c| {
+            solutions::table
+                .inner_join(users::table)
+                .select((solutions::all_columns, UserTransportDiesel::columns()))
+                .filter(solutions::id.eq(id))
+                .first(c)
+                .optional()
+        })
+        .await?;
+    Ok(solution.map(|s| s.into()))
+}
+
 pub async fn get_latest_solution_by_sheet_and_user_id(
     db: &Db,
     sheet_id: Id,
@@ -173,7 +187,9 @@ pub async fn update_solution(
     content: serde_json::Value,
     changed: DateTime<Utc>,
 ) -> Result<(), Error> {
-    if let Some(latest_solution) = get_latest_solution_by_sheet_and_user_id(db, sheet_id, user_id).await? {
+    if let Some(latest_solution) =
+        get_latest_solution_by_sheet_and_user_id(db, sheet_id, user_id).await?
+    {
         db.run(move |c| {
             diesel::update(solutions::table.find(latest_solution.metadata.id))
                 .set((
@@ -184,5 +200,31 @@ pub async fn update_solution(
         })
         .await?;
     }
+    Ok(())
+}
+
+pub async fn delete_solution(db: &Db, id: i32) -> Result<(), Error> {
+    db.run(move |c| diesel::delete(solutions::table.find(id)).execute(c))
+        .await?;
+    Ok(())
+}
+
+pub async fn move_solution_to_trash(db: &Db, id: i32) -> Result<(), Error> {
+    db.run(move |c| {
+        diesel::update(solutions::table.find(id))
+            .set(solutions::trashed.eq(Some(Utc::now())))
+            .execute(c)
+    })
+    .await?;
+    Ok(())
+}
+
+pub async fn restore_solution(db: &Db, id: i32) -> Result<(), Error> {
+    db.run(move |c| {
+        diesel::update(solutions::table.find(id))
+            .set(solutions::trashed.eq(None::<DateTime<Utc>>))
+            .execute(c)
+    })
+    .await?;
     Ok(())
 }

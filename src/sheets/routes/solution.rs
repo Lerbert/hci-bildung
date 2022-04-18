@@ -34,7 +34,6 @@ struct SolutionManagementContext<'a> {
 #[get("/solutions")]
 pub fn solution_overview() {}
 
-
 #[get("/solutions", rank = 2)]
 pub fn login_solution_overview() -> FlashRedirect {
     redirect_to_login()
@@ -96,7 +95,9 @@ pub async fn sheet_solutions_teacher(
     sheet_id: Id,
 ) -> Result<Template, Status> {
     let user = teacher.into_inner();
-    let sheet_title = logic::sheet::get_sheet_title(&db, sheet_id).await.map_err(|e| e.to_status())?;
+    let sheet_title = logic::sheet::get_sheet_title(&db, sheet_id)
+        .await
+        .map_err(|e| e.to_status())?;
     logic::solution::get_sheet_solutions_teacher(&db, user.user_info.id, sheet_id)
         .await
         .map_err(|e| e.to_status())
@@ -114,9 +115,15 @@ pub async fn sheet_solutions_teacher(
 }
 
 #[get("/<sheet_id>/solutions", rank = 2)]
-pub async fn sheet_solutions_student(db: Db, student: Student<'_>, sheet_id: Id) -> Result<Template, Status> {
+pub async fn sheet_solutions_student(
+    db: Db,
+    student: Student<'_>,
+    sheet_id: Id,
+) -> Result<Template, Status> {
     let user = student.into_inner();
-    let sheet_title = logic::sheet::get_sheet_title(&db, sheet_id).await.map_err(|e| e.to_status())?;
+    let sheet_title = logic::sheet::get_sheet_title(&db, sheet_id)
+        .await
+        .map_err(|e| e.to_status())?;
     logic::solution::get_sheet_solutions_student(&db, user.user_info.id, sheet_id)
         .await
         .map_err(|e| e.to_status())
@@ -208,4 +215,37 @@ pub async fn student_solution(
 #[get("/<_sheet_id>/solutions/<_student_id>", rank = 4)]
 pub fn login_student_solution(_sheet_id: Id, _student_id: i32) -> FlashRedirect {
     redirect_to_login()
+}
+
+#[delete("/<sheet_id>/solutions/<student_id>/<solution_id>")]
+pub async fn delete_solution(
+    db: Db,
+    student: Student<'_>,
+    sheet_id: Id,
+    student_id: i32,
+    solution_id: i32,
+) -> Result<Redirect, Status> {
+    let user = student.into_inner();
+    logic::solution::delete_solution(&db, user.user_info.id, sheet_id, student_id, solution_id)
+        .await
+        .map_err(|e| e.to_status())
+        .map(|outcome| match outcome {
+            logic::DeleteOutcome::Trashed => Redirect::to(sheets_uri(uri!(solution_overview))),
+            logic::DeleteOutcome::Deleted => Redirect::to(sheets_uri(uri!(trashed_solutions))),
+        })
+}
+
+#[post("/<sheet_id>/solutions/<student_id>/<solution_id>/restore")]
+pub async fn restore_solution(
+    db: Db,
+    student: Student<'_>,
+    sheet_id: Id,
+    student_id: i32,
+    solution_id: i32,
+) -> Result<Redirect, Status> {
+    let user = student.into_inner();
+    logic::solution::restore_solution(&db, user.user_info.id, sheet_id, student_id, solution_id)
+        .await
+        .map_err(|e| e.to_status())
+        .map(|_| Redirect::to(sheets_uri(uri!(solution_overview))))
 }

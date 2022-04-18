@@ -4,7 +4,7 @@ use rocket::serde::Serialize;
 use crate::login::transport::UserTransport;
 use crate::Db;
 
-use super::{data, Error, Id, Result};
+use super::{data, DeleteOutcome, Error, Id, Result};
 
 #[derive(Debug, Serialize)]
 pub struct Sheet {
@@ -20,11 +20,6 @@ pub struct SheetMetadata {
     pub created: DateTime<Utc>,
     pub changed: DateTime<Utc>,
     pub trashed: Option<DateTime<Utc>>,
-}
-
-pub enum DeleteOutcome {
-    Deleted,
-    Trashed,
 }
 
 pub async fn get_all_sheets(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>> {

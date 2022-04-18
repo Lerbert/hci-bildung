@@ -150,10 +150,10 @@ pub async fn delete_sheet(db: Db, teacher: Teacher<'_>, id: Id) -> Result<Redire
         .await
         .map_err(|e| e.to_status())
         .map(|outcome| match outcome {
-            logic::sheet::DeleteOutcome::Trashed => {
+            logic::DeleteOutcome::Trashed => {
                 Redirect::to(sheets_uri(uri!(sheet_tree::assignment_overview)))
             }
-            logic::sheet::DeleteOutcome::Deleted => {
+            logic::DeleteOutcome::Deleted => {
                 Redirect::to(sheets_uri(uri!(sheet_tree::trashed_sheets)))
             }
         })
