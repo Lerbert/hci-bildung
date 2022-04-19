@@ -1,5 +1,6 @@
 {% import "generic/symbols" as symbols %}
 {% import "management/sidebar" as sidebar %}
+{% import "management/sheet/macros" as macros %}
 
 {% extends "management/sheet/base" %}
 {% block title %}
@@ -46,25 +47,6 @@
   {% set num_actions = 2 %}
   {{ super() }}
   {% for sheet in sheets %}
-    {% set delete_url = url_for(endpoint="delete_sheet", id=sheet.id) %}
-    <div id="delete-modal-{{ sheet.id }}" class="modal">
-      <div class="modal-background"></div>
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <span class="modal-card-title">{{ sheet.title }} wirklich endgültig löschen?</span>
-          <button class="delete" aria-label="close"></button>
-        </header>
-        <section class="modal-card-body">
-          Wollen Sie das Dokument "{{ sheet.title }}" wirklich endgültig löschen? Das Dokument kann nicht wiederhergestellt werden.
-        </section>
-        <footer class="modal-card-foot is-justify-content-flex-end">
-          <form class="mr-2" action="{{ delete_url }}" method="POST">
-            <input type="hidden" name="_method" value="DELETE">
-            <button class="button is-danger" type="submit">Löschen</button>
-          </form>
-          <button class="button abort">Abbrechen</button>
-        </footer>
-      </div>
-    </div>
+    {{ macros::delete_modal(sheet=sheet, permanent=true) }}
   {% endfor %}
 {% endblock content %}

@@ -1,0 +1,58 @@
+{% import "generic/symbols" as symbols %}
+
+{% macro sheet_header(extra_actions=0) -%}
+  <th class="is-narrow"></th>
+  <th>Name</th>
+  <th class="is-narrow">Eigentümer</th>
+  <th class="is-narrow">Zuletzt geändert</th>
+  <th class="is-narrow">Erstellt am</th>
+  <th class="is-narrow" colspan="{{ 3 + extra_actions }}">Aktionen</th>
+{%- endmacro  %}
+
+{% macro sheet_row(sheet) -%}
+  {% set edit_url = url_for(endpoint="edit_sheet", id=sheet.id) %}
+  {% set view_url = url_for(endpoint="view_sheet", id=sheet.id) %}
+  <tr>
+    <td class="is-narrow">{{ symbols::file() }}</td>
+    <td><a href="{{ edit_url }}">{{ sheet.title }}</a></td>
+    <td class="is-narrow">{{ sheet.owner.username }}</td>
+    <td class="is-narrow">{{ sheet.changed | date(format="%d.%m.%Y %H:%M") }}</td>
+    <td class="is-narrow">{{ sheet.created | date(format="%d.%m.%Y %H:%M") }}</td>
+    <td class="is-narrow"><a href="{{ edit_url }}" title="Bearbeiten" class="button is-small is-ghost p-0">{{ symbols::pencil() }}</a></td>
+    <td class="is-narrow"><a href="{{ view_url }}" title="Ansehen" class="button is-small is-ghost p-0">{{ symbols::eye() }}</a></td>
+    <td class="is-narrow"><a title="Löschen" class="button is-small is-ghost p-0 has-text-danger js-modal-trigger" data-target="delete-modal-{{ sheet.id }}">{{ symbols::trash() }}</a></td>
+  </tr>
+{%- endmacro  %}
+
+{% macro delete_modal(sheet, permanent) -%}
+  {% set delete_url = url_for(endpoint="delete_sheet", id=sheet.id) %}
+  <div id="delete-modal-{{ sheet.id }}" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <span class="modal-card-title">
+          {% if permanent %}
+            {{ sheet.title }} wirklich endgültig löschen?
+          {% else %}
+            {{ sheet.title }} wirklich in den Papierkorb verschieben?
+          {% endif %}
+        </span>
+        <button class="delete" aria-label="close"></button>
+      </header>
+      <section class="modal-card-body">
+        {% if permanent %}
+          Wollen Sie das Dokument "{{ sheet.title }}" wirklich endgültig löschen? Das Dokument kann nicht wiederhergestellt werden.
+        {% else %}
+          Wollen Sie das Dokument "{{ sheet.title }}" wirklich in den Papierkorb verschieben? Dokumente im Papierkorb werden nach 30 Tagen automatisch gelöscht.
+        {% endif %}
+      </section>
+      <footer class="modal-card-foot is-justify-content-flex-end">
+        <form class="mr-2" action="{{ delete_url }}" method="POST">
+          <input type="hidden" name="_method" value="DELETE">
+          <button class="button is-danger" type="submit">Löschen</button>
+        </form>
+        <button class="button abort">Abbrechen</button>
+      </footer>
+    </div>
+  </div>
+{%- endmacro  %}

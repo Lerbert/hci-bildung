@@ -1,31 +1,15 @@
-{% import "generic/symbols" as symbols %}
 {% import "management/sidebar" as sidebar %}
+{% import "management/sheet/macros" as macros %}
 
 {% extends "management/sheet/base" %}
 
 {% block header %}
-  <th class="is-narrow"></th>
-  <th>Name</th>
-  <th class="is-narrow">Eigentümer</th>
-  <th class="is-narrow">Zuletzt geändert</th>
-  <th class="is-narrow">Erstellt am</th>
-  <th class="is-narrow" colspan="{{ num_actions }}">Aktionen</th>
+  {{ macros::sheet_header() }}
 {% endblock header %}
 
 {% block rows %}
   {% for sheet in sheets %} 
-    {% set edit_url = url_for(endpoint="edit_sheet", id=sheet.id) %}
-    {% set view_url = url_for(endpoint="view_sheet", id=sheet.id) %}
-    <tr>
-      <td class="is-narrow">{{ symbols::file() }}</td>
-      <td><a href="{{ edit_url }}">{{ sheet.title }}</a></td>
-      <td class="is-narrow">{{ sheet.owner.username }}</td>
-      <td class="is-narrow">{{ sheet.changed | date(format="%d.%m.%Y %H:%M") }}</td>
-      <td class="is-narrow">{{ sheet.created | date(format="%d.%m.%Y %H:%M") }}</td>
-      <td class="is-narrow"><a href="{{ edit_url }}" title="Bearbeiten" class="button is-small is-ghost p-0">{{ symbols::pencil() }}</a></td>
-      <td class="is-narrow"><a href="{{ view_url }}" title="Ansehen" class="button is-small is-ghost p-0">{{ symbols::eye() }}</a></td>
-      <td class="is-narrow"><a title="Löschen" class="button is-small is-ghost p-0 has-text-danger js-modal-trigger" data-target="delete-modal-{{ sheet.id }}">{{ symbols::trash() }}</a></td>
-    </tr>
+    {{ macros::sheet_row(sheet=sheet) }}
   {% endfor %}
 {% endblock rows %}
 
@@ -33,39 +17,6 @@
   {% set num_actions = 3 %}
   {{ super() }}
   {% for sheet in sheets %}
-    {% set delete_url = url_for(endpoint="delete_sheet", id=sheet.id) %}
-    <div id="delete-modal-{{ sheet.id }}" class="modal">
-      <div class="modal-background"></div>
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <span class="modal-card-title">{{ sheet.title }} wirklich in den Papierkorb verschieben?</span>
-          <button class="delete" aria-label="close"></button>
-        </header>
-        <section class="modal-card-body">
-          Wollen Sie das Dokument "{{ sheet.title }}" wirklich in den Papierkorb verschieben? Dokumente im Papierkorb werden nach 30 Tagen automatisch gelöscht.
-        </section>
-        <footer class="modal-card-foot is-justify-content-flex-end">
-          <form class="mr-2" action="{{ delete_url }}" method="POST">
-            <input type="hidden" name="_method" value="DELETE">
-            <button class="button is-danger" type="submit">Löschen</button>
-          </form>
-          <button class="button abort">Abbrechen</button>
-        </footer>
-      </div>
-    </div>
+    {{ macros::delete_modal(sheet=sheet, permanent=false) }}
   {% endfor %}
 {% endblock content %}
-
-{% block scripts %}
-  {{ super() }}
-  <script>
-    // Taken from https://bulma.io/documentation/form/file/
-    const fileInput = document.querySelector('#import-file input[type=file]');
-    fileInput.onchange = () => {
-      if (fileInput.files.length > 0) {
-        const fileName = document.querySelector('#import-file .file-name');
-        fileName.textContent = fileInput.files[0].name;
-      }
-    }
-  </script>
-{% endblock scripts %}

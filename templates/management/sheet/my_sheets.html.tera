@@ -71,3 +71,17 @@
     </div>
   </div>
 {% endblock content %}
+
+{% block scripts %}
+  {{ super() }}
+  <script>
+    // Taken from https://bulma.io/documentation/form/file/
+    const fileInput = document.querySelector('#import-file input[type=file]');
+    fileInput.onchange = () => {
+      if (fileInput.files.length > 0) {
+        const fileName = document.querySelector('#import-file .file-name');
+        fileName.textContent = fileInput.files[0].name;
+      }
+    }
+  </script>
+{% endblock scripts %}
