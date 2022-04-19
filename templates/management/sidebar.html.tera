@@ -12,7 +12,8 @@
       Lösungen
     </p>
     <ul class="menu-list">
-      <li><a href='{{ url_for(endpoint="solution_overview") }}' {% if active == "my_solutions" %} class="is-active" {% endif %}>Meine Lösungen</a></li>
+      {# Currently, it doesn't matter if we use the URL for student or teacher overview, since they are the same #}
+      <li><a href='{{ url_for(endpoint="solution_overview_teacher") }}' {% if active == "my_solutions" %} class="is-active" {% endif %}>Meine Lösungen</a></li>
       <li><a href='{{ url_for(endpoint="recent_solutions") }}' {% if active == "recent_solutions" %} class="is-active" {% endif %}>Zuletzt verwendet</a></li>
       <li><a href='{{ url_for(endpoint="trashed_solutions") }}' {% if active == "trashed_solutions" %} class="is-active" {% endif %}>Papierkorb</a></li>
     </ul>

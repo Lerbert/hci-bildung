@@ -123,7 +123,10 @@ pub async fn edit_sheet(db: Db, teacher: Teacher<'_>, id: Id) -> Result<Template
 }
 
 #[get("/<_id>/edit", rank = 2)]
-pub fn login_edit_sheet(user: Option<&AuthenticatedUser>, _id: Id) -> Result<FlashRedirect, Status> {
+pub fn login_edit_sheet(
+    user: Option<&AuthenticatedUser>,
+    _id: Id,
+) -> Result<FlashRedirect, Status> {
     handle_insufficient_permissions(user)
 }
 

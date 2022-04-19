@@ -44,7 +44,9 @@ pub fn sheets_uri(uri: rocket::http::uri::Origin) -> String {
     format!("{}{}", MOUNT, uri)
 }
 
-fn handle_insufficient_permissions(user: Option<&AuthenticatedUser>) -> Result<FlashRedirect, Status> {
+fn handle_insufficient_permissions(
+    user: Option<&AuthenticatedUser>,
+) -> Result<FlashRedirect, Status> {
     match user {
         Some(user) => {
             info!("forbidden access by user {}", user.user_info.id);

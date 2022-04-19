@@ -1,0 +1,9 @@
+{% extends "management/solution/active_solutions_base" %}
+
+{% block sidebar %}
+  {{ sidebar::sidebar(active="my_solutions") }}
+{% endblock sidebar %}
+
+{% block heading %}
+  Meine Lösungen
+{% endblock heading %}

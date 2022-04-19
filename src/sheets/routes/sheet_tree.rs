@@ -10,7 +10,7 @@ use crate::status::ToStatus;
 use crate::Db;
 
 use super::logic::sheet::SheetMetadata;
-use super::{logic, handle_insufficient_permissions};
+use super::{handle_insufficient_permissions, logic};
 
 #[derive(Serialize)]
 struct SheetManagementContext<'a> {
@@ -42,7 +42,9 @@ pub async fn assignment_overview(
 }
 
 #[get("/assignments", rank = 2)]
-pub fn login_assignment_overview(user: Option<&AuthenticatedUser>) -> Result<FlashRedirect, Status> {
+pub fn login_assignment_overview(
+    user: Option<&AuthenticatedUser>,
+) -> Result<FlashRedirect, Status> {
     handle_insufficient_permissions(user)
 }
 

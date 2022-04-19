@@ -32,11 +32,44 @@ struct SolutionManagementContext<'a> {
 }
 
 #[get("/solutions")]
-pub fn solution_overview() {
-    todo!()
+pub async fn solution_overview_teacher(db: Db, teacher: Teacher<'_>) -> Result<Template, Status> {
+    let user = teacher.into_inner();
+    logic::solution::get_solutions_teacher(&db, user.user_info.id)
+        .await
+        .map_err(|e| e.to_status())
+        .map(|solutions| {
+            Template::render(
+                "management/solution/my_solutions_teacher",
+                &SolutionManagementContext {
+                    flash: None,
+                    sheet_title: None,
+                    solutions,
+                    user: &user.user_info,
+                },
+            )
+        })
 }
 
 #[get("/solutions", rank = 2)]
+pub async fn solution_overview_student(db: Db, student: Student<'_>) -> Result<Template, Status> {
+    let user = student.into_inner();
+    logic::solution::get_solutions_student(&db, user.user_info.id)
+        .await
+        .map_err(|e| e.to_status())
+        .map(|solutions| {
+            Template::render(
+                "management/solution/my_solutions_student",
+                &SolutionManagementContext {
+                    flash: None,
+                    sheet_title: None,
+                    solutions,
+                    user: &user.user_info,
+                },
+            )
+        })
+}
+
+#[get("/solutions", rank = 3)]
 pub fn login_solution_overview(user: Option<&AuthenticatedUser>) -> Result<FlashRedirect, Status> {
     handle_insufficient_permissions(user)
 }
@@ -143,7 +176,10 @@ pub async fn sheet_solutions_student(
 }
 
 #[get("/<_id>/solutions", rank = 3)]
-pub fn login_sheet_solutions(user: Option<&AuthenticatedUser>, _id: Id) -> Result<FlashRedirect, Status> {
+pub fn login_sheet_solutions(
+    user: Option<&AuthenticatedUser>,
+    _id: Id,
+) -> Result<FlashRedirect, Status> {
     handle_insufficient_permissions(user)
 }
 
@@ -174,7 +210,10 @@ pub async fn my_solution(db: Db, student: Student<'_>, sheet_id: Id) -> Result<T
 }
 
 #[get("/<_id>/solutions/my", rank = 3)]
-pub fn login_my_solution(user: Option<&AuthenticatedUser>, _id: Id) -> Result<FlashRedirect, Status> {
+pub fn login_my_solution(
+    user: Option<&AuthenticatedUser>,
+    _id: Id,
+) -> Result<FlashRedirect, Status> {
     handle_insufficient_permissions(user)
 }
 
@@ -215,7 +254,11 @@ pub async fn student_solution(
 }
 
 #[get("/<_sheet_id>/solutions/<_student_id>", rank = 4)]
-pub fn login_student_solution(user: Option<&AuthenticatedUser>, _sheet_id: Id, _student_id: i32) -> Result<FlashRedirect, Status> {
+pub fn login_student_solution(
+    user: Option<&AuthenticatedUser>,
+    _sheet_id: Id,
+    _student_id: i32,
+) -> Result<FlashRedirect, Status> {
     handle_insufficient_permissions(user)
 }
 
@@ -232,7 +275,9 @@ pub async fn delete_solution(
         .await
         .map_err(|e| e.to_status())
         .map(|outcome| match outcome {
-            logic::DeleteOutcome::Trashed => Redirect::to(sheets_uri(uri!(solution_overview))),
+            logic::DeleteOutcome::Trashed => {
+                Redirect::to(sheets_uri(uri!(solution_overview_student)))
+            }
             logic::DeleteOutcome::Deleted => Redirect::to(sheets_uri(uri!(trashed_solutions))),
         })
 }
@@ -249,5 +294,5 @@ pub async fn restore_solution(
     logic::solution::restore_solution(&db, user.user_info.id, sheet_id, student_id, solution_id)
         .await
         .map_err(|e| e.to_status())
-        .map(|_| Redirect::to(sheets_uri(uri!(solution_overview))))
+        .map(|_| Redirect::to(sheets_uri(uri!(solution_overview_student))))
 }

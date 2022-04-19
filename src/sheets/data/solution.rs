@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use rocket_sync_db_pools::diesel;
 
 use crate::db::model::{SolutionDiesel, SolutionMetadataDiesel, UserTransportDiesel};
-use crate::db::schema::{solutions, users};
+use crate::db::schema::{sheets, solutions, users};
 use crate::Db;
 
 use super::logic::solution::{FreshSolution, Solution, SolutionMetadata};
@@ -44,6 +44,47 @@ impl From<(SolutionMetadataDiesel, UserTransportDiesel)> for SolutionMetadata {
             trashed: s.trashed,
         }
     }
+}
+
+pub async fn get_solutions_by_sheet_owner(
+    db: &Db,
+    user_id: i32,
+) -> Result<Vec<SolutionMetadata>, Error> {
+    let solutions: Vec<(SolutionMetadataDiesel, UserTransportDiesel)> = db
+        .run(move |c| {
+            solutions::table
+                .inner_join(users::table)
+                .inner_join(sheets::table)
+                .select((
+                    SolutionMetadataDiesel::columns(),
+                    UserTransportDiesel::columns(),
+                ))
+                .filter(sheets::owner_id.eq(user_id))
+                .filter(sheets::trashed.is_null())
+                .filter(solutions::trashed.is_null())
+                .order((solutions::changed.desc(), users::username.asc()))
+                .load(c)
+        })
+        .await?;
+    Ok(solutions.into_iter().map(|s| s.into()).collect())
+}
+
+pub async fn get_solutions_by_owner(db: &Db, user_id: i32) -> Result<Vec<SolutionMetadata>, Error> {
+    let solutions: Vec<(SolutionMetadataDiesel, UserTransportDiesel)> = db
+        .run(move |c| {
+            solutions::table
+                .inner_join(users::table)
+                .select((
+                    SolutionMetadataDiesel::columns(),
+                    UserTransportDiesel::columns(),
+                ))
+                .filter(solutions::owner_id.eq(user_id))
+                .filter(solutions::trashed.is_null())
+                .order(solutions::sheet_version.desc())
+                .load(c)
+        })
+        .await?;
+    Ok(solutions.into_iter().map(|s| s.into()).collect())
 }
 
 pub async fn get_trash(db: &Db, user_id: i32) -> Result<Vec<SolutionMetadata>, Error> {
