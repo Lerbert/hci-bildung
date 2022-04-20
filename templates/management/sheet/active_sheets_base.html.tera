@@ -1,4 +1,3 @@
-{% import "management/sidebar" as sidebar %}
 {% import "management/sheet/macros" as macros %}
 
 {% extends "management/sheet/base" %}
@@ -9,7 +8,9 @@
 
 {% block rows %}
   {% for sheet in sheets %} 
-    {{ macros::sheet_row(sheet=sheet) }}
+    <tr>
+      {{ macros::sheet_row(sheet=sheet) }}
+    </tr>
   {% endfor %}
 {% endblock rows %}
 

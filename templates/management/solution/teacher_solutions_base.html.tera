@@ -3,21 +3,18 @@
 {% extends "management/solution/base" %}
 
 {% block header %}
-  {{ macros::solution_header_student() }}
+  {{ macros::solution_header_teacher(show_title=show_title) }}
 {% endblock header %}
 
 {% block rows %}
   {% for solution in solutions %} 
     <tr>
-      {{ macros::solution_row_student(solution=solution) }}
+      {{ macros::solution_row_teacher(solution=solution, show_title=show_title) }}
     </tr>
   {% endfor %}
 {% endblock rows %}
 
 {% block content %}
-  {% set num_actions = 2 %}
+  {% set num_actions = 1 %}
   {{ super() }}
-  {% for solution in solutions %}
-    {{ macros::delete_modal(solution=solution, permanent=false) }}
-  {% endfor %}
 {% endblock content %}

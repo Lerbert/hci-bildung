@@ -12,16 +12,14 @@
 {% macro sheet_row(sheet) -%}
   {% set edit_url = url_for(endpoint="edit_sheet", id=sheet.id) %}
   {% set view_url = url_for(endpoint="view_sheet", id=sheet.id) %}
-  <tr>
-    <td class="is-narrow">{{ symbols::file() }}</td>
-    <td><a href="{{ edit_url }}">{{ sheet.title }}</a></td>
-    <td class="is-narrow">{{ sheet.owner.username }}</td>
-    <td class="is-narrow">{{ sheet.changed | date(format="%d.%m.%Y %H:%M") }}</td>
-    <td class="is-narrow">{{ sheet.created | date(format="%d.%m.%Y %H:%M") }}</td>
-    <td class="is-narrow"><a href="{{ edit_url }}" title="Bearbeiten" class="button is-small is-ghost p-0">{{ symbols::pencil() }}</a></td>
-    <td class="is-narrow"><a href="{{ view_url }}" title="Ansehen" class="button is-small is-ghost p-0">{{ symbols::eye() }}</a></td>
-    <td class="is-narrow"><a title="Löschen" class="button is-small is-ghost p-0 has-text-danger js-modal-trigger" data-target="delete-modal-{{ sheet.id }}">{{ symbols::trash() }}</a></td>
-  </tr>
+  <td class="is-narrow">{{ symbols::file() }}</td>
+  <td><a href="{{ edit_url }}">{{ sheet.title }}</a></td>
+  <td class="is-narrow">{{ sheet.owner.username }}</td>
+  <td class="is-narrow">{{ sheet.changed | date(format="%d.%m.%Y %H:%M") }}</td>
+  <td class="is-narrow">{{ sheet.created | date(format="%d.%m.%Y %H:%M") }}</td>
+  <td class="is-narrow"><a href="{{ edit_url }}" title="Bearbeiten" class="button is-small is-ghost p-0">{{ symbols::pencil() }}</a></td>
+  <td class="is-narrow"><a href="{{ view_url }}" title="Ansehen" class="button is-small is-ghost p-0">{{ symbols::eye() }}</a></td>
+  <td class="is-narrow"><a title="Löschen" class="button is-small is-ghost p-0 has-text-danger js-modal-trigger" data-target="delete-modal-{{ sheet.id }}">{{ symbols::trash() }}</a></td>
 {%- endmacro  %}
 
 {% macro delete_modal(sheet, permanent) -%}

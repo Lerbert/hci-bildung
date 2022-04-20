@@ -1,7 +1,9 @@
 {% import "generic/symbols" as symbols %}
 {% import "management/sidebar" as sidebar %}
+{% import "management/solution/macros" as macros %}
 
 {% extends "management/solution/base" %}
+
 {% block title %}
   Papierkorb — {{ super() }}
 {% endblock title %}
@@ -46,25 +48,6 @@
   {% set num_actions = 2 %}
   {{ super() }}
   {% for solution in solutions %}
-    {% set delete_url = url_for(endpoint="delete_solution", sheet_id=solution.sheet_id, student_id=solution.owner.id | as_str, solution_id=solution.id | as_str) %}
-    <div id="delete-modal-{{ solution.id }}" class="modal">
-      <div class="modal-background"></div>
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <span class="modal-card-title">Lösung wirklich endgültig löschen?</span>
-          <button class="delete" aria-label="close"></button>
-        </header>
-        <section class="modal-card-body">
-          Wollen Sie die Lösung für "{{ solution.title }}" (Version vom {{ solution.sheet_version | date(format="%d.%m.%Y %H:%M") }}) wirklich endgültig löschen? Das Dokument kann nicht wiederhergestellt werden.
-        </section>
-        <footer class="modal-card-foot is-justify-content-flex-end">
-          <form class="mr-2" action="{{ delete_url }}" method="POST">
-            <input type="hidden" name="_method" value="DELETE">
-            <button class="button is-danger" type="submit">Löschen</button>
-          </form>
-          <button class="button abort">Abbrechen</button>
-        </footer>
-      </div>
-    </div>
+    {{ macros::delete_modal(solution=solution, permanent=true) }}
   {% endfor %}
 {% endblock content %}

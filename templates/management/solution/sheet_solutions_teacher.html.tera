@@ -1,31 +1,6 @@
-{% import "generic/symbols" as symbols %}
-
-{% extends "management/solution/base" %}
-
-{% block header %}
-  <th class="is-narrow"></th>
-  <th>Eigentümer</th>
-  <th class="is-narrow">Zuletzt geändert</th>
-  <th class="is-narrow">Erstellt am</th>
-  <th class="is-narrow">Version der Aufgabenstellung</th>
-  <th class="is-narrow" colspan="{{ num_actions }}">Aktionen</th>
-{% endblock header %}
-
-{% block rows %}
-  {% for solution in solutions %} 
-    {% set view_url = url_for(endpoint="student_solution", sheet_id=solution.sheet_id, student_id=solution.owner.id | as_str) %}
-    <tr>
-      <td class="is-narrow">{{ symbols::file() }}</td>
-      <td><a href="{{ view_url }}">{{ solution.owner.username }}</a></td>
-      <td class="is-narrow">{{ solution.changed | date(format="%d.%m.%Y %H:%M") }}</td>
-      <td class="is-narrow">{{ solution.created | date(format="%d.%m.%Y %H:%M") }}</td>
-      <td class="is-narrow">{{ solution.sheet_version | date(format="%d.%m.%Y %H:%M") }}</td>
-      <td class="is-narrow"><a href="{{ view_url }}" title="Ansehen" class="button is-small is-ghost p-0">{{ symbols::eye() }}</a></td>
-    </tr>
-  {% endfor %}
-{% endblock rows %}
+{% extends "management/solution/teacher_solutions_base" %}
 
 {% block content %}
-  {% set num_actions = 1 %}
+  {% set show_title = false %}
   {{ super() }}
 {% endblock content %}
