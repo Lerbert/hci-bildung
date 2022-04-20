@@ -127,7 +127,8 @@ fn rocket() -> _ {
         .mount(
             sheets::routes::MOUNT,
             routes![
-                sheets::routes::sheet::sheet_overview,
+                sheets::routes::sheet::sheet_overview_teacher,
+                sheets::routes::sheet::sheet_overview_student,
                 sheets::routes::sheet::new_sheet,
                 sheets::routes::sheet::import_sheet,
                 sheets::routes::sheet::view_sheet,

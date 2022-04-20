@@ -45,7 +45,7 @@ pub fn landing_page(user: Option<&AuthenticatedUser>) -> Template {
 #[get("/login")]
 pub fn already_logged_in(_user: &AuthenticatedUser) -> Redirect {
     Redirect::to(sheets::routes::sheets_uri(uri!(
-        sheets::routes::sheet::sheet_overview
+        sheets::routes::sheet::sheet_overview_teacher
     )))
 }
 
@@ -73,7 +73,7 @@ pub async fn login(
             s.map(|session_id| {
                 cookies.add_private(Cookie::new(guards::SESSION_ID_COOKIE_NAME, session_id));
                 Ok(FlashRedirect::no_flash(sheets::routes::sheets_uri(uri!(
-                    sheets::routes::sheet::sheet_overview
+                    sheets::routes::sheet::sheet_overview_teacher
                 ))))
             })
             .unwrap_or_else(|| {

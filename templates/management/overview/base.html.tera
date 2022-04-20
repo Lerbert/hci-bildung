@@ -1,0 +1,55 @@
+{% import "management/sidebar" as sidebar %}
+
+{% extends "generic/base" %}
+
+{% block content %} 
+  <div class="mt-3 columns">
+    <div class="column is-one-fifth">
+      {% block sidebar %}
+        {{ sidebar::sidebar(active="sheet_overview") }}
+      {% endblock sidebar %}
+    </div>
+    <div class="column">
+      <section class="section">
+        <div class="container is-fluid">
+          <h1 class="title">
+            {% block heading_1 %}
+            {% endblock heading_1 %}
+          </h1>
+          <table class="table is-fullwidth is-hoverable">
+            <thead>
+              <tr>
+                {% block header_1 %}
+                {% endblock header_1 %}
+              </tr>
+            </thead>
+            <tbody>
+              {% block rows_1 %}
+              {% endblock rows_1 %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="section">
+        <div class="container is-fluid">
+          <h1 class="title">
+            {% block heading_2 %}
+            {% endblock heading_2 %}
+          </h1>
+          <table class="table is-fullwidth is-hoverable">
+            <thead>
+              <tr>
+                {% block header_2 %}
+                {% endblock header_2 %}
+              </tr>
+            </thead>
+            <tbody>
+              {% block rows_2 %}
+              {% endblock rows_2 %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+{% endblock content %}

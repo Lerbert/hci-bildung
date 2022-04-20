@@ -1,5 +1,9 @@
 {% macro sidebar(active="none") -%}
   <aside class="box menu">
+    <ul class="menu-list">
+      {# Currently, it doesn't matter if we use the URL for student or teacher overview, since they are the same #}
+      <li><a href='{{ url_for(endpoint="sheet_overview_teacher") }}' {% if active == "sheet_overview" %} class="is-active" {% endif %}>Übersicht</a></li>
+    </ul>
     <p class="menu-label">
       Dokumente
     </p>

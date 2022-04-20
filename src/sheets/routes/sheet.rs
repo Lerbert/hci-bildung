@@ -5,15 +5,16 @@ use rocket::serde::json::Json;
 use rocket::serde::Serialize;
 use rocket_dyn_templates::Template;
 
-use crate::flash::FlashRedirect;
-use crate::login::guards::{AuthenticatedUser, Teacher};
+use crate::flash::{FlashContext, FlashRedirect};
+use crate::login::guards::{AuthenticatedUser, Student, Teacher};
 use crate::login::transport::UserTransport;
 use crate::status::ToStatus;
 use crate::validation::Validate;
 use crate::Db;
 
 use super::logic;
-use super::logic::sheet::Sheet;
+use super::logic::sheet::{Sheet, SheetMetadata};
+use super::logic::solution::SolutionMetadata;
 use super::logic::Id;
 use super::sheet_tree;
 use super::transport::{ImportSheetForm, NewSheetForm, SheetTransport};
@@ -25,12 +26,39 @@ struct SheetContext<'a> {
     user: Option<&'a UserTransport>,
 }
 
+#[derive(Serialize)]
+struct SheetOverviewContext<'a> {
+    flash: Option<FlashContext>,
+    sheets: Vec<SheetMetadata>,
+    solutions: Vec<SolutionMetadata>,
+    user: &'a UserTransport,
+}
+
 #[get("/")]
-pub fn sheet_overview() {
-    todo!()
+pub async fn sheet_overview_teacher(db: Db, teacher: Teacher<'_>) -> Result<Template, Status> {
+    let user = teacher.into_inner();
+    let user_id = user.user_info.id;
+    let recent_sheets = logic::sheet::get_recent(&db, user_id)
+        .await
+        .map_err(|e| e.to_status())?;
+    let recent_solutions = logic::solution::get_solutions_teacher(&db, user_id)
+        .await
+        .map_err(|e| e.to_status())?;
+    Ok(Template::render("management/overview/teacher", &SheetOverviewContext {
+        flash: None,
+        sheets: recent_sheets,
+        solutions: recent_solutions,
+        user: &user.user_info,
+    }))
 }
 
 #[get("/", rank = 2)]
+pub async fn sheet_overview_student(db: Db, student: Student<'_>) -> Result<Template, Status> {
+    let user = student.into_inner();
+    todo!()
+}
+
+#[get("/", rank = 3)]
 pub fn login_sheet_overview(user: Option<&AuthenticatedUser>) -> Result<FlashRedirect, Status> {
     handle_insufficient_permissions(user)
 }
