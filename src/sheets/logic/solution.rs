@@ -119,10 +119,10 @@ pub async fn get_latest_solution(db: &Db, sheet_id: Id, user_id: i32) -> Result<
         })
 }
 
-pub async fn get_solution_for_teacher(
+pub async fn get_latest_solution_for_teacher(
     db: &Db,
-    sheet_id: Id,
     teacher_id: i32,
+    sheet_id: Id,
     student_id: i32,
 ) -> Result<Solution> {
     sheet::check_sheet_ownership(db, teacher_id, sheet_id).await?;
@@ -156,6 +156,18 @@ fn check_coherence(solution: &Solution, sheet_id: Id, student_id: i32) -> Result
     } else {
         Ok(())
     }
+}
+
+pub async fn get_solution_for_teacher(
+    db: &Db,
+    teacher_id: i32,
+    sheet_id: Id,
+    student_id: i32,
+    solution_id: i32,
+) -> Result<Solution> {
+    sheet::check_sheet_ownership(db, teacher_id, sheet_id).await?;
+    let solution = get_my_solution(db, student_id, sheet_id, solution_id).await?;
+    Ok(solution)
 }
 
 pub async fn get_my_solution(

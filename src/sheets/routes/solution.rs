@@ -192,37 +192,6 @@ pub async fn start_solve(db: Db, student: Student<'_>, sheet_id: Id) -> Result<R
         .map(|_| Redirect::to(sheets_uri(uri!(latest_solution(sheet_id)))))
 }
 
-#[get("/<sheet_id>/solutions/<student_id>", rank = 2)]
-pub async fn student_solution(
-    db: Db,
-    teacher: Teacher<'_>,
-    sheet_id: Id,
-    student_id: i32,
-) -> Result<Template, Status> {
-    let user = teacher.into_inner();
-    logic::solution::get_solution_for_teacher(&db, sheet_id, user.user_info.id, student_id)
-        .await
-        .map_err(|e| e.to_status())
-        .map(|solution| {
-            Template::render(
-                "sheet/solution/student_solution",
-                &SolutionContext {
-                    solution,
-                    user: &user.user_info,
-                },
-            )
-        })
-}
-
-#[get("/<_sheet_id>/solutions/<_student_id>", rank = 4)]
-pub fn login_student_solution(
-    user: Option<&AuthenticatedUser>,
-    _sheet_id: Id,
-    _student_id: i32,
-) -> Result<FlashRedirect, Status> {
-    handle_insufficient_permissions(user)
-}
-
 #[get("/<sheet_id>/solutions/my/latest")]
 pub async fn latest_solution(
     db: Db,
@@ -339,4 +308,74 @@ pub async fn restore_solution(
         .await
         .map_err(|e| e.to_status())
         .map(|_| Redirect::to(sheets_uri(uri!(solution_overview_student))))
+}
+
+#[get("/<sheet_id>/solutions/<student_id>/latest", rank = 5)]
+pub async fn latest_student_solution(
+    db: Db,
+    teacher: Teacher<'_>,
+    sheet_id: Id,
+    student_id: i32,
+) -> Result<Template, Status> {
+    let user = teacher.into_inner();
+    logic::solution::get_latest_solution_for_teacher(&db, user.user_info.id, sheet_id, student_id)
+        .await
+        .map_err(|e| e.to_status())
+        .map(|solution| {
+            Template::render(
+                "sheet/solution/student_solution",
+                &SolutionContext {
+                    solution,
+                    user: &user.user_info,
+                },
+            )
+        })
+}
+
+#[get("/<_sheet_id>/solutions/<_student_id>/latest", rank = 6)]
+pub fn login_latest_student_solution(
+    user: Option<&AuthenticatedUser>,
+    _sheet_id: Id,
+    _student_id: i32,
+) -> Result<FlashRedirect, Status> {
+    handle_insufficient_permissions(user)
+}
+
+#[get("/<sheet_id>/solutions/<student_id>/<solution_id>", rank = 7)]
+pub async fn student_solution(
+    db: Db,
+    teacher: Teacher<'_>,
+    sheet_id: Id,
+    student_id: i32,
+    solution_id: i32,
+) -> Result<Template, Status> {
+    let user = teacher.into_inner();
+    logic::solution::get_solution_for_teacher(
+        &db,
+        user.user_info.id,
+        sheet_id,
+        student_id,
+        solution_id,
+    )
+    .await
+    .map_err(|e| e.to_status())
+    .map(|solution| {
+        Template::render(
+            "sheet/solution/student_solution",
+            &SolutionContext {
+                solution,
+                user: &user.user_info,
+            },
+        )
+    })
+}
+
+#[get("/<_sheet_id>/solutions/<_student_id>/<_solution_id>", rank = 8)]
+pub fn login_student_solution(
+    user: Option<&AuthenticatedUser>,
+    _sheet_id: Id,
+    _student_id: i32,
+    _solution_id: i32,
+) -> Result<FlashRedirect, Status> {
+    handle_insufficient_permissions(user)
 }
