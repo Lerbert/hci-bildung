@@ -97,19 +97,31 @@ pub async fn get_recent(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Err
 }
 
 pub async fn get_updated(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Error> {
+    use self::diesel::dsl::{exists, not};
+
     let sheets: Vec<(SheetMetadataDiesel, UserTransportDiesel)> = db
         .run(move |c| {
             sheets::table
                 .inner_join(users::table)
-                .inner_join(solutions::table)
                 .select((
                     SheetMetadataDiesel::columns(),
                     UserTransportDiesel::columns(),
                 ))
-                .filter(solutions::owner_id.eq(user_id))
-                .filter(solutions::sheet_version.lt(sheets::changed))
-                .filter(solutions::trashed.is_null())
                 .filter(sheets::trashed.is_null())
+                .filter(not(exists(
+                    solutions::table
+                        .filter(solutions::trashed.is_null())
+                        .filter(solutions::owner_id.eq(user_id))
+                        .filter(solutions::sheet_id.eq(sheets::id.nullable()))
+                        .filter(solutions::sheet_version.eq(sheets::changed))
+                )))
+                .filter(exists(
+                    solutions::table
+                        .filter(solutions::trashed.is_null())
+                        .filter(solutions::owner_id.eq(user_id))
+                        .filter(solutions::sheet_id.eq(sheets::id.nullable()))
+                        .filter(solutions::sheet_version.lt(sheets::changed))
+                ))
                 .order(sheets::changed.desc())
                 .load(c)
         })
