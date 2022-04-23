@@ -13,7 +13,7 @@ use crate::Db;
 
 use super::guards::{self, AuthenticatedUser};
 use super::logic;
-use super::transport::{LoginForm, UserInfo};
+use super::transport::LoginForm;
 
 impl ToStatus for logic::Error {
     fn to_status(self) -> Status {
@@ -24,7 +24,7 @@ impl ToStatus for logic::Error {
 
 #[derive(Serialize)]
 struct LandingPageContext<'a> {
-    user: Option<&'a UserInfo>,
+    user: Option<&'a AuthenticatedUser>,
 }
 
 #[derive(Serialize)]
@@ -34,12 +34,7 @@ struct LoginContext {
 
 #[get("/")]
 pub fn landing_page(user: Option<&AuthenticatedUser>) -> Template {
-    Template::render(
-        "landing_page",
-        &LandingPageContext {
-            user: user.map(|u| &u.user_info),
-        },
-    )
+    Template::render("landing_page", &LandingPageContext { user })
 }
 
 #[get("/login")]

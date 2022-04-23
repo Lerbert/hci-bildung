@@ -55,10 +55,7 @@ pub async fn get_solutions_by_sheet_owner(
             solutions::table
                 .inner_join(users::table)
                 .inner_join(sheets::table)
-                .select((
-                    SolutionMetadataDiesel::columns(),
-                    UserInfoDiesel::columns(),
-                ))
+                .select((SolutionMetadataDiesel::columns(), UserInfoDiesel::columns()))
                 .filter(sheets::owner_id.eq(user_id))
                 .filter(sheets::trashed.is_null())
                 .filter(solutions::trashed.is_null())
@@ -74,10 +71,7 @@ pub async fn get_solutions_by_owner(db: &Db, user_id: i32) -> Result<Vec<Solutio
         .run(move |c| {
             solutions::table
                 .inner_join(users::table)
-                .select((
-                    SolutionMetadataDiesel::columns(),
-                    UserInfoDiesel::columns(),
-                ))
+                .select((SolutionMetadataDiesel::columns(), UserInfoDiesel::columns()))
                 .filter(solutions::owner_id.eq(user_id))
                 .filter(solutions::trashed.is_null())
                 .order(solutions::sheet_version.desc())
@@ -92,10 +86,7 @@ pub async fn get_trash(db: &Db, user_id: i32) -> Result<Vec<SolutionMetadata>, E
         .run(move |c| {
             solutions::table
                 .inner_join(users::table)
-                .select((
-                    SolutionMetadataDiesel::columns(),
-                    UserInfoDiesel::columns(),
-                ))
+                .select((SolutionMetadataDiesel::columns(), UserInfoDiesel::columns()))
                 .filter(solutions::owner_id.eq(user_id))
                 .filter(solutions::trashed.is_not_null())
                 .order(solutions::trashed.desc())
@@ -110,10 +101,7 @@ pub async fn get_recent(db: &Db, user_id: i32) -> Result<Vec<SolutionMetadata>, 
         .run(move |c| {
             solutions::table
                 .inner_join(users::table)
-                .select((
-                    SolutionMetadataDiesel::columns(),
-                    UserInfoDiesel::columns(),
-                ))
+                .select((SolutionMetadataDiesel::columns(), UserInfoDiesel::columns()))
                 .filter(solutions::owner_id.eq(user_id))
                 .filter(solutions::trashed.is_null())
                 .order(solutions::changed.desc())
@@ -131,10 +119,7 @@ pub async fn get_all_sheet_solutions(
         .run(move |c| {
             solutions::table
                 .inner_join(users::table)
-                .select((
-                    SolutionMetadataDiesel::columns(),
-                    UserInfoDiesel::columns(),
-                ))
+                .select((SolutionMetadataDiesel::columns(), UserInfoDiesel::columns()))
                 .filter(solutions::sheet_id.eq(sheet_id))
                 .filter(solutions::trashed.is_null())
                 .order((users::username.asc(), solutions::sheet_version.desc()))
@@ -153,10 +138,7 @@ pub async fn get_sheet_solutions_by_sheet_and_user_id(
         .run(move |c| {
             solutions::table
                 .inner_join(users::table)
-                .select((
-                    SolutionMetadataDiesel::columns(),
-                    UserInfoDiesel::columns(),
-                ))
+                .select((SolutionMetadataDiesel::columns(), UserInfoDiesel::columns()))
                 .filter(solutions::sheet_id.eq(sheet_id))
                 .filter(solutions::owner_id.eq(user_id))
                 .filter(solutions::trashed.is_null())

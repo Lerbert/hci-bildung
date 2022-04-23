@@ -7,7 +7,6 @@ use rocket_dyn_templates::Template;
 
 use crate::flash::{FlashContext, FlashRedirect};
 use crate::login::guards::{AuthenticatedUser, Student, Teacher};
-use crate::login::transport::UserInfo;
 use crate::status::ToStatus;
 use crate::Db;
 
@@ -20,7 +19,7 @@ use super::{handle_insufficient_permissions, sheets_uri};
 #[derive(Serialize)]
 struct SolutionContext<'a> {
     solution: Solution,
-    user: &'a UserInfo,
+    user: &'a AuthenticatedUser,
 }
 
 #[derive(Serialize)]
@@ -28,7 +27,7 @@ struct SolutionManagementContext<'a> {
     flash: Option<FlashContext>,
     sheet_title: Option<String>,
     solutions: Vec<SolutionMetadata>,
-    user: &'a UserInfo,
+    user: &'a AuthenticatedUser,
 }
 
 #[get("/solutions")]
@@ -44,7 +43,7 @@ pub async fn solution_overview_teacher(db: Db, teacher: Teacher<'_>) -> Result<T
                     flash: None,
                     sheet_title: None,
                     solutions,
-                    user: &user.user_info,
+                    user,
                 },
             )
         })
@@ -63,7 +62,7 @@ pub async fn solution_overview_student(db: Db, student: Student<'_>) -> Result<T
                     flash: None,
                     sheet_title: None,
                     solutions,
-                    user: &user.user_info,
+                    user,
                 },
             )
         })
@@ -87,7 +86,7 @@ pub async fn trashed_solutions(db: Db, student: Student<'_>) -> Result<Template,
                     flash: None,
                     sheet_title: None,
                     solutions,
-                    user: &user.user_info,
+                    user,
                 },
             )
         })
@@ -111,7 +110,7 @@ pub async fn recent_solutions(db: Db, student: Student<'_>) -> Result<Template, 
                     flash: None,
                     sheet_title: None,
                     solutions,
-                    user: &user.user_info,
+                    user,
                 },
             )
         })
@@ -143,7 +142,7 @@ pub async fn sheet_solutions_teacher(
                     flash: flash.map(|f| f.into()),
                     sheet_title: Some(sheet_title),
                     solutions,
-                    user: &user.user_info,
+                    user,
                 },
             )
         })
@@ -169,7 +168,7 @@ pub async fn sheet_solutions_student(
                     flash: None,
                     sheet_title: Some(sheet_title),
                     solutions,
-                    user: &user.user_info,
+                    user,
                 },
             )
         })
@@ -205,10 +204,7 @@ pub async fn latest_solution(
         .map(|solution| {
             Template::render(
                 "sheet/solution/my_solution",
-                &SolutionContext {
-                    solution,
-                    user: &user.user_info,
-                },
+                &SolutionContext { solution, user },
             )
         })
 }
@@ -235,10 +231,7 @@ pub async fn my_solution(
         .map(|solution| {
             Template::render(
                 "sheet/solution/my_solution",
-                &SolutionContext {
-                    solution,
-                    user: &user.user_info,
-                },
+                &SolutionContext { solution, user },
             )
         })
 }
@@ -324,10 +317,7 @@ pub async fn latest_student_solution(
         .map(|solution| {
             Template::render(
                 "sheet/solution/student_solution",
-                &SolutionContext {
-                    solution,
-                    user: &user.user_info,
-                },
+                &SolutionContext { solution, user },
             )
         })
 }
@@ -362,10 +352,7 @@ pub async fn student_solution(
     .map(|solution| {
         Template::render(
             "sheet/solution/student_solution",
-            &SolutionContext {
-                solution,
-                user: &user.user_info,
-            },
+            &SolutionContext { solution, user },
         )
     })
 }

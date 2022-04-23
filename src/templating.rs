@@ -129,7 +129,11 @@ mod test {
         let args = HashMap::new();
         let result = instantiate_uri(&uri, &args);
         let msg = result.unwrap_err().to_string();
-        assert!(msg.contains("No argument found for instantiate"), "Message {} does not contain \"No argument found for instantiate\"", msg);
+        assert!(
+            msg.contains("No argument found for instantiate"),
+            "Message {} does not contain \"No argument found for instantiate\"",
+            msg
+        );
     }
 
     #[test]

@@ -5,7 +5,6 @@ use rocket_dyn_templates::Template;
 
 use crate::flash::{FlashContext, FlashRedirect};
 use crate::login::guards::{AuthenticatedUser, Teacher};
-use crate::login::transport::UserInfo;
 use crate::status::ToStatus;
 use crate::Db;
 
@@ -16,7 +15,7 @@ use super::{handle_insufficient_permissions, logic};
 struct SheetManagementContext<'a> {
     flash: Option<FlashContext>,
     sheets: Vec<SheetMetadata>,
-    user: &'a UserInfo,
+    user: &'a AuthenticatedUser,
 }
 
 #[get("/assignments")]
@@ -35,7 +34,7 @@ pub async fn assignment_overview(
                 &SheetManagementContext {
                     flash: flash.map(|f| f.into()),
                     sheets,
-                    user: &user.user_info,
+                    user,
                 },
             )
         })
@@ -60,7 +59,7 @@ pub async fn trashed_sheets(db: Db, teacher: Teacher<'_>) -> Result<Template, St
                 &SheetManagementContext {
                     flash: None,
                     sheets,
-                    user: &user.user_info,
+                    user,
                 },
             )
         })
@@ -83,7 +82,7 @@ pub async fn recent_sheets(db: Db, teacher: Teacher<'_>) -> Result<Template, Sta
                 &SheetManagementContext {
                     flash: None,
                     sheets,
-                    user: &user.user_info,
+                    user,
                 },
             )
         })

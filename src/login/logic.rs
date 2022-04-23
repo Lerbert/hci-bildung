@@ -6,6 +6,7 @@ use crypto::scrypt;
 use log::error;
 use rand::rngs::OsRng;
 use rand::RngCore;
+use rocket::serde::{Deserialize, Serialize};
 
 use crate::Db;
 
@@ -32,7 +33,7 @@ impl From<data::Error> for Error {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum Role {
     Teacher,
     Student,

@@ -4,15 +4,15 @@ use rocket::serde::{Deserialize, Serialize};
 
 use crate::Db;
 
-use super::logic::{self, User};
-use super::transport::{RoleTransport, UserInfo};
+use super::logic::{self, Role, User};
+use super::transport::UserInfo;
 
 pub const SESSION_ID_COOKIE_NAME: &str = "session_id";
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct AuthenticatedUser {
     pub user_info: UserInfo,
-    pub roles: Vec<RoleTransport>,
+    pub roles: Vec<Role>,
 }
 
 #[rocket::async_trait]
@@ -48,9 +48,9 @@ impl From<User> for AuthenticatedUser {
         AuthenticatedUser {
             user_info: UserInfo {
                 id: user.id,
-                username: user.username.clone(),
+                username: user.username,
             },
-            roles: user.roles.into_iter().map(|r| r.into()).collect(),
+            roles: user.roles,
         }
     }
 }
@@ -59,7 +59,7 @@ impl From<&User> for AuthenticatedUser {
     fn from(user: &User) -> Self {
         AuthenticatedUser {
             user_info: user.into(),
-            roles: user.roles.iter().map(|&r| r.into()).collect(),
+            roles: user.roles.clone(),
         }
     }
 }
@@ -78,7 +78,7 @@ impl<'r> FromRequest<'r> for Teacher<'r> {
 
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         let user = try_outcome!(request.guard::<&'r AuthenticatedUser>().await);
-        if user.roles.contains(&RoleTransport::Teacher) {
+        if user.roles.contains(&Role::Teacher) {
             Outcome::Success(Teacher(user))
         } else {
             Outcome::Forward(())
@@ -100,7 +100,7 @@ impl<'r> FromRequest<'r> for Student<'r> {
 
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         let user = try_outcome!(request.guard::<&'r AuthenticatedUser>().await);
-        if user.roles.contains(&RoleTransport::Student) {
+        if user.roles.contains(&Role::Student) {
             Outcome::Success(Student(user))
         } else {
             Outcome::Forward(())

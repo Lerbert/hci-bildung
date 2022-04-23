@@ -47,10 +47,7 @@ pub async fn get_all_sheets(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>,
         .run(move |c| {
             sheets::table
                 .inner_join(users::table)
-                .select((
-                    SheetMetadataDiesel::columns(),
-                    UserInfoDiesel::columns(),
-                ))
+                .select((SheetMetadataDiesel::columns(), UserInfoDiesel::columns()))
                 .filter(sheets::owner_id.eq(user_id))
                 .filter(sheets::trashed.is_null())
                 .order(sheets::title.asc())
@@ -65,10 +62,7 @@ pub async fn get_trash(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Erro
         .run(move |c| {
             sheets::table
                 .inner_join(users::table)
-                .select((
-                    SheetMetadataDiesel::columns(),
-                    UserInfoDiesel::columns(),
-                ))
+                .select((SheetMetadataDiesel::columns(), UserInfoDiesel::columns()))
                 .filter(sheets::owner_id.eq(user_id))
                 .filter(sheets::trashed.is_not_null())
                 .order(sheets::trashed.desc())
@@ -83,10 +77,7 @@ pub async fn get_recent(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Err
         .run(move |c| {
             sheets::table
                 .inner_join(users::table)
-                .select((
-                    SheetMetadataDiesel::columns(),
-                    UserInfoDiesel::columns(),
-                ))
+                .select((SheetMetadataDiesel::columns(), UserInfoDiesel::columns()))
                 .filter(sheets::owner_id.eq(user_id))
                 .filter(sheets::trashed.is_null())
                 .order(sheets::changed.desc())
@@ -103,10 +94,7 @@ pub async fn get_updated(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Er
         .run(move |c| {
             sheets::table
                 .inner_join(users::table)
-                .select((
-                    SheetMetadataDiesel::columns(),
-                    UserInfoDiesel::columns(),
-                ))
+                .select((SheetMetadataDiesel::columns(), UserInfoDiesel::columns()))
                 .filter(sheets::trashed.is_null())
                 .filter(not(exists(
                     solutions::table

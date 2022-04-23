@@ -56,7 +56,7 @@
       {% if user %}
         <div class="navbar-item has-dropdown is-hoverable">
           <a class="navbar-link">
-            {{ user.username }}
+            {{ user.user_info.username }}
           </a>
           
           <div class="navbar-dropdown">

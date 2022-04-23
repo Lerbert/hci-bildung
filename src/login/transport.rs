@@ -1,6 +1,6 @@
 use rocket::serde::{Deserialize, Serialize};
 
-use super::logic::{Role, User};
+use super::logic::User;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct UserInfo {
@@ -22,21 +22,6 @@ impl From<&User> for UserInfo {
         UserInfo {
             id: user.id,
             username: user.username.clone(),
-        }
-    }
-}
-
-#[derive(Debug, Deserialize, Eq, PartialEq, Serialize)]
-pub enum RoleTransport {
-    Teacher,
-    Student,
-}
-
-impl From<Role> for RoleTransport {
-    fn from(role: Role) -> Self {
-        match role {
-            Role::Teacher => Self::Teacher,
-            Role::Student => Self::Student,
         }
     }
 }

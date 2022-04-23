@@ -7,7 +7,6 @@ use rocket_dyn_templates::Template;
 
 use crate::flash::{FlashContext, FlashRedirect};
 use crate::login::guards::{AuthenticatedUser, Student, Teacher};
-use crate::login::transport::UserInfo;
 use crate::status::ToStatus;
 use crate::validation::Validate;
 use crate::Db;
@@ -23,7 +22,7 @@ use super::{handle_insufficient_permissions, sheets_uri};
 #[derive(Serialize)]
 struct SheetContext<'a> {
     sheet: Sheet,
-    user: Option<&'a UserInfo>,
+    user: Option<&'a AuthenticatedUser>,
 }
 
 #[derive(Serialize)]
@@ -31,7 +30,7 @@ struct SheetOverviewContext<'a> {
     flash: Option<FlashContext>,
     sheets: Vec<SheetMetadata>,
     solutions: Vec<SolutionMetadata>,
-    user: &'a UserInfo,
+    user: &'a AuthenticatedUser,
 }
 
 #[get("/")]
@@ -50,7 +49,7 @@ pub async fn sheet_overview_teacher(db: Db, teacher: Teacher<'_>) -> Result<Temp
             flash: None,
             sheets: recent_sheets,
             solutions: recent_solutions,
-            user: &user.user_info,
+            user,
         },
     ))
 }
@@ -71,7 +70,7 @@ pub async fn sheet_overview_student(db: Db, student: Student<'_>) -> Result<Temp
             flash: None,
             sheets: updated_sheets,
             solutions: recent_solutions,
-            user: &user.user_info,
+            user,
         },
     ))
 }
@@ -140,15 +139,7 @@ pub async fn view_sheet(
     logic::sheet::get_sheet(&db, id)
         .await
         .map_err(|e| e.to_status())
-        .map(|sheet| {
-            Template::render(
-                "sheet/view_sheet",
-                &SheetContext {
-                    sheet,
-                    user: user.map(|u| &u.user_info),
-                },
-            )
-        })
+        .map(|sheet| Template::render("sheet/view_sheet", &SheetContext { sheet, user }))
 }
 
 #[get("/<id>/edit")]
@@ -162,7 +153,7 @@ pub async fn edit_sheet(db: Db, teacher: Teacher<'_>, id: Id) -> Result<Template
                 "sheet/edit_sheet",
                 &SheetContext {
                     sheet,
-                    user: Some(&user.user_info),
+                    user: Some(user),
                 },
             )
         })
