@@ -223,24 +223,19 @@ pub async fn get_latest_solution_by_sheet_and_user_id(
 
 pub async fn update_solution(
     db: &Db,
-    sheet_id: Id,
-    user_id: i32,
+    solution_id: i32,
     content: serde_json::Value,
     changed: DateTime<Utc>,
 ) -> Result<(), Error> {
-    if let Some(latest_solution) =
-        get_latest_solution_by_sheet_and_user_id(db, sheet_id, user_id).await?
-    {
-        db.run(move |c| {
-            diesel::update(solutions::table.find(latest_solution.metadata.id))
-                .set((
-                    solutions::content.eq(content),
-                    solutions::changed.eq(changed),
-                ))
-                .execute(c)
-        })
-        .await?;
-    }
+    db.run(move |c| {
+        diesel::update(solutions::table.find(solution_id))
+            .set((
+                solutions::content.eq(content),
+                solutions::changed.eq(changed),
+            ))
+            .execute(c)
+    })
+    .await?;
     Ok(())
 }
 

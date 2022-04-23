@@ -146,6 +146,7 @@ fn rocket() -> _ {
                 sheets::routes::solution::sheet_solutions_teacher,
                 sheets::routes::solution::sheet_solutions_student,
                 sheets::routes::solution::start_solve,
+                sheets::routes::solution::latest_solution,
                 sheets::routes::solution::my_solution,
                 sheets::routes::solution::save_solution,
                 sheets::routes::solution::student_solution,
@@ -160,6 +161,7 @@ fn rocket() -> _ {
                 sheets::routes::solution::login_trashed_solutions,
                 sheets::routes::solution::login_recent_solutions,
                 sheets::routes::solution::login_sheet_solutions,
+                sheets::routes::solution::login_latest_solution,
                 sheets::routes::solution::login_my_solution,
                 sheets::routes::solution::login_student_solution
             ],

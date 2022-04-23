@@ -189,46 +189,7 @@ pub async fn start_solve(db: Db, student: Student<'_>, sheet_id: Id) -> Result<R
     logic::solution::start_solve(&db, sheet_id, user.user_info.id)
         .await
         .map_err(|e| e.to_status())
-        .map(|_| Redirect::to(sheets_uri(uri!(my_solution(sheet_id)))))
-}
-
-#[get("/<sheet_id>/solutions/my")]
-pub async fn my_solution(db: Db, student: Student<'_>, sheet_id: Id) -> Result<Template, Status> {
-    let user = student.into_inner();
-    logic::solution::get_latest_solution(&db, sheet_id, user.user_info.id)
-        .await
-        .map_err(|e| e.to_status())
-        .map(|solution| {
-            Template::render(
-                "sheet/solution/my_solution",
-                &SolutionContext {
-                    solution,
-                    user: &user.user_info,
-                },
-            )
-        })
-}
-
-#[get("/<_id>/solutions/my", rank = 3)]
-pub fn login_my_solution(
-    user: Option<&AuthenticatedUser>,
-    _id: Id,
-) -> Result<FlashRedirect, Status> {
-    handle_insufficient_permissions(user)
-}
-
-#[put("/<sheet_id>/solutions/my", format = "json", data = "<solution>")]
-pub async fn save_solution(
-    db: Db,
-    student: Student<'_>,
-    sheet_id: Id,
-    solution: Json<SolutionTransport>,
-) -> Result<(), Status> {
-    let user = student.into_inner();
-    let solution = solution.into_inner();
-    logic::solution::update_solution(&db, sheet_id, user.user_info.id, solution.content)
-        .await
-        .map_err(|e| e.to_status())
+        .map(|_| Redirect::to(sheets_uri(uri!(latest_solution(sheet_id)))))
 }
 
 #[get("/<sheet_id>/solutions/<student_id>", rank = 2)]
@@ -262,16 +223,100 @@ pub fn login_student_solution(
     handle_insufficient_permissions(user)
 }
 
-#[delete("/<sheet_id>/solutions/<student_id>/<solution_id>")]
+#[get("/<sheet_id>/solutions/my/latest")]
+pub async fn latest_solution(
+    db: Db,
+    student: Student<'_>,
+    sheet_id: Id,
+) -> Result<Template, Status> {
+    let user = student.into_inner();
+    logic::solution::get_latest_solution(&db, sheet_id, user.user_info.id)
+        .await
+        .map_err(|e| e.to_status())
+        .map(|solution| {
+            Template::render(
+                "sheet/solution/my_solution",
+                &SolutionContext {
+                    solution,
+                    user: &user.user_info,
+                },
+            )
+        })
+}
+
+#[get("/<_sheet_id>/solutions/my/latest", rank = 2)]
+pub fn login_latest_solution(
+    user: Option<&AuthenticatedUser>,
+    _sheet_id: Id,
+) -> Result<FlashRedirect, Status> {
+    handle_insufficient_permissions(user)
+}
+
+#[get("/<sheet_id>/solutions/my/<solution_id>", rank = 3)]
+pub async fn my_solution(
+    db: Db,
+    student: Student<'_>,
+    sheet_id: Id,
+    solution_id: i32,
+) -> Result<Template, Status> {
+    let user = student.into_inner();
+    logic::solution::get_my_solution(&db, user.user_info.id, sheet_id, solution_id)
+        .await
+        .map_err(|e| e.to_status())
+        .map(|solution| {
+            Template::render(
+                "sheet/solution/my_solution",
+                &SolutionContext {
+                    solution,
+                    user: &user.user_info,
+                },
+            )
+        })
+}
+
+#[get("/<_sheet_id>/solutions/my/<_solution_id>", rank = 4)]
+pub fn login_my_solution(
+    user: Option<&AuthenticatedUser>,
+    _sheet_id: Id,
+    _solution_id: i32,
+) -> Result<FlashRedirect, Status> {
+    handle_insufficient_permissions(user)
+}
+
+#[put(
+    "/<sheet_id>/solutions/my/<solution_id>",
+    format = "json",
+    data = "<solution>"
+)]
+pub async fn save_solution(
+    db: Db,
+    student: Student<'_>,
+    sheet_id: Id,
+    solution_id: i32,
+    solution: Json<SolutionTransport>,
+) -> Result<(), Status> {
+    let user = student.into_inner();
+    let solution = solution.into_inner();
+    logic::solution::update_solution(
+        &db,
+        user.user_info.id,
+        sheet_id,
+        solution_id,
+        solution.content,
+    )
+    .await
+    .map_err(|e| e.to_status())
+}
+
+#[delete("/<sheet_id>/solutions/my/<solution_id>")]
 pub async fn delete_solution(
     db: Db,
     student: Student<'_>,
     sheet_id: Id,
-    student_id: i32,
     solution_id: i32,
 ) -> Result<Redirect, Status> {
     let user = student.into_inner();
-    logic::solution::delete_solution(&db, user.user_info.id, sheet_id, student_id, solution_id)
+    logic::solution::delete_solution(&db, user.user_info.id, sheet_id, solution_id)
         .await
         .map_err(|e| e.to_status())
         .map(|outcome| match outcome {
@@ -282,16 +327,15 @@ pub async fn delete_solution(
         })
 }
 
-#[post("/<sheet_id>/solutions/<student_id>/<solution_id>/restore")]
+#[post("/<sheet_id>/solutions/my/<solution_id>/restore")]
 pub async fn restore_solution(
     db: Db,
     student: Student<'_>,
     sheet_id: Id,
-    student_id: i32,
     solution_id: i32,
 ) -> Result<Redirect, Status> {
     let user = student.into_inner();
-    logic::solution::restore_solution(&db, user.user_info.id, sheet_id, student_id, solution_id)
+    logic::solution::restore_solution(&db, user.user_info.id, sheet_id, solution_id)
         .await
         .map_err(|e| e.to_status())
         .map(|_| Redirect::to(sheets_uri(uri!(solution_overview_student))))

@@ -119,16 +119,6 @@ pub async fn get_latest_solution(db: &Db, sheet_id: Id, user_id: i32) -> Result<
         })
 }
 
-pub async fn update_solution(
-    db: &Db,
-    sheet_id: Id,
-    user_id: i32,
-    content: serde_json::Value,
-) -> Result<()> {
-    let now = Utc::now();
-    Ok(data::solution::update_solution(db, sheet_id, user_id, content, now).await?)
-}
-
 pub async fn get_solution_for_teacher(
     db: &Db,
     sheet_id: Id,
@@ -168,15 +158,46 @@ fn check_coherence(solution: &Solution, sheet_id: Id, student_id: i32) -> Result
     }
 }
 
+pub async fn get_my_solution(
+    db: &Db,
+    user_id: i32,
+    sheet_id: Id,
+    solution_id: i32,
+) -> Result<Solution> {
+    let solution = get_solution_owned_by_user(db, user_id, solution_id).await?;
+    check_coherence(&solution, sheet_id, user_id)?;
+    Ok(solution)
+}
+
+async fn check_solution_ownership(
+    db: &Db,
+    user_id: i32,
+    sheet_id: Id,
+    solution_id: i32,
+) -> Result<()> {
+    get_my_solution(db, user_id, sheet_id, solution_id).await?; // We don't care about the solution here, we just need to check ownership
+    Ok(())
+}
+
+pub async fn update_solution(
+    db: &Db,
+    user_id: i32,
+    sheet_id: Id,
+    solution_id: i32,
+    content: serde_json::Value,
+) -> Result<()> {
+    check_solution_ownership(db, user_id, sheet_id, solution_id).await?;
+    let now = Utc::now();
+    Ok(data::solution::update_solution(db, solution_id, content, now).await?)
+}
+
 pub async fn delete_solution(
     db: &Db,
     user_id: i32,
     sheet_id: Id,
-    student_id: i32,
     solution_id: i32,
 ) -> Result<DeleteOutcome> {
-    let solution = get_solution_owned_by_user(db, user_id, solution_id).await?;
-    check_coherence(&solution, sheet_id, student_id)?;
+    let solution = get_my_solution(db, user_id, sheet_id, solution_id).await?;
     if solution.metadata.trashed.is_some() {
         data::solution::delete_solution(db, solution_id).await?;
         Ok(DeleteOutcome::Deleted)
@@ -186,15 +207,8 @@ pub async fn delete_solution(
     }
 }
 
-pub async fn restore_solution(
-    db: &Db,
-    user_id: i32,
-    sheet_id: Id,
-    student_id: i32,
-    solution_id: i32,
-) -> Result<()> {
-    let solution = get_solution_owned_by_user(db, user_id, solution_id).await?;
-    check_coherence(&solution, sheet_id, student_id)?;
+pub async fn restore_solution(db: &Db, user_id: i32, sheet_id: Id, solution_id: i32) -> Result<()> {
+    check_solution_ownership(db, user_id, sheet_id, solution_id).await?;
     data::solution::restore_solution(db, solution_id).await?;
     Ok(())
 }
