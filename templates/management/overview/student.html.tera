@@ -12,7 +12,7 @@
 {% endblock header_1 %}
 
 {% block rows_1 %}
-  {% for solution in solutions | slice(end=8) %}
+  {% for solution in solutions %}
     <tr>
       {{ solution_macros::solution_row_student(solution=solution, show_title=true) }}
     </tr>
@@ -28,9 +28,18 @@
 {% endblock header_2 %}
 
 {% block rows_2 %}
-  {% for sheet in sheets | slice(end=8) %}
+  {% for sheet in sheets %}
     <tr>
       {{ sheet_macros::sheet_row_student(sheet=sheet) }}
     </tr>
   {% endfor %}
 {% endblock rows_2 %}
+
+{% block content %}
+  {% set sheets = sheets | slice(end=8) %}
+  {% set solutions = solutions | slice(end=8) %}
+  {{ super() }}
+  {% for solution in solutions %}
+    {{ solution_macros::delete_modal(solution=solution, permanent=false) }}
+  {% endfor %}
+{% endblock content %}

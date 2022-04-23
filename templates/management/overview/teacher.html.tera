@@ -34,3 +34,12 @@
     </tr>
   {% endfor %}
 {% endblock rows_2 %}
+
+{% block content %}
+  {% set sheets = sheets | slice(end=8) %}
+  {% set solutions = solutions | slice(end=8) %}
+  {{ super() }}
+  {% for sheet in sheets %}
+    {{ sheet_macros::delete_modal(sheet=sheet, permanent=false) }}
+  {% endfor %}
+{% endblock content %}
