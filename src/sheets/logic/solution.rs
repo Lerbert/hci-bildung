@@ -90,14 +90,21 @@ pub async fn start_solve(db: &Db, sheet_id: Id, user_id: i32) -> Result<()> {
     let sheet = sheet::get_sheet(db, sheet_id).await?;
     let solution = get_latest_solution(db, sheet_id, user_id).await;
     match solution {
-        Err(Error::NotFound(_)) => {
-            let fresh_solution = FreshSolution::from(sheet, user_id);
-            data::solution::create_solution(db, fresh_solution).await?;
+        Ok(solution) => {
+            if solution.metadata.sheet_version < sheet.metadata.changed {
+                create_solution(db, sheet, user_id).await
+            } else {
+                Ok(())
+            }
         }
-        sol => {
-            sol?;
-        }
-    };
+        Err(Error::NotFound(_)) => create_solution(db, sheet, user_id).await,
+        Err(e) => Err(e),
+    }
+}
+
+async fn create_solution(db: &Db, sheet: Sheet, user_id: i32) -> Result<()> {
+    let fresh_solution = FreshSolution::from(sheet, user_id);
+    data::solution::create_solution(db, fresh_solution).await?;
     Ok(())
 }
 
