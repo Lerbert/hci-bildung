@@ -23,7 +23,7 @@
         Schülerlösungen
       </p>
       <ul class="menu-list">
-        <li><a href='{{ url_for(endpoint="solution_overview_teacher") }}' {% if active == "student_solutions" %} class="is-active" {% endif %}>Lösungen für meine Dokumente</a></li>
+        <li><a href='{{ url_for(endpoint="solution_overview") }}' {% if active == "student_solutions" %} class="is-active" {% endif %}>Lösungen für meine Dokumente</a></li>
       </ul>
     {% endif %}
     
@@ -32,7 +32,7 @@
         Lösungen
       </p>
       <ul class="menu-list">
-        <li><a href='{{ url_for(endpoint="solution_overview_student") }}' {% if active == "my_solutions" %} class="is-active" {% endif %}>Meine Lösungen</a></li>
+        <li><a href='{{ url_for(endpoint="my_solution_overview") }}' {% if active == "my_solutions" %} class="is-active" {% endif %}>Meine Lösungen</a></li>
         <li><a href='{{ url_for(endpoint="recent_solutions") }}' {% if active == "recent_solutions" %} class="is-active" {% endif %}>Zuletzt verwendet</a></li>
         <li><a href='{{ url_for(endpoint="trashed_solutions") }}' {% if active == "trashed_solutions" %} class="is-active" {% endif %}>Papierkorb</a></li>
       </ul>
