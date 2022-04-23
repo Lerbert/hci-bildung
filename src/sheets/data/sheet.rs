@@ -113,14 +113,14 @@ pub async fn get_updated(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Er
                         .filter(solutions::trashed.is_null())
                         .filter(solutions::owner_id.eq(user_id))
                         .filter(solutions::sheet_id.eq(sheets::id.nullable()))
-                        .filter(solutions::sheet_version.eq(sheets::changed))
+                        .filter(solutions::sheet_version.eq(sheets::changed)),
                 )))
                 .filter(exists(
                     solutions::table
                         .filter(solutions::trashed.is_null())
                         .filter(solutions::owner_id.eq(user_id))
                         .filter(solutions::sheet_id.eq(sheets::id.nullable()))
-                        .filter(solutions::sheet_version.lt(sheets::changed))
+                        .filter(solutions::sheet_version.lt(sheets::changed)),
                 ))
                 .order(sheets::changed.desc())
                 .load(c)

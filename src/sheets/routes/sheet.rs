@@ -44,12 +44,15 @@ pub async fn sheet_overview_teacher(db: Db, teacher: Teacher<'_>) -> Result<Temp
     let recent_solutions = logic::solution::get_solutions_teacher(&db, user_id)
         .await
         .map_err(|e| e.to_status())?;
-    Ok(Template::render("management/overview/teacher", &SheetOverviewContext {
-        flash: None,
-        sheets: recent_sheets,
-        solutions: recent_solutions,
-        user: &user.user_info,
-    }))
+    Ok(Template::render(
+        "management/overview/teacher",
+        &SheetOverviewContext {
+            flash: None,
+            sheets: recent_sheets,
+            solutions: recent_solutions,
+            user: &user.user_info,
+        },
+    ))
 }
 
 #[get("/", rank = 2)]
@@ -62,12 +65,15 @@ pub async fn sheet_overview_student(db: Db, student: Student<'_>) -> Result<Temp
     let recent_solutions = logic::solution::get_solutions_student(&db, user_id)
         .await
         .map_err(|e| e.to_status())?;
-    Ok(Template::render("management/overview/student", &SheetOverviewContext {
-        flash: None,
-        sheets: updated_sheets,
-        solutions: recent_solutions,
-        user: &user.user_info,
-    }))
+    Ok(Template::render(
+        "management/overview/student",
+        &SheetOverviewContext {
+            flash: None,
+            sheets: updated_sheets,
+            solutions: recent_solutions,
+            user: &user.user_info,
+        },
+    ))
 }
 
 #[get("/", rank = 3)]
