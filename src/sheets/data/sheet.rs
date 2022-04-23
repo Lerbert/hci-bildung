@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use rocket_sync_db_pools::diesel;
 
 use crate::db::model::{SheetDiesel, SheetMetadataDiesel, UserTransportDiesel};
-use crate::db::schema::{sheets, users};
+use crate::db::schema::{sheets, solutions, users};
 use crate::Db;
 
 use super::logic::sheet::{Sheet, SheetMetadata};
@@ -88,6 +88,27 @@ pub async fn get_recent(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Err
                     UserTransportDiesel::columns(),
                 ))
                 .filter(sheets::owner_id.eq(user_id))
+                .filter(sheets::trashed.is_null())
+                .order(sheets::changed.desc())
+                .load(c)
+        })
+        .await?;
+    Ok(sheets.into_iter().map(|s| s.into()).collect())
+}
+
+pub async fn get_updated(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Error> {
+    let sheets: Vec<(SheetMetadataDiesel, UserTransportDiesel)> = db
+        .run(move |c| {
+            sheets::table
+                .inner_join(users::table)
+                .inner_join(solutions::table)
+                .select((
+                    SheetMetadataDiesel::columns(),
+                    UserTransportDiesel::columns(),
+                ))
+                .filter(solutions::owner_id.eq(user_id))
+                .filter(solutions::sheet_version.lt(sheets::changed))
+                .filter(solutions::trashed.is_null())
                 .filter(sheets::trashed.is_null())
                 .order(sheets::changed.desc())
                 .load(c)

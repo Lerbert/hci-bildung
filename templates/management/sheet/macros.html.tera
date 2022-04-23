@@ -1,25 +1,45 @@
 {% import "generic/symbols" as symbols %}
 
-{% macro sheet_header(extra_actions=0) -%}
+{% macro sheet_header(actions=0) -%}
   <th class="is-narrow"></th>
   <th>Name</th>
   <th class="is-narrow">Eigentümer</th>
   <th class="is-narrow">Zuletzt geändert</th>
   <th class="is-narrow">Erstellt am</th>
-  <th class="is-narrow" colspan="{{ 3 + extra_actions }}">Aktionen</th>
+  <th class="is-narrow" colspan="{{ actions }}">Aktionen</th>
 {%- endmacro  %}
 
-{% macro sheet_row(sheet) -%}
-  {% set edit_url = url_for(endpoint="edit_sheet", id=sheet.id) %}
-  {% set view_url = url_for(endpoint="view_sheet", id=sheet.id) %}
+{% macro sheet_header_teacher(extra_actions=0) -%}
+  {% set actions = 3 + extra_actions %}
+  {{ self::sheet_header(actions=actions) }}
+{%- endmacro  %}
+
+{% macro sheet_header_student(extra_actions=0) -%}
+  {% set actions = 1 + extra_actions %}
+  {{ self::sheet_header(actions=actions) }}
+{%- endmacro  %}
+
+{% macro sheet_row(sheet, title_link) -%}
   <td class="is-narrow">{{ symbols::file() }}</td>
-  <td><a href="{{ edit_url }}">{{ sheet.title }}</a></td>
+  <td><a href="{{ title_link }}">{{ sheet.title }}</a></td>
   <td class="is-narrow">{{ sheet.owner.username }}</td>
   <td class="is-narrow">{{ sheet.changed | date(format="%d.%m.%Y %H:%M") }}</td>
   <td class="is-narrow">{{ sheet.created | date(format="%d.%m.%Y %H:%M") }}</td>
+{%- endmacro  %}
+
+{% macro sheet_row_teacher(sheet) -%}
+  {% set edit_url = url_for(endpoint="edit_sheet", id=sheet.id) %}
+  {% set view_url = url_for(endpoint="view_sheet", id=sheet.id) %}
+  {{ self::sheet_row(sheet=sheet, title_link=edit_url) }}
   <td class="is-narrow"><a href="{{ edit_url }}" title="Bearbeiten" class="button is-small is-ghost p-0">{{ symbols::pencil() }}</a></td>
   <td class="is-narrow"><a href="{{ view_url }}" title="Ansehen" class="button is-small is-ghost p-0">{{ symbols::eye() }}</a></td>
   <td class="is-narrow"><a title="Löschen" class="button is-small is-ghost p-0 has-text-danger js-modal-trigger" data-target="delete-modal-{{ sheet.id }}">{{ symbols::trash() }}</a></td>
+{%- endmacro  %}
+
+{% macro sheet_row_student(sheet) -%}
+  {% set view_url = url_for(endpoint="view_sheet", id=sheet.id) %}
+  {{ self::sheet_row(sheet=sheet, title_link=view_url) }}
+  <td class="is-narrow"><a href="{{ view_url }}" title="Ansehen" class="button is-small is-ghost p-0">{{ symbols::eye() }}</a></td>
 {%- endmacro  %}
 
 {% macro delete_modal(sheet, permanent) -%}

@@ -3,13 +3,13 @@
 {% extends "management/sheet/base" %}
 
 {% block header %}
-  {{ macros::sheet_header() }}
+  {{ macros::sheet_header_teacher() }}
 {% endblock header %}
 
 {% block rows %}
   {% for sheet in sheets %} 
     <tr>
-      {{ macros::sheet_row(sheet=sheet) }}
+      {{ macros::sheet_row_teacher(sheet=sheet) }}
     </tr>
   {% endfor %}
 {% endblock rows %}

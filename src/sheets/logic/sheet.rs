@@ -34,6 +34,10 @@ pub async fn get_recent(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>> {
     Ok(data::sheet::get_recent(db, user_id).await?)
 }
 
+pub async fn get_updated(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>> {
+    Ok(data::sheet::get_updated(db, user_id).await?)
+}
+
 pub async fn create_empty_sheet(db: &Db, user_id: i32, title: String) -> Result<Id> {
     let content =
         serde_json::from_str("{\"type\": \"doc\", \"content\": [{\"type\": \"paragraph\", \"content\": [], \"marks\": []}], \"marks\": []}")
