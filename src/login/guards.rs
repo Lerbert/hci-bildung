@@ -5,13 +5,13 @@ use rocket::serde::{Deserialize, Serialize};
 use crate::Db;
 
 use super::logic::{self, User};
-use super::transport::{RoleTransport, UserTransport};
+use super::transport::{RoleTransport, UserInfo};
 
 pub const SESSION_ID_COOKIE_NAME: &str = "session_id";
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct AuthenticatedUser {
-    pub user_info: UserTransport,
+    pub user_info: UserInfo,
     pub roles: Vec<RoleTransport>,
 }
 
@@ -46,7 +46,7 @@ impl<'r> FromRequest<'r> for &'r AuthenticatedUser {
 impl From<User> for AuthenticatedUser {
     fn from(user: User) -> Self {
         AuthenticatedUser {
-            user_info: UserTransport {
+            user_info: UserInfo {
                 id: user.id,
                 username: user.username.clone(),
             },

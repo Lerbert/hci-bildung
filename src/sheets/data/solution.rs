@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use rocket_sync_db_pools::diesel;
 
-use crate::db::model::{SolutionDiesel, SolutionMetadataDiesel, UserTransportDiesel};
+use crate::db::model::{SolutionDiesel, SolutionMetadataDiesel, UserInfoDiesel};
 use crate::db::schema::{sheets, solutions, users};
 use crate::Db;
 
@@ -11,8 +11,8 @@ use super::Error;
 
 use self::diesel::prelude::*;
 
-impl From<(SolutionDiesel, UserTransportDiesel)> for Solution {
-    fn from(t: (SolutionDiesel, UserTransportDiesel)) -> Solution {
+impl From<(SolutionDiesel, UserInfoDiesel)> for Solution {
+    fn from(t: (SolutionDiesel, UserInfoDiesel)) -> Solution {
         let (s, u) = t;
         Solution {
             metadata: SolutionMetadata {
@@ -30,8 +30,8 @@ impl From<(SolutionDiesel, UserTransportDiesel)> for Solution {
     }
 }
 
-impl From<(SolutionMetadataDiesel, UserTransportDiesel)> for SolutionMetadata {
-    fn from(t: (SolutionMetadataDiesel, UserTransportDiesel)) -> SolutionMetadata {
+impl From<(SolutionMetadataDiesel, UserInfoDiesel)> for SolutionMetadata {
+    fn from(t: (SolutionMetadataDiesel, UserInfoDiesel)) -> SolutionMetadata {
         let (s, u) = t;
         SolutionMetadata {
             id: s.id,
@@ -50,14 +50,14 @@ pub async fn get_solutions_by_sheet_owner(
     db: &Db,
     user_id: i32,
 ) -> Result<Vec<SolutionMetadata>, Error> {
-    let solutions: Vec<(SolutionMetadataDiesel, UserTransportDiesel)> = db
+    let solutions: Vec<(SolutionMetadataDiesel, UserInfoDiesel)> = db
         .run(move |c| {
             solutions::table
                 .inner_join(users::table)
                 .inner_join(sheets::table)
                 .select((
                     SolutionMetadataDiesel::columns(),
-                    UserTransportDiesel::columns(),
+                    UserInfoDiesel::columns(),
                 ))
                 .filter(sheets::owner_id.eq(user_id))
                 .filter(sheets::trashed.is_null())
@@ -70,13 +70,13 @@ pub async fn get_solutions_by_sheet_owner(
 }
 
 pub async fn get_solutions_by_owner(db: &Db, user_id: i32) -> Result<Vec<SolutionMetadata>, Error> {
-    let solutions: Vec<(SolutionMetadataDiesel, UserTransportDiesel)> = db
+    let solutions: Vec<(SolutionMetadataDiesel, UserInfoDiesel)> = db
         .run(move |c| {
             solutions::table
                 .inner_join(users::table)
                 .select((
                     SolutionMetadataDiesel::columns(),
-                    UserTransportDiesel::columns(),
+                    UserInfoDiesel::columns(),
                 ))
                 .filter(solutions::owner_id.eq(user_id))
                 .filter(solutions::trashed.is_null())
@@ -88,13 +88,13 @@ pub async fn get_solutions_by_owner(db: &Db, user_id: i32) -> Result<Vec<Solutio
 }
 
 pub async fn get_trash(db: &Db, user_id: i32) -> Result<Vec<SolutionMetadata>, Error> {
-    let solutions: Vec<(SolutionMetadataDiesel, UserTransportDiesel)> = db
+    let solutions: Vec<(SolutionMetadataDiesel, UserInfoDiesel)> = db
         .run(move |c| {
             solutions::table
                 .inner_join(users::table)
                 .select((
                     SolutionMetadataDiesel::columns(),
-                    UserTransportDiesel::columns(),
+                    UserInfoDiesel::columns(),
                 ))
                 .filter(solutions::owner_id.eq(user_id))
                 .filter(solutions::trashed.is_not_null())
@@ -106,13 +106,13 @@ pub async fn get_trash(db: &Db, user_id: i32) -> Result<Vec<SolutionMetadata>, E
 }
 
 pub async fn get_recent(db: &Db, user_id: i32) -> Result<Vec<SolutionMetadata>, Error> {
-    let solutions: Vec<(SolutionMetadataDiesel, UserTransportDiesel)> = db
+    let solutions: Vec<(SolutionMetadataDiesel, UserInfoDiesel)> = db
         .run(move |c| {
             solutions::table
                 .inner_join(users::table)
                 .select((
                     SolutionMetadataDiesel::columns(),
-                    UserTransportDiesel::columns(),
+                    UserInfoDiesel::columns(),
                 ))
                 .filter(solutions::owner_id.eq(user_id))
                 .filter(solutions::trashed.is_null())
@@ -127,13 +127,13 @@ pub async fn get_all_sheet_solutions(
     db: &Db,
     sheet_id: Id,
 ) -> Result<Vec<SolutionMetadata>, Error> {
-    let solutions: Vec<(SolutionMetadataDiesel, UserTransportDiesel)> = db
+    let solutions: Vec<(SolutionMetadataDiesel, UserInfoDiesel)> = db
         .run(move |c| {
             solutions::table
                 .inner_join(users::table)
                 .select((
                     SolutionMetadataDiesel::columns(),
-                    UserTransportDiesel::columns(),
+                    UserInfoDiesel::columns(),
                 ))
                 .filter(solutions::sheet_id.eq(sheet_id))
                 .filter(solutions::trashed.is_null())
@@ -149,13 +149,13 @@ pub async fn get_sheet_solutions_by_sheet_and_user_id(
     sheet_id: Id,
     user_id: i32,
 ) -> Result<Vec<SolutionMetadata>, Error> {
-    let solutions: Vec<(SolutionMetadataDiesel, UserTransportDiesel)> = db
+    let solutions: Vec<(SolutionMetadataDiesel, UserInfoDiesel)> = db
         .run(move |c| {
             solutions::table
                 .inner_join(users::table)
                 .select((
                     SolutionMetadataDiesel::columns(),
-                    UserTransportDiesel::columns(),
+                    UserInfoDiesel::columns(),
                 ))
                 .filter(solutions::sheet_id.eq(sheet_id))
                 .filter(solutions::owner_id.eq(user_id))
@@ -188,11 +188,11 @@ pub async fn create_solution(db: &Db, fresh_solution: FreshSolution) -> Result<i
 }
 
 pub async fn get_solution_by_id(db: &Db, id: i32) -> Result<Option<Solution>, Error> {
-    let solution: Option<(SolutionDiesel, UserTransportDiesel)> = db
+    let solution: Option<(SolutionDiesel, UserInfoDiesel)> = db
         .run(move |c| {
             solutions::table
                 .inner_join(users::table)
-                .select((solutions::all_columns, UserTransportDiesel::columns()))
+                .select((solutions::all_columns, UserInfoDiesel::columns()))
                 .filter(solutions::id.eq(id))
                 .first(c)
                 .optional()
@@ -206,11 +206,11 @@ pub async fn get_latest_solution_by_sheet_and_user_id(
     sheet_id: Id,
     user_id: i32,
 ) -> Result<Option<Solution>, Error> {
-    let solution: Option<(SolutionDiesel, UserTransportDiesel)> = db
+    let solution: Option<(SolutionDiesel, UserInfoDiesel)> = db
         .run(move |c| {
             solutions::table
                 .inner_join(users::table)
-                .select((solutions::all_columns, UserTransportDiesel::columns()))
+                .select((solutions::all_columns, UserInfoDiesel::columns()))
                 .filter(solutions::sheet_id.eq(sheet_id))
                 .filter(solutions::owner_id.eq(user_id))
                 .order(solutions::sheet_version.desc())

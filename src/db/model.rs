@@ -13,12 +13,12 @@ pub struct UserDiesel {
 }
 
 #[derive(Debug, PartialEq, Queryable)]
-pub struct UserTransportDiesel {
+pub struct UserInfoDiesel {
     pub id: i32,
     pub username: String,
 }
 
-impl UserTransportDiesel {
+impl UserInfoDiesel {
     pub fn columns() -> (users::id, users::username) {
         (users::id, users::username)
     }

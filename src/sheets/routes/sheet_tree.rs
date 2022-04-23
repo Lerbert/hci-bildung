@@ -5,7 +5,7 @@ use rocket_dyn_templates::Template;
 
 use crate::flash::{FlashContext, FlashRedirect};
 use crate::login::guards::{AuthenticatedUser, Teacher};
-use crate::login::transport::UserTransport;
+use crate::login::transport::UserInfo;
 use crate::status::ToStatus;
 use crate::Db;
 
@@ -16,7 +16,7 @@ use super::{handle_insufficient_permissions, logic};
 struct SheetManagementContext<'a> {
     flash: Option<FlashContext>,
     sheets: Vec<SheetMetadata>,
-    user: &'a UserTransport,
+    user: &'a UserInfo,
 }
 
 #[get("/assignments")]

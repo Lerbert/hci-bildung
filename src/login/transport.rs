@@ -3,23 +3,23 @@ use rocket::serde::{Deserialize, Serialize};
 use super::logic::{Role, User};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct UserTransport {
+pub struct UserInfo {
     pub id: i32,
     pub username: String,
 }
 
-impl From<User> for UserTransport {
+impl From<User> for UserInfo {
     fn from(user: User) -> Self {
-        UserTransport {
+        UserInfo {
             id: user.id,
             username: user.username,
         }
     }
 }
 
-impl From<&User> for UserTransport {
+impl From<&User> for UserInfo {
     fn from(user: &User) -> Self {
-        UserTransport {
+        UserInfo {
             id: user.id,
             username: user.username.clone(),
         }

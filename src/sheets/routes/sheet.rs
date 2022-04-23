@@ -7,7 +7,7 @@ use rocket_dyn_templates::Template;
 
 use crate::flash::{FlashContext, FlashRedirect};
 use crate::login::guards::{AuthenticatedUser, Student, Teacher};
-use crate::login::transport::UserTransport;
+use crate::login::transport::UserInfo;
 use crate::status::ToStatus;
 use crate::validation::Validate;
 use crate::Db;
@@ -23,7 +23,7 @@ use super::{handle_insufficient_permissions, sheets_uri};
 #[derive(Serialize)]
 struct SheetContext<'a> {
     sheet: Sheet,
-    user: Option<&'a UserTransport>,
+    user: Option<&'a UserInfo>,
 }
 
 #[derive(Serialize)]
@@ -31,7 +31,7 @@ struct SheetOverviewContext<'a> {
     flash: Option<FlashContext>,
     sheets: Vec<SheetMetadata>,
     solutions: Vec<SolutionMetadata>,
-    user: &'a UserTransport,
+    user: &'a UserInfo,
 }
 
 #[get("/")]

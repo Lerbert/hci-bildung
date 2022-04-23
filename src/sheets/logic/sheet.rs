@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use rocket::serde::Serialize;
 
-use crate::login::transport::UserTransport;
+use crate::login::transport::UserInfo;
 use crate::Db;
 
 use super::{data, DeleteOutcome, Error, Id, Result};
@@ -16,7 +16,7 @@ pub struct Sheet {
 pub struct SheetMetadata {
     pub id: Id,
     pub title: String,
-    pub owner: UserTransport,
+    pub owner: UserInfo,
     pub created: DateTime<Utc>,
     pub changed: DateTime<Utc>,
     pub trashed: Option<DateTime<Utc>>,

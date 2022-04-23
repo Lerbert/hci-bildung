@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use rocket_sync_db_pools::diesel;
 
-use crate::db::model::{SheetDiesel, SheetMetadataDiesel, UserTransportDiesel};
+use crate::db::model::{SheetDiesel, SheetMetadataDiesel, UserInfoDiesel};
 use crate::db::schema::{sheets, solutions, users};
 use crate::Db;
 
@@ -11,8 +11,8 @@ use super::Error;
 
 use self::diesel::prelude::*;
 
-impl From<(SheetDiesel, UserTransportDiesel)> for Sheet {
-    fn from(t: (SheetDiesel, UserTransportDiesel)) -> Sheet {
+impl From<(SheetDiesel, UserInfoDiesel)> for Sheet {
+    fn from(t: (SheetDiesel, UserInfoDiesel)) -> Sheet {
         let (s, u) = t;
         Sheet {
             metadata: SheetMetadata {
@@ -28,8 +28,8 @@ impl From<(SheetDiesel, UserTransportDiesel)> for Sheet {
     }
 }
 
-impl From<(SheetMetadataDiesel, UserTransportDiesel)> for SheetMetadata {
-    fn from(t: (SheetMetadataDiesel, UserTransportDiesel)) -> SheetMetadata {
+impl From<(SheetMetadataDiesel, UserInfoDiesel)> for SheetMetadata {
+    fn from(t: (SheetMetadataDiesel, UserInfoDiesel)) -> SheetMetadata {
         let (s, u) = t;
         SheetMetadata {
             id: s.id,
@@ -43,13 +43,13 @@ impl From<(SheetMetadataDiesel, UserTransportDiesel)> for SheetMetadata {
 }
 
 pub async fn get_all_sheets(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Error> {
-    let sheets: Vec<(SheetMetadataDiesel, UserTransportDiesel)> = db
+    let sheets: Vec<(SheetMetadataDiesel, UserInfoDiesel)> = db
         .run(move |c| {
             sheets::table
                 .inner_join(users::table)
                 .select((
                     SheetMetadataDiesel::columns(),
-                    UserTransportDiesel::columns(),
+                    UserInfoDiesel::columns(),
                 ))
                 .filter(sheets::owner_id.eq(user_id))
                 .filter(sheets::trashed.is_null())
@@ -61,13 +61,13 @@ pub async fn get_all_sheets(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>,
 }
 
 pub async fn get_trash(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Error> {
-    let sheets: Vec<(SheetMetadataDiesel, UserTransportDiesel)> = db
+    let sheets: Vec<(SheetMetadataDiesel, UserInfoDiesel)> = db
         .run(move |c| {
             sheets::table
                 .inner_join(users::table)
                 .select((
                     SheetMetadataDiesel::columns(),
-                    UserTransportDiesel::columns(),
+                    UserInfoDiesel::columns(),
                 ))
                 .filter(sheets::owner_id.eq(user_id))
                 .filter(sheets::trashed.is_not_null())
@@ -79,13 +79,13 @@ pub async fn get_trash(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Erro
 }
 
 pub async fn get_recent(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Error> {
-    let sheets: Vec<(SheetMetadataDiesel, UserTransportDiesel)> = db
+    let sheets: Vec<(SheetMetadataDiesel, UserInfoDiesel)> = db
         .run(move |c| {
             sheets::table
                 .inner_join(users::table)
                 .select((
                     SheetMetadataDiesel::columns(),
-                    UserTransportDiesel::columns(),
+                    UserInfoDiesel::columns(),
                 ))
                 .filter(sheets::owner_id.eq(user_id))
                 .filter(sheets::trashed.is_null())
@@ -99,13 +99,13 @@ pub async fn get_recent(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Err
 pub async fn get_updated(db: &Db, user_id: i32) -> Result<Vec<SheetMetadata>, Error> {
     use self::diesel::dsl::{exists, not};
 
-    let sheets: Vec<(SheetMetadataDiesel, UserTransportDiesel)> = db
+    let sheets: Vec<(SheetMetadataDiesel, UserInfoDiesel)> = db
         .run(move |c| {
             sheets::table
                 .inner_join(users::table)
                 .select((
                     SheetMetadataDiesel::columns(),
-                    UserTransportDiesel::columns(),
+                    UserInfoDiesel::columns(),
                 ))
                 .filter(sheets::trashed.is_null())
                 .filter(not(exists(
@@ -142,11 +142,11 @@ pub async fn get_sheet_title(db: &Db, id: Id) -> Result<String, Error> {
 }
 
 pub async fn get_sheet_by_id(db: &Db, id: Id) -> Result<Option<Sheet>, Error> {
-    let sheet: Option<(SheetDiesel, UserTransportDiesel)> = db
+    let sheet: Option<(SheetDiesel, UserInfoDiesel)> = db
         .run(move |c| {
             sheets::table
                 .inner_join(users::table)
-                .select((sheets::all_columns, UserTransportDiesel::columns()))
+                .select((sheets::all_columns, UserInfoDiesel::columns()))
                 .filter(sheets::id.eq(id))
                 .first(c)
                 .optional()

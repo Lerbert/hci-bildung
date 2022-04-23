@@ -13,7 +13,7 @@ use crate::Db;
 
 use super::guards::{self, AuthenticatedUser};
 use super::logic;
-use super::transport::{LoginForm, UserTransport};
+use super::transport::{LoginForm, UserInfo};
 
 impl ToStatus for logic::Error {
     fn to_status(self) -> Status {
@@ -24,7 +24,7 @@ impl ToStatus for logic::Error {
 
 #[derive(Serialize)]
 struct LandingPageContext<'a> {
-    user: Option<&'a UserTransport>,
+    user: Option<&'a UserInfo>,
 }
 
 #[derive(Serialize)]
