@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use rocket::http::uri::Query;
 use rocket::route::RouteUri;
 use tera::{self, from_value, to_value, Function};
 
@@ -29,56 +30,61 @@ fn instantiate_uri(
         .origin
         .path()
         .segments()
-        .map(|s| {
-            if s.starts_with('<') && s.ends_with('>') {
-                let mut name = &s[1..(s.len() - 1)];
-
-                if name.ends_with("..") {
-                    name = &name[..(name.len() - 2)];
-                }
-
-                args.get(name)
-                    .and_then(|val| from_value::<String>(val.clone()).ok())
-                    .unwrap_or_else(|| s.into())
-            } else {
-                s.into()
-            }
+        .map(|s| match get_dynamic_segment_name(s) {
+            Some(name) => args
+                .get(name)
+                .and_then(|v| from_value::<String>(v.clone()).ok())
+                .ok_or_else(|| format!("No argument found for {}", name)),
+            None => Ok(s.into()),
         })
-        .collect::<Vec<String>>()
+        .collect::<Result<Vec<String>, _>>()?
         .join("/");
 
-    let query = uri.origin.query().map(|q| {
-        {
-            q.segments().map(|(k, v)| {
-                let (k, v) = if k.starts_with('<') && k.ends_with('>') {
-                    let mut name = &k[1..(k.len() - 1)];
-
-                    if name.ends_with("..") {
-                        name = &name[..(name.len() - 2)];
-                    }
-
-                    let v = args
-                        .get(name)
-                        .and_then(|val| from_value::<String>(val.clone()).ok())
-                        .unwrap_or_else(|| v.into());
-                    (name, v)
-                } else {
-                    (k, v.into())
-                };
-                if v.is_empty() {
-                    k.to_string()
-                } else {
-                    format!("{}={}", k, v)
-                }
-            })
-        }
-        .collect::<Vec<String>>()
-        .join("&")
-    });
-    if let Some(query) = query {
+    if let Some(query) = uri.origin.query() {
+        let query = instantiate_query(query, args)?;
         Ok(to_value(format!("/{}?{}", path, query)).unwrap())
     } else {
         Ok(to_value(format!("/{}", path)).unwrap())
+    }
+}
+
+fn instantiate_query(
+    query: Query<'_>,
+    args: &HashMap<String, tera::Value>,
+) -> tera::Result<String> {
+    let query: Result<Vec<String>, tera::Error> = query
+        .segments()
+        .map(|(k, v)| {
+            let (k, v) = match get_dynamic_segment_name(k) {
+                Some(name) => args
+                    .get(name)
+                    .and_then(|v| from_value::<String>(v.clone()).ok())
+                    .map(|v| (name, v))
+                    .ok_or_else(|| format!("No argument found for {}", name)),
+                None => Ok((k, v.into())),
+            }?;
+            if v.is_empty() {
+                Ok(k.to_string())
+            } else {
+                Ok(format!("{}={}", k, v))
+            }
+        })
+        .collect();
+    Ok(query?.join("&"))
+}
+
+fn get_dynamic_segment_name(segment: &str) -> Option<&str> {
+    if segment.starts_with('<') && segment.ends_with('>') {
+        let mut name = &segment[1..(segment.len() - 1)];
+
+        // Path segment
+        if name.ends_with("..") {
+            name = &name[..(name.len() - 2)];
+        }
+
+        Some(name)
+    } else {
+        None
     }
 }
 
@@ -115,6 +121,15 @@ mod test {
         ]);
         let result = instantiate_uri(&uri, &args);
         assert_eq!(result.unwrap(), to_value("/test/instantiated").unwrap());
+    }
+
+    #[test]
+    fn instantiate_missing_arg() {
+        let uri = Route::new(Method::Get, "/test/<instantiate>", dummy_handler).uri;
+        let args = HashMap::new();
+        let result = instantiate_uri(&uri, &args);
+        let msg = result.unwrap_err().to_string();
+        assert!(msg.contains("No argument found for instantiate"), "Message {} does not contain \"No argument found for instantiate\"", msg);
     }
 
     #[test]
