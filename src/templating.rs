@@ -81,3 +81,142 @@ fn instantiate_uri(
         Ok(to_value(format!("/{}", path)).unwrap())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    use rocket::http::Method;
+    use rocket::route::dummy_handler;
+    use rocket::Route;
+
+    #[test]
+    fn static_uri() {
+        let uri = Route::new(Method::Get, "/test/static", dummy_handler).uri;
+        let args = HashMap::new();
+        let result = instantiate_uri(&uri, &args);
+        assert_eq!(result.unwrap(), to_value("/test/static").unwrap());
+    }
+
+    #[test]
+    fn instantiate_basic() {
+        let uri = Route::new(Method::Get, "/test/<instantiate>", dummy_handler).uri;
+        let args = HashMap::from([("instantiate".to_owned(), to_value("instantiated").unwrap())]);
+        let result = instantiate_uri(&uri, &args);
+        assert_eq!(result.unwrap(), to_value("/test/instantiated").unwrap());
+    }
+
+    #[test]
+    fn instantiate_too_many_args() {
+        let uri = Route::new(Method::Get, "/test/<instantiate>", dummy_handler).uri;
+        let args = HashMap::from([
+            ("instantiate".to_owned(), to_value("instantiated").unwrap()),
+            ("other".to_owned(), to_value("foo").unwrap()),
+        ]);
+        let result = instantiate_uri(&uri, &args);
+        assert_eq!(result.unwrap(), to_value("/test/instantiated").unwrap());
+    }
+
+    #[test]
+    fn instantiate_double() {
+        let uri = Route::new(Method::Get, "/test/<one>/<two>", dummy_handler).uri;
+        let args = HashMap::from([
+            ("one".to_owned(), to_value("foo").unwrap()),
+            ("two".to_owned(), to_value("bar").unwrap()),
+        ]);
+        let result = instantiate_uri(&uri, &args);
+        assert_eq!(result.unwrap(), to_value("/test/foo/bar").unwrap());
+    }
+
+    #[test]
+    fn instantiate_path() {
+        let uri = Route::new(Method::Get, "/test/<instantiate>/<path..>", dummy_handler).uri;
+        let args = HashMap::from([
+            ("instantiate".to_owned(), to_value("instantiated").unwrap()),
+            ("path".to_owned(), to_value("path/to/res").unwrap()),
+        ]);
+        let result = instantiate_uri(&uri, &args);
+        assert_eq!(
+            result.unwrap(),
+            to_value("/test/instantiated/path/to/res").unwrap()
+        );
+    }
+
+    #[test]
+    fn instantiate_query() {
+        let uri = Route::new(Method::Get, "/test/static?<key>", dummy_handler).uri;
+        let args = HashMap::from([("key".to_owned(), to_value("instantiated").unwrap())]);
+        let result = instantiate_uri(&uri, &args);
+        assert_eq!(
+            result.unwrap(),
+            to_value("/test/static?key=instantiated").unwrap()
+        );
+    }
+
+    #[test]
+    fn instantiate_query_empty() {
+        let uri = Route::new(Method::Get, "/test/static?<key>", dummy_handler).uri;
+        let args = HashMap::from([("key".to_owned(), to_value("").unwrap())]);
+        let result = instantiate_uri(&uri, &args);
+        assert_eq!(result.unwrap(), to_value("/test/static?key").unwrap());
+    }
+
+    #[test]
+    fn instantiate_query_double() {
+        let uri = Route::new(Method::Get, "/test/static?<key>&<key2>", dummy_handler).uri;
+        let args = HashMap::from([
+            ("key".to_owned(), to_value("val").unwrap()),
+            ("key2".to_owned(), to_value("val2").unwrap()),
+        ]);
+        let result = instantiate_uri(&uri, &args);
+        assert_eq!(
+            result.unwrap(),
+            to_value("/test/static?key=val&key2=val2").unwrap()
+        );
+    }
+
+    #[test]
+    fn instantiate_query_double_empty() {
+        let uri = Route::new(Method::Get, "/test/static?<key>&<key2>", dummy_handler).uri;
+        let args = HashMap::from([
+            ("key".to_owned(), to_value("").unwrap()),
+            ("key2".to_owned(), to_value("val2").unwrap()),
+        ]);
+        let result = instantiate_uri(&uri, &args);
+        assert_eq!(
+            result.unwrap(),
+            to_value("/test/static?key&key2=val2").unwrap()
+        );
+    }
+
+    #[test]
+    fn instantiate_both() {
+        let uri = Route::new(
+            Method::Get,
+            "/test/<instantiate>/<path..>?<key>",
+            dummy_handler,
+        )
+        .uri;
+        let args = HashMap::from([
+            ("instantiate".to_owned(), to_value("instantiated").unwrap()),
+            ("path".to_owned(), to_value("path/to/res").unwrap()),
+            ("key".to_owned(), to_value("val").unwrap()),
+        ]);
+        let result = instantiate_uri(&uri, &args);
+        assert_eq!(
+            result.unwrap(),
+            to_value("/test/instantiated/path/to/res?key=val").unwrap()
+        );
+    }
+
+    #[test]
+    fn instantiate_both_empty() {
+        let uri = Route::new(Method::Get, "/test/<instantiate>?<key>", dummy_handler).uri;
+        let args = HashMap::from([
+            ("instantiate".to_owned(), to_value("instantiated").unwrap()),
+            ("key".to_owned(), to_value("").unwrap()),
+        ]);
+        let result = instantiate_uri(&uri, &args);
+        assert_eq!(result.unwrap(), to_value("/test/instantiated?key").unwrap());
+    }
+}
