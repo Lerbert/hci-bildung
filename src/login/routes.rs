@@ -23,18 +23,8 @@ impl ToStatus for logic::Error {
 }
 
 #[derive(Serialize)]
-struct LandingPageContext<'a> {
-    user: Option<&'a AuthenticatedUser>,
-}
-
-#[derive(Serialize)]
 struct LoginContext {
     flash: Option<FlashContext>,
-}
-
-#[get("/")]
-pub fn landing_page(user: Option<&AuthenticatedUser>) -> Template {
-    Template::render("landing_page", &LandingPageContext { user })
 }
 
 #[get("/login")]

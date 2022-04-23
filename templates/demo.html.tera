@@ -1,0 +1,7 @@
+{% import "sheet/vue_macros" as vue_macros %}
+
+{% extends "sheet/base" %}
+
+{% block content %}
+    {{ vue_macros::vue_app(mode="demo") }}
+{% endblock content %}

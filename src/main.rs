@@ -14,6 +14,7 @@ use rocket_dyn_templates::Template;
 
 mod db;
 mod flash;
+mod landing_page;
 mod login;
 mod sheets;
 mod status;
@@ -45,6 +46,22 @@ fn rocket() -> _ {
         panic!("{}", e);
     }
     let r = rocket::build()
+        .mount(
+            "/",
+            routes![
+                landing_page::routes::landing_page,
+                landing_page::routes::demo
+            ],
+        )
+        .mount(
+            "/",
+            routes![
+                login::routes::login_form,
+                login::routes::already_logged_in,
+                login::routes::login,
+                login::routes::logout
+            ],
+        )
         .mount(
             sheets::routes::MOUNT,
             routes![
@@ -89,16 +106,6 @@ fn rocket() -> _ {
                 sheets::routes::solution::login_my_solution,
                 sheets::routes::solution::login_latest_student_solution,
                 sheets::routes::solution::login_student_solution
-            ],
-        )
-        .mount(
-            "/",
-            routes![
-                login::routes::landing_page,
-                login::routes::login_form,
-                login::routes::already_logged_in,
-                login::routes::login,
-                login::routes::logout
             ],
         )
         .mount("/vue", FileServer::from(relative!("vue_dist/vue")))
