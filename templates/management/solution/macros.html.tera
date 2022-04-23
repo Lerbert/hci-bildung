@@ -20,7 +20,7 @@
 {%- endmacro  %}
 
 {% macro solution_row_teacher(solution, show_title=true) -%}
-  {% set view_url = url_for(endpoint="student_solution", sheet_id=solution.sheet_id, student_id=solution.owner.id | as_str) %}
+  {% set view_url = url_for(endpoint="student_solution", sheet_id=solution.sheet_id, student_id=solution.owner.id | as_str, solution_id=solution.id | as_str) %}
   <td class="is-narrow">{{ symbols::file() }}</td>
   <td><a href="{{ view_url }}">{{ solution.owner.username }}</a></td>
   {% if show_title %}<td>{{ solution.title }}</td>{% endif %}
@@ -31,7 +31,7 @@
 {%- endmacro  %}
 
 {% macro solution_row_student(solution) -%}
-  {% set edit_url = url_for(endpoint="my_solution", sheet_id=solution.sheet_id) %}
+  {% set edit_url = url_for(endpoint="my_solution", sheet_id=solution.sheet_id, student_id=solution.owner.id | as_str, solution_id=solution.id | as_str) %}
   <td class="is-narrow">{{ symbols::file() }}</td>
   <td><a href="{{ edit_url }}">{{ solution.title }}</a></td>
   <td class="is-narrow">{{ solution.changed | date(format="%d.%m.%Y %H:%M") }}</td>
