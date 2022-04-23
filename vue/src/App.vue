@@ -2,7 +2,6 @@
   <div class="container is-fluid content" id="app">
     <edit-sheet-view
       v-if="mode === AppMode.EDIT_SHEET"
-      :autosave="true"
       :sheetId="sheetid"
       :initialSheet="sheet"
       :sheetTitle="sheettitle"
@@ -23,6 +22,12 @@
       :sheet="sheet"
       :sheetTitle="sheettitle"
     ></solution-view>
+    <demo-view
+      v-if="mode === AppMode.DEMO"
+      :sheetId="sheetid"
+      :initialSheet="sheet"
+      :sheetTitle="sheettitle"
+    ></demo-view>
   </div>
 </template>
 
@@ -32,6 +37,7 @@ import { computed, provide, toRefs } from "vue";
 import { AppMode } from "./enums";
 import { Node, NodeJSON } from "./model/SheetDisplayNode";
 
+import DemoView from "./components/DemoView.vue";
 import EditSheetView from "./components/EditSheetView.vue";
 import EditSolutionView from "./components/EditSolutionView.vue";
 import SheetView from "./components/SheetView.vue";

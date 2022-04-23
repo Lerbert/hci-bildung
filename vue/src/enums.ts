@@ -11,4 +11,5 @@ export enum AppMode {
   VIEW_SHEET = "view_sheet",
   EDIT_SOLUTION = "edit_solution",
   VIEW_SOLUTION = "view_solution",
+  DEMO = "demo",
 }

@@ -92,7 +92,7 @@ export class Node {
   }
 
   public static emptyDocument(): Node {
-    return new Node([new Node([], [], "paragraph")], [], "document");
+    return new Node([new Node([], [], "paragraph")], [], "doc");
   }
 
   public toTiptap(): JSONContent {
