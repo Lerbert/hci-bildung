@@ -1,13 +1,11 @@
 use std::fmt::{self, Display};
-use std::io;
 
 use chrono::NaiveDateTime;
-use crypto::scrypt;
-use log::error;
 use rand::rngs::OsRng;
 use rand::RngCore;
 use rocket::serde::{Deserialize, Serialize};
 
+use crate::crypt;
 use crate::Db;
 
 use super::data;
@@ -50,7 +48,7 @@ pub struct User {
 
 impl User {
     fn check_password(&self, password: &str) -> bool {
-        check_password(password, &self.password_hash)
+        crypt::check_password(password, &self.password_hash)
     }
 }
 
@@ -127,15 +125,4 @@ fn generate_session_id() -> String {
     let mut bytes: [u8; 96] = [0; 96];
     rng.fill_bytes(&mut bytes);
     base64::encode(bytes)
-}
-
-fn _hash_password(password: &str) -> io::Result<String> {
-    scrypt::scrypt_simple(password, &scrypt::ScryptParams::new(14, 16, 1))
-}
-
-fn check_password(password: &str, hash: &str) -> bool {
-    scrypt::scrypt_check(password, hash).unwrap_or_else(|e| {
-        error!("Error checking password: {}", e);
-        false
-    })
 }

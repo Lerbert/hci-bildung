@@ -13,6 +13,7 @@ use rocket::route::RouteUri;
 use rocket::{Build, Rocket};
 use rocket_dyn_templates::Template;
 
+pub mod crypt;
 mod db;
 mod flash;
 mod landing_page;
