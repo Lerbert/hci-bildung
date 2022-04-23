@@ -1,7 +1,7 @@
 {% extends "management/solution/teacher_solutions_base" %}
 
 {% block sidebar %}
-  {{ sidebar::sidebar(active="my_solutions") }}
+  {{ sidebar::sidebar(active="student_solutions") }}
 {% endblock sidebar %}
 
 {% block heading %}
