@@ -9,13 +9,13 @@
   </noscript>  
 {%- endmacro %}
 
-{% macro vue_app(mode, sheet_id, sheet_title, content, save_url="#") -%}
+{% macro vue_app(mode, sheet_id="", sheet_title="", content="", save_url="") -%}
   {# using {{ "" }} here to prevent webpack from converting the outer single quotes to double quotes as this would break the JSON inserted by Tera #}
   <div id="app"
     data-mode='"{{ mode }}"'
-    data-sheetid='"{{ sheet_id }}"'
-    data-sheettitle='"{{ sheet_title }}"'
-    data-content='{{ "" }}{{ content | json_encode() | safe }}'
-    data-saveurl='"{{ save_url }}"'>
+    {% if sheet_id !="" %}data-sheetid='"{{ sheet_id }}"'{% endif %}
+    {% if sheet_title !="" %}data-sheettitle='"{{ sheet_title }}"'{% endif %}
+    {% if content !="" %}data-content='{{ "" }}{{ content | json_encode() | safe }}'{% endif %}
+    {% if save_url !="" %}data-saveurl='"{{ save_url }}"'{% endif %}>
   </div>
 {%- endmacro %}

@@ -46,18 +46,19 @@ import SolutionView from "./components/SolutionView.vue";
 const propsDef = withDefaults(
   defineProps<{
     mode: AppMode;
-    sheetid: string;
+    sheetid?: string;
     sheettitle?: string;
     content?: NodeJSON;
     saveurl?: string;
   }>(),
   {
+    sheetid: "00000000-0000-0000-0000-000000000000",
+    sheettitle: "",
     content: () => ({
       type: "doc",
       content: [{ type: "paragraph", content: [], marks: [] }],
       marks: [],
     }),
-    sheettitle: "",
     saveurl: "#",
   }
 );
