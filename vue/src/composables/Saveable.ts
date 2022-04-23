@@ -1,14 +1,15 @@
-import { ref, Ref, watch } from "vue";
+import { inject, ref, Ref, watch } from "vue";
 import debounce from "lodash/debounce";
 
 import { SaveStatus } from "../enums";
 
 export function useSaveable<T>(
-  url: string,
   autosave: Ref<boolean>,
   entity: Ref<T>,
   validate: (entity: T) => boolean
 ) {
+  const url = inject<string>("saveURL", "#");
+
   const saveStatus = ref(
     autosave.value ? SaveStatus.SAVED : SaveStatus.DISABLED
   );

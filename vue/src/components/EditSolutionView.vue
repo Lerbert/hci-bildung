@@ -16,7 +16,6 @@ import { Node } from "../model/SheetDisplayNode";
 import SheetDisplay from "./SheetDisplay.vue";
 
 defineProps<{
-  sheetId: string;
   sheet: Node;
   sheetTitle: string;
 }>();

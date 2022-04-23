@@ -107,7 +107,6 @@ const solution = computed(() => ({
   content: sheetExport.value,
 }));
 const { saveStatus: status } = useSaveable(
-  "./my",
   props.autosave,
   solution,
   () => true

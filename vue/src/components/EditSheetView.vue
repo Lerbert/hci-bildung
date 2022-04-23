@@ -95,7 +95,6 @@ const doc = computed(() => ({
 }));
 
 const { saveStatus } = useSaveable(
-  ".",
   props.autosave,
   doc,
   (doc) => doc.title !== ""

@@ -15,13 +15,11 @@
     ></sheet-view>
     <edit-solution-view
       v-else-if="mode === AppMode.EDIT_SOLUTION"
-      :sheetId="sheetid"
       :sheet="sheet"
       :sheetTitle="sheettitle"
     ></edit-solution-view>
     <solution-view
       v-else-if="mode === AppMode.VIEW_SOLUTION"
-      :sheetId="sheetid"
       :sheet="sheet"
       :sheetTitle="sheettitle"
     ></solution-view>
@@ -29,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, toRefs } from "vue";
+import { computed, provide, toRefs } from "vue";
 
 import { AppMode } from "./enums";
 import { Node, NodeJSON } from "./model/SheetDisplayNode";
@@ -41,10 +39,11 @@ import SolutionView from "./components/SolutionView.vue";
 
 const propsDef = withDefaults(
   defineProps<{
-    sheetid: string;
-    content?: NodeJSON;
-    sheettitle?: string;
     mode: AppMode;
+    sheetid: string;
+    sheettitle?: string;
+    content?: NodeJSON;
+    saveurl?: string;
   }>(),
   {
     content: () => ({
@@ -53,9 +52,12 @@ const propsDef = withDefaults(
       marks: [],
     }),
     sheettitle: "",
+    saveurl: "#",
   }
 );
 const props = toRefs(propsDef);
+
+provide("saveURL", props.saveurl.value);
 
 const sheet = computed(() => Node.fromJSON(props.content.value));
 </script>
