@@ -3,5 +3,6 @@
 {% extends "sheet/base" %}
 
 {% block content %}
-    {{ vue_macros::vue_app(mode="edit_sheet", sheet_id=sheet.metadata.id, sheet_title=sheet.metadata.title, content=sheet.content) }}
+    {% set save_url = url_for(endpoint="save_sheet", id=sheet.metadata.id) %}
+    {{ vue_macros::vue_app(mode="edit_sheet", sheet_id=sheet.metadata.id, sheet_title=sheet.metadata.title, content=sheet.content, save_url=save_url) }}
 {% endblock content %}
