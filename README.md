@@ -76,7 +76,8 @@ npm run build
 ```
 
 This should produce the directory `vue_dist` at the root of the repository.
-The directory contains the file `sheet.html.tera`, which our backend loads as template, and the directory `vue` containing the assets.
+The file `vue_macros.html.tera` in `vue_dist` is then moved to `templates/sheet` such that the backend can render the vue app in templates.
+The directory `vue` containing the assets remains in `vue_dist`.
 After starting the backend, the `vue` directory is available at `/vue` enabling the vue app to load its assets correctly.
 
 #### Building and running the backend
@@ -94,6 +95,22 @@ cargo run
 ```
 
 The backend serves additional assets from the `assets` directoy at `/assets`.
+
+### Creating users
+
+Currently it is not possible to register new users via the web interface.
+Instead, the project provides the `create_user` binary which can be used to generate the SQL to insert a new user into the database.
+
+You can run the script with `cargo` like this
+
+```
+cargo run --bin create_user -- <username>
+```
+
+You will then be prompted to choose a password for the new user before the script prints the insert statement for the `users` table.
+
+> Bear in mind that the script does **not** perform any SQL escaping.
+> Its main purpose is to compute the password hash when an admin wants to insert a new user.
 
 ## Development of the vue app
 
