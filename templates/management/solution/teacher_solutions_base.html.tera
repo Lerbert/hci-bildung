@@ -1,3 +1,4 @@
+{% import "generic/macros" as generic %}
 {% import "management/solution/macros" as macros %}
 
 {% extends "management/solution/base" %}
@@ -11,6 +12,12 @@
     <tr>
       {{ macros::solution_row_teacher(solution=solution, show_title=show_title) }}
     </tr>
+  {% else %}
+    {% if show_title %}
+      {{ generic::no_entries(cols=7 + num_actions) }}
+    {% else %}
+      {{ generic::no_entries(cols=6 + num_actions) }}
+    {% endif %}
   {% endfor %}
 {% endblock rows %}
 

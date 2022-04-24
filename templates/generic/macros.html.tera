@@ -1,0 +1,3 @@
+{% macro no_entries(cols, msg="Keine Einträge vorhanden") -%}
+  <tr><td colspan="{{ cols }}" class="has-text-grey has-text-centered is-italic">Keine Einträge vorhanden</td></tr>
+{%- endmacro %}

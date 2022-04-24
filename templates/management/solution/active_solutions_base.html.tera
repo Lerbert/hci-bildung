@@ -1,3 +1,4 @@
+{% import "generic/macros" as generic %}
 {% import "management/solution/macros" as macros %}
 
 {% extends "management/solution/base" %}
@@ -11,6 +12,8 @@
     <tr>
       {{ macros::solution_row_student(solution=solution) }}
     </tr>
+  {% else %}
+    {{ generic::no_entries(cols=5 + num_actions) }}
   {% endfor %}
 {% endblock rows %}
 

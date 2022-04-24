@@ -1,4 +1,6 @@
+{# for some reason switching these two lines breaks the template #}
 {% import "management/sheet/macros" as sheet_macros %}
+{% import "generic/macros" as generic %}
 {% import "management/solution/macros" as solution_macros %}
 
 {% extends "management/overview/base" %}
@@ -16,6 +18,8 @@
     <tr>
       {{ sheet_macros::sheet_row_teacher(sheet=sheet) }}
     </tr>
+  {% else %}
+    {{ generic::no_entries(cols=8) }}
   {% endfor %}
 {% endblock rows_1 %}
 
@@ -32,6 +36,8 @@
     <tr>
       {{ solution_macros::solution_row_teacher(solution=solution, show_title=true) }}
     </tr>
+  {% else %}
+    {{ generic::no_entries(cols=7) }}
   {% endfor %}
 {% endblock rows_2 %}
 

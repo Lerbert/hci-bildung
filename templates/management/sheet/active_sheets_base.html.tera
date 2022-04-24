@@ -1,4 +1,6 @@
+{# for some reason switching these two lines breaks the template #}
 {% import "management/sheet/macros" as macros %}
+{% import "generic/macros" as generic %}
 
 {% extends "management/sheet/base" %}
 
@@ -11,6 +13,8 @@
     <tr>
       {{ macros::sheet_row_teacher(sheet=sheet) }}
     </tr>
+  {% else %}
+    {{ generic::no_entries(cols=5 + num_actions) }}
   {% endfor %}
 {% endblock rows %}
 

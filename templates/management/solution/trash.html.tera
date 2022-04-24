@@ -1,3 +1,4 @@
+{% import "generic/macros" as generic %}
 {% import "generic/symbols" as symbols %}
 {% import "management/sidebar" as sidebar %}
 {% import "management/solution/macros" as macros %}
@@ -41,6 +42,8 @@
       </td>
       <td class="is-narrow"><a title="Endgültig löschen" class="button is-small is-ghost p-0 has-text-danger js-modal-trigger" data-target="delete-modal-{{ solution.id }}">{{ symbols::trash() }}</a></td>
     </tr>
+  {% else %}
+    {{ generic::no_entries(cols=5 + num_actions) }}
   {% endfor %}
 {% endblock rows %}
 
