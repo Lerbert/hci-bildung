@@ -1,6 +1,7 @@
 FROM node:latest as vue-build
 
 WORKDIR /app/vue
+RUN mkdir -p /app/templates/sheet
 COPY vue/package*.json ./
 RUN npm install
 
@@ -8,7 +9,7 @@ COPY ./vue .
 
 RUN npm run build
 
-FROM rust:1.59 as rust-build
+FROM rust:latest as rust-build
 
 RUN user=root cargo new --bin hci-bildung
 WORKDIR /hci-bildung
@@ -37,6 +38,7 @@ COPY ./deployment/launch_server.sh ./launch.sh
 COPY ./Rocket.toml ./Rocket.toml
 COPY ./assets ./assets
 COPY ./templates ./templates
+COPY --from=vue-build /app/templates ./templates
 
 EXPOSE 8000
 CMD ["./launch.sh"]
