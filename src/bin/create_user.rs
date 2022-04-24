@@ -21,5 +21,8 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn print_sql(username: &str, password_hash: &str) {
-    println!("INSERT INTO users(username, password_hash) VALUES ('{}', '{}') RETURNING id", username, password_hash);
+    println!(
+        "INSERT INTO users(username, password_hash) VALUES ('{}', '{}') RETURNING id",
+        username, password_hash
+    );
 }
